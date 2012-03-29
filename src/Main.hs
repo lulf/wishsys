@@ -3,7 +3,7 @@ main = quickHttpServe site
 
 site :: Snap ()
 site =
-    ifTop (writeBS mainPage) <|>
+    ifTop (writeBS (readFile "static/index.html")) <|>
     route [ ("insert", writeBS "Inserting wish")
           , ("echo/:echoparam", echoHandler)
           ] <|>

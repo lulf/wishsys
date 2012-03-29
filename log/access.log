@@ -1,0 +1,6 @@
+127.0.0.1 - - [29/Mar/2012:20:15:25 +0200] "GET / HTTP/1.1" 200 - - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
+127.0.0.1 - - [29/Mar/2012:20:15:25 +0200] "GET /favicon.ico HTTP/1.1" 404 - - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
+127.0.0.1 - - [29/Mar/2012:20:15:29 +0200] "GET /insert HTTP/1.1" 200 - - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
+127.0.0.1 - - [29/Mar/2012:20:15:29 +0200] "GET /favicon.ico HTTP/1.1" 404 - - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
+127.0.0.1 - - [29/Mar/2012:20:18:42 +0200] "GET / HTTP/1.1" 500 119 - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
+127.0.0.1 - - [29/Mar/2012:20:18:42 +0200] "GET /favicon.ico HTTP/1.1" 404 - - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"

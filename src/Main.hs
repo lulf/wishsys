@@ -36,6 +36,7 @@ makeLenses [''App]
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addRoutes [ ("", serveFile "static/index.html")
+              , ("wishlist", wishViewHandler)
               , ("insert", insertHandler)
               , ("admin", serveFile "static/admin.html") ]
     let sqli = connectSqlite3 "test/test.db"
@@ -55,14 +56,32 @@ insertHandler = do
                then (writeBS "must specify 'amount'")
                else (writeBS (B.concat ["What: '", (fromJust what), "', Amount: '", (fromJust amount), "'"]))
 
-data Wish = Wish String Integer deriving (Show)
+formatWishEntry :: Wish -> String
+formatWishEntry (Wish name amount) = "<td>" ++ name ++ "</td>" ++
+                                     "<td>" ++ (show amount) ++ "</td>"
+
+wishViewHandler :: Handler App App ()
+wishViewHandler = do
+    wishList <- getWishes -- [ (Wish "foo" 1), (Wish "bar" 2) ]
+    writeBS "<html><table>"
+    writeBS "<tr><th>Hva</th><th>Antall</th></tr>"
+    writeBS (fromString (concat (map formatWishEntry wishList)))
+    --writeBS (wishName (head wishList)) --(BS.append (fromString "<tr><td>") (wishName w) (fromString "</td></tr>"))) wishList
+    writeBS "</table>"
+    writeBS "</html>"
+    -- writeBS . BS.pack $ show wishList
+
+data Wish = Wish {
+    wishName   :: String,
+    wishAmount :: Integer
+}
 
 getWishes :: HasHdbc m c s => m [Wish]
 getWishes = do
     rows <- query "SELECT * FROM list" []
     return $ map toWish rows
     where toWish :: Row -> Wish
-          toWish rw = Wish (fromSql (rw ! "item")) (fromSql (rw ! "amount"))
+          toWish rw = Wish (fromSql (rw ! "what")) (fromSql (rw ! "amount"))
 
 
 instance HasHdbc (Handler App App) Connection IO where

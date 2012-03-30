@@ -176,3 +176,5 @@
 127.0.0.1 - - [30/Mar/2012:20:50:13 +0200] "GET /wishlist HTTP/1.1" 200 - "http://localhost:8000/insert" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
 127.0.0.1 - - [30/Mar/2012:20:54:31 +0200] "GET /admin HTTP/1.1" 304 - - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
 127.0.0.1 - - [30/Mar/2012:20:54:34 +0200] "POST /insert HTTP/1.1" 200 - "http://localhost:8000/admin" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
+127.0.0.1 - - [30/Mar/2012:21:04:11 +0200] "GET /admin HTTP/1.1" 304 - - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"
+127.0.0.1 - - [30/Mar/2012:21:04:13 +0200] "POST /insert HTTP/1.1" 200 - "http://localhost:8000/admin" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/17.0.963.79 Chrome/17.0.963.79 Safari/535.11"

@@ -38,6 +38,7 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addRoutes [ ("", serveFile "static/index.html")
               , ("wishlist", wishViewHandler)
               , ("insert", insertHandler)
+              , ("register", registerHandler)
               , ("admin", serveFile "static/admin.html") ]
     let sqli = connectSqlite3 "test/test.db"
     _dblens'  <- nestSnaplet "hdbc" dbLens $ hdbcInit sqli
@@ -56,18 +57,38 @@ insertHandler = do
                then (writeBS "must specify 'amount'")
                else (writeBS (B.concat ["What: '", (fromJust what), "', Amount: '", (fromJust amount), "'"]))
 
+registerHandler :: Handler App App ()
+registerHandler = do
+    wishid <- getParam "wishid"
+    amount <- getParam "amount"
+    if wishid == Nothing
+       then (writeBS "id not given, aborting")
+       else if amount == Nothing
+               then (writeBS "amount not specified")
+               else do registerPurchase (read (BS.unpack (fromJust wishid)) ::Integer)
+                                        (read (BS.unpack (fromJust amount)) ::Integer)
+
+registerPurchase :: Integer -> Integer -> Handler App App ()
+registerPurchase wishid amount = do
+    wish <- getWish wishid
+    let wamount = (wishAmount wish)
+    let bought = (wishBought wish)
+    let remaining = wamount - bought
+    if remaining - amount >= 0
+       then do
+            updateWish wishid (bought + amount)
+            writeBS (B.concat ["Har trukket ifra ", (fromString (show amount)), " stk. av type '", (fromString (wishName wish)), "'"])
+       else writeBS "Ikke nok ønsker igjen!"
+
 formatWishEntry :: Wish -> String
 formatWishEntry (Wish wishid name amount bought) =
         "<tr>" ++
         "<td>" ++ name ++ "</td>" ++
-        "<td>" ++ (show amount) ++ "</td>" ++
         "<td>" ++ (show remaining) ++ "</td>" ++
         "<td>" ++
-        "<form action=\"register\" method=\"post\">" ++
         "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
         "<input type=\"hidden\" name=\"wishid\" value=\"" ++ (show wishid) ++ "\" />" ++
         "<input type=\"submit\" value=\"Registrer\" />" ++
-        "</form>" ++
         "</td>" ++
         "</tr>"
     where remaining = amount - bought
@@ -77,10 +98,12 @@ wishViewHandler = do
     wishList <- getWishes
     writeBS "<html>"
     writeBS "<h1>Ønskeliste</h1>"
+    writeBS "<form action=\"register\" method=\"post\">"
     writeBS "<table border=\"1\">"
-    writeBS "<tr><th>Hva</th><th>Antall</th><th>Gjenstående</th><th>Registrer</th></tr>"
+    writeBS "<tr><th>Hva</th><th>Antall</th><th>Registrer</th></tr>"
     writeBS (fromString (concat (map formatWishEntry wishList)))
     writeBS "</table>"
+    writeBS "</form>"
     writeBS "</html>"
 
 data Wish = Wish {
@@ -97,6 +120,17 @@ getWishes = do
     where toWish :: Row -> Wish
           toWish rw = Wish (fromSql (rw ! "id")) (fromSql (rw ! "what")) (fromSql (rw ! "amount")) (fromSql (rw ! "bought"))
 
+getWish :: HasHdbc m c s => Integer -> m Wish
+getWish wishid = do
+    rows <- query "SELECT * FROM list WHERE id = ?" [toSql wishid]
+    return $ head (map toWish rows)
+    where toWish :: Row -> Wish
+          toWish rw = Wish (fromSql (rw ! "id")) (fromSql (rw ! "what")) (fromSql (rw ! "amount")) (fromSql (rw ! "bought"))
+
+updateWish :: HasHdbc m c s => Integer -> Integer -> m ()
+updateWish wishid bought = do
+    numchanged <- query' "UPDATE list SET bought = ? WHERE id = ?" [toSql bought, toSql wishid]
+    return ()
 
 instance HasHdbc (Handler App App) Connection IO where
     getHdbcState = with dbLens get

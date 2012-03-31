@@ -57,23 +57,37 @@ insertHandler = do
                else (writeBS (B.concat ["What: '", (fromJust what), "', Amount: '", (fromJust amount), "'"]))
 
 formatWishEntry :: Wish -> String
-formatWishEntry (Wish name amount) = "<td>" ++ name ++ "</td>" ++
-                                     "<td>" ++ (show amount) ++ "</td>"
+formatWishEntry (Wish wishid name amount bought) =
+        "<tr>" ++
+        "<td>" ++ name ++ "</td>" ++
+        "<td>" ++ (show amount) ++ "</td>" ++
+        "<td>" ++ (show remaining) ++ "</td>" ++
+        "<td>" ++
+        "<form action=\"register\" method=\"post\">" ++
+        "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
+        "<input type=\"hidden\" name=\"wishid\" value=\"" ++ (show wishid) ++ "\" />" ++
+        "<input type=\"submit\" value=\"Registrer\" />" ++
+        "</form>" ++
+        "</td>" ++
+        "</tr>"
+    where remaining = amount - bought
 
 wishViewHandler :: Handler App App ()
 wishViewHandler = do
-    wishList <- getWishes -- [ (Wish "foo" 1), (Wish "bar" 2) ]
-    writeBS "<html><table>"
-    writeBS "<tr><th>Hva</th><th>Antall</th></tr>"
+    wishList <- getWishes
+    writeBS "<html>"
+    writeBS "<h1>Ønskeliste</h1>"
+    writeBS "<table border=\"1\">"
+    writeBS "<tr><th>Hva</th><th>Antall</th><th>Gjenstående</th><th>Registrer</th></tr>"
     writeBS (fromString (concat (map formatWishEntry wishList)))
-    --writeBS (wishName (head wishList)) --(BS.append (fromString "<tr><td>") (wishName w) (fromString "</td></tr>"))) wishList
     writeBS "</table>"
     writeBS "</html>"
-    -- writeBS . BS.pack $ show wishList
 
 data Wish = Wish {
+    wishId     :: Integer,
     wishName   :: String,
-    wishAmount :: Integer
+    wishAmount :: Integer,
+    wishBought :: Integer
 }
 
 getWishes :: HasHdbc m c s => m [Wish]
@@ -81,7 +95,7 @@ getWishes = do
     rows <- query "SELECT * FROM list" []
     return $ map toWish rows
     where toWish :: Row -> Wish
-          toWish rw = Wish (fromSql (rw ! "what")) (fromSql (rw ! "amount"))
+          toWish rw = Wish (fromSql (rw ! "id")) (fromSql (rw ! "what")) (fromSql (rw ! "amount")) (fromSql (rw ! "bought"))
 
 
 instance HasHdbc (Handler App App) Connection IO where

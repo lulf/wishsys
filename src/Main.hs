@@ -55,7 +55,9 @@ insertHandler = do
        then (writeBS "must specify 'what'")
        else if amount == Nothing
                then (writeBS "must specify 'amount'")
-               else (writeBS (B.concat ["What: '", (fromJust what), "', Amount: '", (fromJust amount), "'"]))
+               else do
+                    insertWish (Wish 0 (BS.unpack (fromJust what)) (read (BS.unpack (fromJust amount)) ::Integer) 0)
+                    writeBS (B.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
 
 registerHandler :: Handler App App ()
 registerHandler = do
@@ -129,7 +131,13 @@ getWish wishid = do
 
 updateWish :: HasHdbc m c s => Integer -> Integer -> m ()
 updateWish wishid bought = do
-    numchanged <- query' "UPDATE list SET bought = ? WHERE id = ?" [toSql bought, toSql wishid]
+    query' "UPDATE list SET bought = ? WHERE id = ?" [toSql bought, toSql wishid]
+    return ()
+
+insertWish:: HasHdbc m c s => Wish -> m ()
+insertWish (Wish _ name amount _ ) = do
+    let sqlList = [toSql name, toSql amount]
+    query' "INSERT INTO list (what, amount, bought) VALUES(?, ?, 0)" sqlList
     return ()
 
 instance HasHdbc (Handler App App) Connection IO where

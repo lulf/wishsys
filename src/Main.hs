@@ -86,9 +86,11 @@ formatWishEntry (Wish wishid name amount bought) =
         "<td>" ++ name ++ "</td>" ++
         "<td>" ++ (show remaining) ++ "</td>" ++
         "<td>" ++
+        "<form action=\"register\" method=\"post\">" ++
         "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
         "<input type=\"hidden\" name=\"wishid\" value=\"" ++ (show wishid) ++ "\" />" ++
         "<input type=\"submit\" value=\"Registrer\" />" ++
+        "</form>" ++
         "</td>" ++
         "</tr>"
     where remaining = amount - bought
@@ -98,12 +100,10 @@ wishViewHandler = do
     wishList <- getWishes
     writeBS "<html>"
     writeBS "<h1>Ønskeliste</h1>"
-    writeBS "<form action=\"register\" method=\"post\">"
     writeBS "<table border=\"1\">"
     writeBS "<tr><th>Hva</th><th>Antall</th><th>Registrer</th></tr>"
     writeBS (fromString (concat (map formatWishEntry wishList)))
     writeBS "</table>"
-    writeBS "</form>"
     writeBS "</html>"
 
 data Wish = Wish {

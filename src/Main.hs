@@ -47,6 +47,15 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
 main :: IO ()
 main = serveSnaplet defaultConfig appInit
 
+-- Wish data type
+data Wish = Wish {
+    wishId     :: Integer,
+    wishName   :: String,
+    wishAmount :: Integer,
+    wishBought :: Integer
+}
+
+-- Insert handler deals with inserting new wishes into the database.
 insertHandler :: Handler App App ()
 insertHandler = do
     what <- getParam "what"
@@ -59,6 +68,7 @@ insertHandler = do
                     insertWish (Wish 0 (BS.unpack (fromJust what)) (read (BS.unpack (fromJust amount)) ::Integer) 0)
                     writeBS (B.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
 
+-- Register handler registers an update on a wish
 registerHandler :: Handler App App ()
 registerHandler = do
     wishid <- getParam "wishid"
@@ -70,6 +80,8 @@ registerHandler = do
                else do registerPurchase (read (BS.unpack (fromJust wishid)) ::Integer)
                                         (read (BS.unpack (fromJust amount)) ::Integer)
 
+-- Given a wish id and the amount of items, subtract this wish' remaining
+-- amount.
 registerPurchase :: Integer -> Integer -> Handler App App ()
 registerPurchase wishid amount = do
     wish <- getWish wishid
@@ -82,6 +94,19 @@ registerPurchase wishid amount = do
             writeBS (B.concat ["Har trukket ifra ", (fromString (show amount)), " stk. av type '", (fromString (wishName wish)), "'"])
        else writeBS "Ikke nok ønsker igjen!"
 
+-- Display all wishes and a form for registering purchases
+wishViewHandler :: Handler App App ()
+wishViewHandler = do
+    wishList <- getWishes
+    writeBS "<html>"
+    writeBS "<h1>Ønskeliste</h1>"
+    writeBS "<table border=\"1\">"
+    writeBS "<tr><th>Hva</th><th>Antall</th><th>Registrer</th></tr>"
+    writeBS (fromString (concat (map formatWishEntry wishList)))
+    writeBS "</table>"
+    writeBS "</html>"
+
+-- Helper method for formatting a wish entry in the wish view.
 formatWishEntry :: Wish -> String
 formatWishEntry (Wish wishid name amount bought) =
         "<tr>" ++
@@ -97,24 +122,12 @@ formatWishEntry (Wish wishid name amount bought) =
         "</tr>"
     where remaining = amount - bought
 
-wishViewHandler :: Handler App App ()
-wishViewHandler = do
-    wishList <- getWishes
-    writeBS "<html>"
-    writeBS "<h1>Ønskeliste</h1>"
-    writeBS "<table border=\"1\">"
-    writeBS "<tr><th>Hva</th><th>Antall</th><th>Registrer</th></tr>"
-    writeBS (fromString (concat (map formatWishEntry wishList)))
-    writeBS "</table>"
-    writeBS "</html>"
 
-data Wish = Wish {
-    wishId     :: Integer,
-    wishName   :: String,
-    wishAmount :: Integer,
-    wishBought :: Integer
-}
+------------------------------------------
+-- Functions for interacting with database
+------------------------------------------
 
+-- Get a list of all wishes
 getWishes :: HasHdbc m c s => m [Wish]
 getWishes = do
     rows <- query "SELECT * FROM list" []
@@ -122,6 +135,7 @@ getWishes = do
     where toWish :: Row -> Wish
           toWish rw = Wish (fromSql (rw ! "id")) (fromSql (rw ! "what")) (fromSql (rw ! "amount")) (fromSql (rw ! "bought"))
 
+-- Get a specific wish given an id
 getWish :: HasHdbc m c s => Integer -> m Wish
 getWish wishid = do
     rows <- query "SELECT * FROM list WHERE id = ?" [toSql wishid]
@@ -129,11 +143,14 @@ getWish wishid = do
     where toWish :: Row -> Wish
           toWish rw = Wish (fromSql (rw ! "id")) (fromSql (rw ! "what")) (fromSql (rw ! "amount")) (fromSql (rw ! "bought"))
 
+-- Update a wish (given its id) with a new value for the number of bought items
 updateWish :: HasHdbc m c s => Integer -> Integer -> m ()
 updateWish wishid bought = do
     query' "UPDATE list SET bought = ? WHERE id = ?" [toSql bought, toSql wishid]
     return ()
 
+-- Insert a new wish entity into the database. The id and bought parameters to
+-- the wish are ignored
 insertWish:: HasHdbc m c s => Wish -> m ()
 insertWish (Wish _ name amount _ ) = do
     let sqlList = [toSql name, toSql amount]

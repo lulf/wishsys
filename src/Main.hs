@@ -52,6 +52,7 @@ data Wish = Wish {
     wishId     :: Integer,
     wishName   :: String,
     wishImg    :: String,
+    wishStore  :: String,
     wishAmount :: Integer,
     wishBought :: Integer
 }
@@ -62,13 +63,15 @@ insertHandler = do
     what <- getParam "what"
     imgurl <- getParam "imgurl"
     amount <- getParam "amount"
-    if what == Nothing || imgurl == Nothing || amount == Nothing
+    store <- getParam "store"
+    if what == Nothing || imgurl == Nothing || amount == Nothing || store == Nothing
        then writeBS "All three parameters must be set!"
        else do
             let whatText = BS.unpack (fromJust what)
             let urlText = BS.unpack (fromJust imgurl)
+            let storeText = BS.unpack (fromJust store)
             let amountValue = read (BS.unpack (fromJust amount)) :: Integer
-            insertWish (Wish 0 whatText urlText amountValue 0)
+            insertWish (Wish 0 whatText urlText storeText amountValue 0)
             writeBS (B.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
 
 -- Register handler registers an update on a wish
@@ -104,17 +107,18 @@ wishViewHandler = do
     writeBS "<html>"
     writeBS "<h1>Ønskeliste</h1>"
     writeBS "<table border=\"1\">"
-    writeBS "<tr><th>Hva</th><th>Bilde</th><th>Antall</th><th>Registrer</th></tr>"
+    writeBS "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th><th>Antall</th><th>Registrer</th></tr>"
     writeBS (fromString (concat (map formatWishEntry wishList)))
     writeBS "</table>"
     writeBS "</html>"
 
 -- Helper method for formatting a wish entry in the wish view.
 formatWishEntry :: Wish -> String
-formatWishEntry (Wish wishid name url amount bought) =
+formatWishEntry (Wish wishid name url store amount bought) =
         "<tr>" ++
         "<td>" ++ name ++ "</td>" ++
         "<td><a href=\"" ++ url ++ "\"><img src=\"" ++ url ++ "\" width=\"100\" height=\"100\" /></a></td>" ++ 
+        "<td>" ++ store ++ "</td>" ++
         "<td>" ++ (show remaining) ++ "</td>" ++
         "<td>" ++
         "<form action=\"register\" method=\"post\">" ++
@@ -142,6 +146,7 @@ constructWish :: Row -> Wish
 constructWish row = Wish (fromSql (row ! "id"))
                          (fromSql (row ! "what"))
                          (fromSql (row ! "url"))
+                         (fromSql (row ! "store"))
                          (fromSql (row ! "amount"))
                          (fromSql (row ! "bought"))
 
@@ -160,9 +165,9 @@ updateWish wishid bought = do
 -- Insert a new wish entity into the database. The id and bought parameters to
 -- the wish are ignored
 insertWish:: HasHdbc m c s => Wish -> m ()
-insertWish (Wish _ name url amount _ ) = do
-    let sqlList = [toSql name, toSql url, toSql amount]
-    query' "INSERT INTO list (what, url, amount, bought) VALUES(?, ?, ?, 0)" sqlList
+insertWish (Wish _ name url store amount _ ) = do
+    let sqlList = [toSql name, toSql url, toSql store, toSql amount]
+    query' "INSERT INTO list (what, url, store, amount, bought) VALUES(?, ?, ?, ?, 0)" sqlList
     return ()
 
 instance HasHdbc (Handler App App) Connection IO where

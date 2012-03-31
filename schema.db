@@ -2,5 +2,6 @@ CREATE TABLE list (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 what TEXT,
 url TEXT,
+store TEXT,
 amount INTEGER,
 bought INTEGER);

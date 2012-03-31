@@ -51,6 +51,7 @@ main = serveSnaplet defaultConfig appInit
 data Wish = Wish {
     wishId     :: Integer,
     wishName   :: String,
+    wishImg    :: String,
     wishAmount :: Integer,
     wishBought :: Integer
 }
@@ -59,14 +60,16 @@ data Wish = Wish {
 insertHandler :: Handler App App ()
 insertHandler = do
     what <- getParam "what"
+    imgurl <- getParam "imgurl"
     amount <- getParam "amount"
-    if what == Nothing
-       then (writeBS "must specify 'what'")
-       else if amount == Nothing
-               then (writeBS "must specify 'amount'")
-               else do
-                    insertWish (Wish 0 (BS.unpack (fromJust what)) (read (BS.unpack (fromJust amount)) ::Integer) 0)
-                    writeBS (B.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
+    if what == Nothing || imgurl == Nothing || amount == Nothing
+       then writeBS "All three parameters must be set!"
+       else do
+            let whatText = BS.unpack (fromJust what)
+            let urlText = BS.unpack (fromJust imgurl)
+            let amountValue = read (BS.unpack (fromJust amount)) :: Integer
+            insertWish (Wish 0 whatText urlText amountValue 0)
+            writeBS (B.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
 
 -- Register handler registers an update on a wish
 registerHandler :: Handler App App ()
@@ -101,16 +104,17 @@ wishViewHandler = do
     writeBS "<html>"
     writeBS "<h1>Ønskeliste</h1>"
     writeBS "<table border=\"1\">"
-    writeBS "<tr><th>Hva</th><th>Antall</th><th>Registrer</th></tr>"
+    writeBS "<tr><th>Hva</th><th>Bilde</th><th>Antall</th><th>Registrer</th></tr>"
     writeBS (fromString (concat (map formatWishEntry wishList)))
     writeBS "</table>"
     writeBS "</html>"
 
 -- Helper method for formatting a wish entry in the wish view.
 formatWishEntry :: Wish -> String
-formatWishEntry (Wish wishid name amount bought) =
+formatWishEntry (Wish wishid name url amount bought) =
         "<tr>" ++
         "<td>" ++ name ++ "</td>" ++
+        "<td><a href=\"" ++ url ++ "\"><img src=\"" ++ url ++ "\" width=\"100\" height=\"100\" /></a></td>" ++ 
         "<td>" ++ (show remaining) ++ "</td>" ++
         "<td>" ++
         "<form action=\"register\" method=\"post\">" ++
@@ -131,17 +135,21 @@ formatWishEntry (Wish wishid name amount bought) =
 getWishes :: HasHdbc m c s => m [Wish]
 getWishes = do
     rows <- query "SELECT * FROM list" []
-    return $ map toWish rows
-    where toWish :: Row -> Wish
-          toWish rw = Wish (fromSql (rw ! "id")) (fromSql (rw ! "what")) (fromSql (rw ! "amount")) (fromSql (rw ! "bought"))
+    return $ map constructWish rows
+
+-- Constructs a wish from a database row
+constructWish :: Row -> Wish
+constructWish row = Wish (fromSql (row ! "id"))
+                         (fromSql (row ! "what"))
+                         (fromSql (row ! "url"))
+                         (fromSql (row ! "amount"))
+                         (fromSql (row ! "bought"))
 
 -- Get a specific wish given an id
 getWish :: HasHdbc m c s => Integer -> m Wish
 getWish wishid = do
     rows <- query "SELECT * FROM list WHERE id = ?" [toSql wishid]
-    return $ head (map toWish rows)
-    where toWish :: Row -> Wish
-          toWish rw = Wish (fromSql (rw ! "id")) (fromSql (rw ! "what")) (fromSql (rw ! "amount")) (fromSql (rw ! "bought"))
+    return $ head (map constructWish rows)
 
 -- Update a wish (given its id) with a new value for the number of bought items
 updateWish :: HasHdbc m c s => Integer -> Integer -> m ()
@@ -152,9 +160,9 @@ updateWish wishid bought = do
 -- Insert a new wish entity into the database. The id and bought parameters to
 -- the wish are ignored
 insertWish:: HasHdbc m c s => Wish -> m ()
-insertWish (Wish _ name amount _ ) = do
-    let sqlList = [toSql name, toSql amount]
-    query' "INSERT INTO list (what, amount, bought) VALUES(?, ?, 0)" sqlList
+insertWish (Wish _ name url amount _ ) = do
+    let sqlList = [toSql name, toSql url, toSql amount]
+    query' "INSERT INTO list (what, url, amount, bought) VALUES(?, ?, ?, 0)" sqlList
     return ()
 
 instance HasHdbc (Handler App App) Connection IO where

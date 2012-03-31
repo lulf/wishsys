@@ -1,7 +1,6 @@
 CREATE TABLE list (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 what TEXT,
+url TEXT,
 amount INTEGER,
 bought INTEGER);
-
-INSERT INTO list (what, amount, bought) VALUES("Her har du et fint ønske", 10, 0);

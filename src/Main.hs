@@ -38,13 +38,13 @@ makeLenses [''App]
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addRoutes [ ("", serveFile "static/index.html")
-              , ("wishlist", doAsUser "bryllup" wishViewHandler)
-              , ("insert", doAsUser "admin" insertHandler)
+              , ("wishlist", requireUser "bryllup" wishViewHandler)
+              , ("insert", requireUser "admin" insertHandler)
               , ("login", with authLens $ loginHandler)
               , ("logout", with authLens $ logoutHandler)
               , ("loginpage", serveFile "static/login.html")
-              , ("register", doAsUser "bryllup" registerHandler)
-              , ("admin", doAsUser "admin" (serveFile "static/admin.html")) ]
+              , ("register", requireUser "bryllup" registerHandler)
+              , ("admin", requireUser "admin" (serveFile "static/admin.html")) ]
               
     _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing
     _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens "users.json"
@@ -62,8 +62,8 @@ main = serveSnaplet defaultConfig appInit
 --------------------
 
 -- Verifies user credentials and username before running handler
-doAsUser :: String -> (Handler App App ()) -> Handler App App ()
-doAsUser user fn = do
+requireUser :: String -> (Handler App App ()) -> Handler App App ()
+requireUser user fn = do
     mu <- with authLens currentUser
     case mu of
       Just u -> do if (userLogin u) == (Data.Text.pack user)

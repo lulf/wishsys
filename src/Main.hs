@@ -40,8 +40,8 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addRoutes [ ("", serveFile "static/index.html")
               , ("wishlist", handleAsUser "bryllup" wishViewHandler)
               , ("insert", handleAsUser "admin" insertHandler)
-              , ("login", with authLens $ loginHandler)
-              , ("logout", with authLens $ logoutHandler)
+              , ("login", loginHandler)
+              , ("logout", logoutHandler)
               , ("loginpage", serveFile "static/login.html")
               , ("register", handleAsUser "bryllup" registerHandler)
               , ("admin", handleAsUser "admin" (serveFile "static/admin.html")) ]
@@ -61,6 +61,9 @@ main = serveSnaplet defaultConfig appInit
 -- Authentication --
 --------------------
 
+redirectLogin :: MonadSnap m => m a
+redirectLogin = redirect' "/loginpage" 303
+
 -- Verifies user credentials and username before running handler
 handleAsUser :: String -> (Handler App App ()) -> Handler App App ()
 handleAsUser user fn = do
@@ -68,23 +71,31 @@ handleAsUser user fn = do
     case mu of
       Just u -> do if (userLogin u) == (Data.Text.pack user)
                       then fn
-                      else redirect' "/loginpage" 303
-      Nothing -> redirect' "/loginpage" 303
+                      else redirectLogin
+      Nothing -> redirectLogin
+
+-- Redirect to a value if set
+redirectTo :: MonadSnap m => Maybe a -> m b
+redirectTo dest = do
+    case dest of
+              Nothing -> redirect' "/" 303
+              Just d -> redirect' "/bar" 303
 
 -- Performs the actual login.
-loginHandler :: Handler App (AuthManager App) ()
-loginHandler = do
+loginHandler :: Handler App App ()
+loginHandler = with authLens $ do
     loginUser "login" "password" (Just "remember") onFailure onSuccess
-    where onFailure _ = redirect' "/loginpage" 303
+    where onFailure _ = redirectLogin
           onSuccess = do
                       mu <- currentUser
                       case mu of
-                              Just _ -> redirect' "/" 303
-                              Nothing -> redirect' "/loginpage" 303 -- Why does this happen?
+                              Just _ -> do ref <- getParam "referrer"
+                                           redirectTo ref
+                              Nothing -> redirectLogin -- Why does this happen?
 
-logoutHandler :: Handler App (AuthManager App) ()
+logoutHandler :: Handler App App ()
 logoutHandler = do
-  logout
+  with authLens logout
   redirect' "/" 303
 
 -- Wish data type

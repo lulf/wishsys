@@ -1,0 +1,2 @@
+* Run cabal install to create the snaplet, and just run with 'wishsys <portnumber>'
+* To populate with users, use snap-auth-cli (https://github.com/dzhus/snap-auth-cli/)

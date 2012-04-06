@@ -19,6 +19,7 @@ import            Snap.Core
 import            Snap.Snaplet
 import            Snap.Snaplet.Auth
 import            Snap.Snaplet.Auth.Backends.Hdbc
+import            Snap.Snaplet.Auth.Backends.JsonFile
 import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Session
 import            Snap.Snaplet.Session.Backends.CookieSession
@@ -46,9 +47,11 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
               , ("admin", doAsUser "admin" (serveFile "static/admin.html")) ]
               
     _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing
+    _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens "users.json"
     let sqli = connectSqlite3 "config/wishsys.db"
     _dblens'  <- nestSnaplet "hdbc" dbLens $ hdbcInit sqli
-    _authlens' <- nestSnaplet "auth" authLens $ initHdbcAuthManager defAuthSettings sessLens sqli defAuthTable defQueries
+    -- Unable to make hdbc work yet
+    -- _authlens' <- nestSnaplet "auth" authLens $ initHdbcAuthManager defAuthSettings sessLens sqli defAuthTable defQueries
     return $ App _authlens' _sesslens' _dblens'
 
 main :: IO ()
@@ -71,13 +74,13 @@ doAsUser user fn = do
 -- Performs the actual login.
 loginHandler :: Handler App (AuthManager App) ()
 loginHandler = do
-  loginUser "login" "password" (Just "remember") onFailure onSuccess
-  where onFailure _ = writeBS "Login and password don't match."
-        onSuccess = do
-                    mu <- currentUser
-                    case mu of
-                            Just _ -> redirect' "/" 303
-                            Nothing -> writeBS "Can't happen"
+    loginUser "login" "password" (Just "remember") onFailure onSuccess
+    where onFailure _ = writeBS "Login and password don't match."
+          onSuccess = do
+                      mu <- currentUser
+                      case mu of
+                              Just _ -> redirect' "/" 303
+                              Nothing -> writeBS "Can't happen"
 
 logoutHandler :: Handler App (AuthManager App) ()
 logoutHandler = do

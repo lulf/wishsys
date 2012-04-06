@@ -12,6 +12,7 @@ import            Data.Lens.Template
 import            Data.Map ((!))
 import            Data.Maybe
 import            Data.String
+import qualified  Data.Text
 import            Database.HDBC.Sqlite3
 import            Snap
 import            Snap.Core
@@ -38,8 +39,10 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addRoutes [ ("", serveFile "static/index.html")
               , ("wishlist", wishViewHandler)
               , ("insert", insertHandler)
+              , ("login", with authLens $ loginHandler)
+              , ("logout", with authLens $ logoutHandler)
               , ("register", registerHandler)
-              , ("admin", serveFile "static/admin.html") ]
+              , ("admin", doAsUser "admin" (serveFile "static/admin.html")) ]
               
     _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing
     let sqli = connectSqlite3 "config/wishsys.db"
@@ -49,6 +52,36 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
 
 main :: IO ()
 main = serveSnaplet defaultConfig appInit
+
+--------------------
+-- Authentication --
+--------------------
+
+-- Verifies user credentials and username before running handler
+doAsUser :: String -> (Handler App App ()) -> Handler App App ()
+doAsUser user fn = do
+    mu <- with authLens currentUser
+    case mu of
+      Just u -> do if (userLogin u) == (Data.Text.pack user)
+                      then fn
+                      else redirect' "/loginpage" 303
+      Nothing -> redirect' "/loginpage" 303
+
+-- Performs the actual login.
+loginHandler :: Handler App (AuthManager App) ()
+loginHandler = do
+  loginUser "login" "password" (Just "remember") onFailure onSuccess
+  where onFailure _ = writeBS "Login and password don't match."
+        onSuccess = do
+                    mu <- currentUser
+                    case mu of
+                            Just _ -> redirect' "/" 303
+                            Nothing -> writeBS "Can't happen"
+
+logoutHandler :: Handler App (AuthManager App) ()
+logoutHandler = do
+  logout
+  redirect' "/" 303
 
 -- Wish data type
 data Wish = Wish {

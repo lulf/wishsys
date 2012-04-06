@@ -38,13 +38,13 @@ makeLenses [''App]
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addRoutes [ ("", serveFile "static/index.html")
-              , ("wishlist", requireUser "bryllup" wishViewHandler)
-              , ("insert", requireUser "admin" insertHandler)
+              , ("wishlist", handleAsUser "bryllup" wishViewHandler)
+              , ("insert", handleAsUser "admin" insertHandler)
               , ("login", with authLens $ loginHandler)
               , ("logout", with authLens $ logoutHandler)
               , ("loginpage", serveFile "static/login.html")
-              , ("register", requireUser "bryllup" registerHandler)
-              , ("admin", requireUser "admin" (serveFile "static/admin.html")) ]
+              , ("register", handleAsUser "bryllup" registerHandler)
+              , ("admin", handleAsUser "admin" (serveFile "static/admin.html")) ]
               
     _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing
     _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens "users.json"
@@ -62,8 +62,8 @@ main = serveSnaplet defaultConfig appInit
 --------------------
 
 -- Verifies user credentials and username before running handler
-requireUser :: String -> (Handler App App ()) -> Handler App App ()
-requireUser user fn = do
+handleAsUser :: String -> (Handler App App ()) -> Handler App App ()
+handleAsUser user fn = do
     mu <- with authLens currentUser
     case mu of
       Just u -> do if (userLogin u) == (Data.Text.pack user)
@@ -75,12 +75,12 @@ requireUser user fn = do
 loginHandler :: Handler App (AuthManager App) ()
 loginHandler = do
     loginUser "login" "password" (Just "remember") onFailure onSuccess
-    where onFailure _ = writeBS "Login and password don't match."
+    where onFailure _ = redirect' "/loginpage" 303
           onSuccess = do
                       mu <- currentUser
                       case mu of
                               Just _ -> redirect' "/" 303
-                              Nothing -> writeBS "Can't happen"
+                              Nothing -> redirect' "/loginpage" 303 -- Why does this happen?
 
 logoutHandler :: Handler App (AuthManager App) ()
 logoutHandler = do

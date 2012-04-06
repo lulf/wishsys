@@ -26,9 +26,9 @@ import            Data.Maybe
 import qualified  Data.ByteString as B
 
 data App = App
-   { --_authLens :: Snaplet (AuthManager App)
---   , _sessLens :: Snaplet SessionManager
-     _dbLens   :: Snaplet (HdbcSnaplet Connection IO)
+   { _authLens :: Snaplet (AuthManager App)
+   , _sessLens :: Snaplet SessionManager
+   , _dbLens   :: Snaplet (HdbcSnaplet Connection IO)
    }
 
 makeLenses [''App]
@@ -40,9 +40,12 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
               , ("insert", insertHandler)
               , ("register", registerHandler)
               , ("admin", serveFile "static/admin.html") ]
-    let sqli = connectSqlite3 "test/test.db"
+              
+    _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing
+    let sqli = connectSqlite3 "config/wishsys.db"
     _dblens'  <- nestSnaplet "hdbc" dbLens $ hdbcInit sqli
-    return $ App _dblens'
+    _authlens' <- nestSnaplet "auth" authLens $ initHdbcAuthManager defAuthSettings sessLens sqli defAuthTable defQueries
+    return $ App _authlens' _sesslens' _dblens'
 
 main :: IO ()
 main = serveSnaplet defaultConfig appInit

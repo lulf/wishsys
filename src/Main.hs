@@ -37,11 +37,12 @@ makeLenses [''App]
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addRoutes [ ("", serveFile "static/index.html")
-              , ("wishlist", wishViewHandler)
-              , ("insert", insertHandler)
+              , ("wishlist", doAsUser "bryllup" wishViewHandler)
+              , ("insert", doAsUser "admin" insertHandler)
               , ("login", with authLens $ loginHandler)
               , ("logout", with authLens $ logoutHandler)
-              , ("register", registerHandler)
+              , ("loginpage", serveFile "static/login.html")
+              , ("register", doAsUser "bryllup" registerHandler)
               , ("admin", doAsUser "admin" (serveFile "static/admin.html")) ]
               
     _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing

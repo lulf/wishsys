@@ -201,7 +201,7 @@ insertHandler = do
                           let storeText = BS.unpack store
                           let amountValue = read (BS.unpack amount) :: Integer
                           insertWish (Wish 0 whatText urlText storeText amountValue 0)
-                          -- writeBS (BS.concat ["Inserted: '", what, "'. Amount: '", amount, "'"])
+                          render $ "La inn " ++ (show amountValue) ++ " stk. av '" ++ whatText ++ "'"
          _            ->  return ()
 
 

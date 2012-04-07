@@ -42,7 +42,7 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
               , ("insert", handleAsUser "admin" insertHandler)
               , ("login", loginHandler)
               , ("logout", logoutHandler)
-              , ("loginpage", serveFile "static/login.html")
+              , ("loginpage/:ref", loginPageHandler)
               , ("register", handleAsUser "bryllup" registerHandler)
               , ("admin", handleAsUser "admin" (serveFile "static/admin.html")) ]
               
@@ -62,7 +62,32 @@ main = serveSnaplet defaultConfig appInit
 --------------------
 
 redirectLogin :: MonadSnap m => m a
-redirectLogin = redirect' "/loginpage" 303
+redirectLogin = do
+    req <- getRequest
+    let uri = rqURI req
+    redirect $ BS.concat ["/loginpage", uri]
+
+-- Creates the login page
+createLoginPage :: String -> String
+createLoginPage referrer = "<html>" ++
+                           "<body>" ++
+                           "<h1>Du må logge inn for å få tilgang til denne siden</h1>" ++
+                           "<form action=\"/login\" method=\"post\">" ++
+                           "<input type=\"text\" size=\"10\" name=\"login\" value=\"\" />" ++
+                           "<input type=\"password\" size=\"20\" name=\"password\" value=\"\" />" ++
+                           "<input type=\"hidden\" name=\"referrer\" value=\"" ++ referrer ++ "\" />" ++
+                           "<input type=\"submit\" value=\"login\" />" ++
+                           "</form>" ++
+                           "</body>" ++
+                           "</html>"
+
+-- Displays the login page, and preserve the referrer header
+loginPageHandler :: Handler App App ()
+loginPageHandler = do
+    ref <- getParam "ref"
+    case ref of
+             Nothing -> writeBS (BS.pack (createLoginPage ""))
+             Just val  -> writeBS (BS.pack (createLoginPage (BS.unpack val)))
 
 -- Verifies user credentials and username before running handler
 handleAsUser :: String -> (Handler App App ()) -> Handler App App ()
@@ -75,28 +100,28 @@ handleAsUser user fn = do
       Nothing -> redirectLogin
 
 -- Redirect to a value if set
-redirectTo :: MonadSnap m => Maybe a -> m b
+redirectTo :: MonadSnap m => Maybe ByteString -> m b
 redirectTo dest = do
     case dest of
-              Nothing -> redirect' "/" 303
-              Just d -> redirect' "/bar" 303
+              Nothing -> redirect "/"
+              Just _ -> redirect (fromJust dest)
 
 -- Performs the actual login.
 loginHandler :: Handler App App ()
 loginHandler = with authLens $ do
     loginUser "login" "password" (Just "remember") onFailure onSuccess
-    where onFailure _ = redirectLogin
+    where onFailure _ = do redirectLogin
           onSuccess = do
                       mu <- currentUser
                       case mu of
                               Just _ -> do ref <- getParam "referrer"
                                            redirectTo ref
-                              Nothing -> redirectLogin -- Why does this happen?
+                              Nothing -> do redirectLogin -- Why does this happen?
 
 logoutHandler :: Handler App App ()
 logoutHandler = do
   with authLens logout
-  redirect' "/" 303
+  redirect "/"
 
 -- Wish data type
 data Wish = Wish {
@@ -161,6 +186,7 @@ wishViewHandler = do
     writeBS "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th><th>Antall</th><th>Registrer</th></tr>"
     writeBS (fromString (concat (map formatWishEntry wishList)))
     writeBS "</table>"
+    writeBS "<a href=\"/logout\">Logg ut</a>"
     writeBS "</html>"
 
 -- Helper method for formatting a wish entry in the wish view.

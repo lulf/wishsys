@@ -70,7 +70,7 @@ addAuthRoutes routeList = do
     
 -- FIXME: Support more than one user
 createAuthRoute :: (ByteString, Handler App App (), [String]) -> (ByteString, Handler App App ())
-createAuthRoute (routePath, handler, (user:users)) = (routePath, handleAsUser user handler)
+createAuthRoute (routePath, handler, (user:_)) = (routePath, handleAsUser user handler)
 createAuthRoute (routePath, handler, []) = (routePath, handler)
 
 redirectLogin :: MonadSnap m => m a
@@ -211,7 +211,7 @@ wishViewHandler :: Handler App App ()
 wishViewHandler = do
     wishidParam <- getParam "wishid"
     amountParam <- getParam "amount"
-    render $ pageHeader "Registre kjøpt ønske"
+    render $ pageHeader "Registrere kjøpt ønske"
     case (wishidParam, amountParam) of
          (Just wishid, Just amount) -> do registerPurchase (read (BS.unpack wishid) ::Integer)
                                                            (read (BS.unpack amount) ::Integer)
@@ -226,7 +226,7 @@ registerPurchase wishid amount = do
     wish <- getWish wishid
     let bought = (wishBought wish)
     updateWish wishid (bought + amount)
-            -- writeBS (BS.concat ["Har trukket ifra ", (fromString (show amount)), " stk. av type '", (fromString (wishName wish)), "'"])
+    render $ concat ["<p>Registrerte ", show amount, " stk. av '", wishName wish, "'</p>"]
 
 -- Display all wishes and a form for registering purchases
 printWishList :: Bool -> Handler App App ()

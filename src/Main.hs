@@ -31,10 +31,8 @@ makeLenses [''App]
 
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
-    addRoutes [ ("wishlist", handleAsUser "bryllup" wishViewHandler)
-              , ("insert", handleAsUser "admin" insertHandler)
-              , ("register", handleAsUser "bryllup" registerHandler)
-              , ("admin", handleAsUser "admin" (serveFile "static/admin.html")) ]
+    addAuthRoutes [ ("wishlist", wishViewHandler, ["bryllup"])
+                  , ("admin", adminHandler, ["admin"]) ]
     addRoutes [ ("", serveFile "static/index.html")
               , ("login/:ref", loginHandler)
               , ("login", loginHandler)
@@ -54,6 +52,17 @@ main = serveSnaplet defaultConfig appInit
 --------------------
 -- Authentication --
 --------------------
+
+-- Add routes that are authenticated by a user
+addAuthRoutes :: [(ByteString, Handler App App (), [String])] -> Initializer App App () 
+addAuthRoutes routeList = do
+    let authRouteList = map createAuthRoute routeList
+    addRoutes authRouteList
+    
+-- FIXME: Support more than one user
+createAuthRoute :: (ByteString, Handler App App (), [String]) -> (ByteString, Handler App App ())
+createAuthRoute (routePath, handler, (user:users)) = (routePath, handleAsUser user handler)
+createAuthRoute (routePath, handler, []) = (routePath, handler)
 
 redirectLogin :: MonadSnap m => m a
 redirectLogin = do
@@ -128,36 +137,60 @@ data Wish = Wish {
     wishBought :: Integer
 }
 
+adminHandler :: Handler App App ()
+adminHandler = do
+
+    insertHandler
+    writeBS (BS.pack createInsertForm)
+
+createInsertForm :: String
+createInsertForm =
+    "<html>" ++
+    "<body>" ++
+    "<h1>Sett inn i ønskeliste</h1>" ++
+    "<form action=\"insert\" method=\"post\">" ++
+    "<input type=\"text\" size=\"200\" name=\"what\" value=\"Skriv inn ønske\" />" ++
+    "<input type=\"text\" size=\"200\" name=\"imgurl\" value=\"URL til bilde\" />" ++
+    "<input type=\"text\" size=\"200\" name=\"store\" value=\"Navn på butikk + evt. url\" />" ++
+    "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
+    "<input type=\"submit\" value=\"Registrer\" />" ++
+    "</form>" ++
+    "<a href=\"/logout\">Logg ut</a>" ++
+    "</body>" ++
+    "</html>"
+
 -- Insert handler deals with inserting new wishes into the database.
 insertHandler :: Handler App App ()
 insertHandler = do
-    what <- getParam "what"
-    imgurl <- getParam "imgurl"
-    amount <- getParam "amount"
-    store <- getParam "store"
-    if what == Nothing || imgurl == Nothing || amount == Nothing || store == Nothing
-       then writeBS "All three parameters must be set!"
-       else do
-            let whatText = BS.unpack (fromJust what)
-            let urlText = BS.unpack (fromJust imgurl)
-            let storeText = BS.unpack (fromJust store)
-            let amountValue = read (BS.unpack (fromJust amount)) :: Integer
-            insertWish (Wish 0 whatText urlText storeText amountValue 0)
-            writeBS (BS.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
-            redirect "/admin"
+    whatParam <- getParam "what"
+    imgurlParam <- getParam "imgurl"
+    amountParam <- getParam "amount"
+    storeParam <- getParam "store"
+    case (whatParam, imgurlParam, amountParam, storeParam) of
+         (Just what,
+          Just imgurl,
+          Just amount,
+          Just store) ->  do
+                          let whatText = BS.unpack what
+                          let urlText = BS.unpack imgurl
+                          let storeText = BS.unpack store
+                          let amountValue = read (BS.unpack amount) :: Integer
+                          insertWish (Wish 0 whatText urlText storeText amountValue 0)
+                          writeBS (BS.concat ["Inserted: '", what, "'. Amount: '", amount, "'"])
+         _            ->  return ()
 
--- Register handler registers an update on a wish
-registerHandler :: Handler App App ()
-registerHandler = do
-    wishid <- getParam "wishid"
-    amount <- getParam "amount"
-    if wishid == Nothing
-       then (writeBS "id not given, aborting")
-       else if amount == Nothing
-               then (writeBS "amount not specified")
-               else do registerPurchase (read (BS.unpack (fromJust wishid)) ::Integer)
-                                        (read (BS.unpack (fromJust amount)) ::Integer)
-                       redirect "/wishlist"
+
+-- Handler for the wishlist view. Registers any purchases and displays wish
+-- list.
+wishViewHandler :: Handler App App ()
+wishViewHandler = do
+    wishidParam <- getParam "wishid"
+    amountParam <- getParam "amount"
+    case (wishidParam, amountParam) of
+         (Just wishid, Just amount) -> do registerPurchase (read (BS.unpack wishid) ::Integer)
+                                                           (read (BS.unpack amount) ::Integer)
+                                          printWishList
+         _                          -> do printWishList
 
 -- Given a wish id and the amount of items, subtract this wish' remaining
 -- amount.
@@ -174,17 +207,22 @@ registerPurchase wishid amount = do
        else writeBS "Ikke nok ønsker igjen!"
 
 -- Display all wishes and a form for registering purchases
-wishViewHandler :: Handler App App ()
-wishViewHandler = do
+printWishList :: Handler App App ()
+printWishList = do
     wishList <- getWishes
-    writeBS "<html>"
-    writeBS "<h1>Ønskeliste</h1>"
-    writeBS "<table border=\"1\">"
-    writeBS "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th><th>Antall</th><th>Registrer</th></tr>"
-    writeBS (fromString (concat (map formatWishEntry wishList)))
-    writeBS "</table>"
-    writeBS "<a href=\"/logout\">Logg ut</a>"
-    writeBS "</html>"
+    writeBS $ BS.pack (formatWishList wishList)
+
+formatWishList :: [Wish] -> String
+formatWishList wishList =
+        "<html>" ++ 
+        "<h1>Ønskeliste</h1>" ++
+        "<table border=\"1\">" ++
+        "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th><th>Antall</th><th>Registrer</th></tr>" ++
+        wishes ++
+        "</table>" ++
+        "<a href=\"/logout\">Logg ut</a>" ++
+        "</html>"
+    where wishes = concat (map formatWishEntry wishList)
 
 -- Helper method for formatting a wish entry in the wish view.
 formatWishEntry :: Wish -> String
@@ -195,7 +233,7 @@ formatWishEntry (Wish wishid name url store amount bought) =
         "<td>" ++ store ++ "</td>" ++
         "<td>" ++ (show remaining) ++ "</td>" ++
         "<td>" ++
-        "<form action=\"register\" method=\"post\">" ++
+        "<form action=\"/wishlist\" method=\"post\">" ++
         "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
         "<input type=\"hidden\" name=\"wishid\" value=\"" ++ (show wishid) ++ "\" />" ++
         "<input type=\"submit\" value=\"Registrer\" />" ++
@@ -203,7 +241,6 @@ formatWishEntry (Wish wishid name url store amount bought) =
         "</td>" ++
         "</tr>"
     where remaining = amount - bought
-
 
 ------------------------------------------
 -- Functions for interacting with database

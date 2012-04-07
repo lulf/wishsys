@@ -4,10 +4,10 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Main where
 
-import            Control.Monad
+-- import            Control.Monad
 import            Control.Monad.State
 import            Data.ByteString.Char8 (ByteString)
-import qualified  Data.ByteString.Char8 as BS
+import qualified  Data.ByteString.Char8 as BS (concat, pack, unpack)
 import            Data.Lens.Template
 import            Data.Map ((!))
 import            Data.Maybe
@@ -15,17 +15,14 @@ import            Data.String
 import qualified  Data.Text
 import            Database.HDBC.Sqlite3
 import            Snap
-import            Snap.Core
-import            Snap.Snaplet
+-- import            Snap.Core
+-- import            Snap.Snaplet
 import            Snap.Snaplet.Auth
-import            Snap.Snaplet.Auth.Backends.Hdbc
 import            Snap.Snaplet.Auth.Backends.JsonFile
 import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Session
 import            Snap.Snaplet.Session.Backends.CookieSession
 import            Snap.Util.FileServe
-import            Data.Maybe
-import qualified  Data.ByteString as B
 
 data App = App
    { _authLens :: Snaplet (AuthManager App)
@@ -148,7 +145,7 @@ insertHandler = do
             let storeText = BS.unpack (fromJust store)
             let amountValue = read (BS.unpack (fromJust amount)) :: Integer
             insertWish (Wish 0 whatText urlText storeText amountValue 0)
-            writeBS (B.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
+            writeBS (BS.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
 
 -- Register handler registers an update on a wish
 registerHandler :: Handler App App ()
@@ -173,7 +170,7 @@ registerPurchase wishid amount = do
     if remaining - amount >= 0
        then do
             updateWish wishid (bought + amount)
-            writeBS (B.concat ["Har trukket ifra ", (fromString (show amount)), " stk. av type '", (fromString (wishName wish)), "'"])
+            writeBS (BS.concat ["Har trukket ifra ", (fromString (show amount)), " stk. av type '", (fromString (wishName wish)), "'"])
        else writeBS "Ikke nok ønsker igjen!"
 
 -- Display all wishes and a form for registering purchases

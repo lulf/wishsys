@@ -43,7 +43,7 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addAuthRoutes [ ("wishlist", wishViewHandler, guestUsers)
                   , ("admin", adminHandler, adminUsers) ]
     addRoutes [ ("", serveFile "static/index.html")
-              , ("login/:ref", loginHandler)
+              , ("login/:referrer", loginHandler)
               , ("login", loginHandler)
               , ("logout", logoutHandler) ]
               
@@ -84,10 +84,9 @@ createLoginPage :: String -> String
 createLoginPage referrer = "<html>" ++
                            "<body>" ++
                            "<h1>Du må logge inn for å få tilgang til denne siden</h1>" ++
-                           "<form action=\"/login\" method=\"post\">" ++
+                           "<form action=\"/login/" ++ referrer ++ "\" method=\"post\">" ++
                            "<input type=\"text\" size=\"10\" name=\"login\" value=\"\" />" ++
                            "<input type=\"password\" size=\"20\" name=\"password\" value=\"\" />" ++
-                           "<input type=\"hidden\" name=\"referrer\" value=\"" ++ referrer ++ "\" />" ++
                            "<input type=\"submit\" value=\"login\" />" ++
                            "</form>" ++
                            "</body>" ++
@@ -96,7 +95,7 @@ createLoginPage referrer = "<html>" ++
 -- Displays the login page, and preserve the referrer header
 loginForm :: Handler App (AuthManager b) ()
 loginForm = do
-    ref <- getParam "ref"
+    ref <- getParam "referrer"
     case ref of
              Nothing -> writeBS (BS.pack (createLoginPage ""))
              Just val  -> writeBS (BS.pack (createLoginPage (BS.unpack val)))
@@ -107,12 +106,12 @@ loginHandler :: Handler App App ()
 loginHandler = with authLens $ do
     loginUser "login" "password" (Just "remember") onFailure onSuccess
     where onFailure _ = do loginForm
-          onSuccess = do
-                      mu <- currentUser
-                      case mu of
-                              Just _ -> do ref <- getParam "referrer"
-                                           redirectTo ref
-                              Nothing -> do loginForm -- Why does this happen?
+          onSuccess   = do
+                        mu <- currentUser
+                        case mu of
+                                Just _ -> do ref <- getParam "referrer"
+                                             redirectTo ref
+                                Nothing -> do loginForm -- Why does this happen?
 
 -- Verifies user credentials and username before running handler
 handleAsUser :: String -> (Handler App App ()) -> Handler App App ()
@@ -149,6 +148,10 @@ data Wish = Wish {
 pageHeader :: String -> String
 pageHeader header =
     "<html>" ++
+    "<head>" ++
+    "<title>Ønskesys</title>" ++
+    "<link rel=\"stylesheet\" href=\"style.css\">" ++
+    "</head>" ++
     "<body>" ++
     "<h1>" ++ header ++ "</h1>"
 

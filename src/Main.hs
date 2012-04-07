@@ -43,6 +43,7 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addAuthRoutes [ ("wishlist", wishViewHandler, guestUsers)
                   , ("admin", adminHandler, adminUsers) ]
     addRoutes [ ("", serveFile "static/index.html")
+              , ("public/stylesheets", serveDirectory "public/stylesheets")
               , ("login/:ref", loginHandler)
               , ("login", loginHandler)
               , ("logout", logoutHandler) ]
@@ -151,7 +152,7 @@ pageHeader header =
     "<html>" ++
     "<head>" ++
     "<title>Ønskesys</title>" ++
-    "<link rel=\"stylesheet\" href=\"/style.css\" />" ++
+    "<link rel=\"stylesheet\" href=\"public/stylesheets/style.css\" type=\"text/css\" />" ++
     "</head>" ++
     "<body>" ++
     "<h1>" ++ header ++ "</h1>"

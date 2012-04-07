@@ -111,7 +111,7 @@ redirectTo :: MonadSnap m => Maybe ByteString -> m b
 redirectTo dest = do
     case dest of
               Nothing -> redirect "/"
-              Just _ -> redirect (fromJust dest)
+              Just uri -> redirect uri
 
 logoutHandler :: Handler App App ()
 logoutHandler = do

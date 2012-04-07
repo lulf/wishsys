@@ -146,6 +146,7 @@ insertHandler = do
             let amountValue = read (BS.unpack (fromJust amount)) :: Integer
             insertWish (Wish 0 whatText urlText storeText amountValue 0)
             writeBS (BS.concat ["Inserted: '", (fromJust what), "'. Amount: '", (fromJust amount), "'"])
+            redirect "/admin"
 
 -- Register handler registers an update on a wish
 registerHandler :: Handler App App ()
@@ -158,6 +159,7 @@ registerHandler = do
                then (writeBS "amount not specified")
                else do registerPurchase (read (BS.unpack (fromJust wishid)) ::Integer)
                                         (read (BS.unpack (fromJust amount)) ::Integer)
+                       redirect "/wishlist"
 
 -- Given a wish id and the amount of items, subtract this wish' remaining
 -- amount.

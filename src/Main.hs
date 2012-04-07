@@ -4,7 +4,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Main where
 
--- import            Control.Monad
 import            Control.Monad.State
 import            Data.ByteString.Char8 (ByteString)
 import qualified  Data.ByteString.Char8 as BS (concat, pack, unpack)
@@ -15,8 +14,6 @@ import            Data.String
 import qualified  Data.Text
 import            Database.HDBC.Sqlite3
 import            Snap
--- import            Snap.Core
--- import            Snap.Snaplet
 import            Snap.Snaplet.Auth
 import            Snap.Snaplet.Auth.Backends.JsonFile
 import            Snap.Snaplet.Hdbc

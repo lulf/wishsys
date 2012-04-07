@@ -146,13 +146,15 @@ data Wish = Wish {
     wishBought :: Integer
 }
 
-pageHeader :: String
-pageHeader =
+pageHeader :: String -> String
+pageHeader header =
     "<html>" ++
-    "<body>"
+    "<body>" ++
+    "<h1>" ++ header ++ "</h1>"
 
 pageFooter :: String
 pageFooter =
+    "<a href=\"/logout\">Logg ut</a>" ++
     "</body>" ++
     "</html>"
 
@@ -161,7 +163,7 @@ render text = writeBS (BS.pack text)
 
 adminHandler :: Handler App App ()
 adminHandler = do
-    render pageHeader
+    render $ pageHeader "Administrer ønskeliste"
     insertHandler
     printWishList True
     render insertForm
@@ -169,15 +171,14 @@ adminHandler = do
 
 insertForm :: String
 insertForm =
-    "<h1>Sett inn i ønskeliste</h1>" ++
+    "<h3>Sett inn nytt ønske</h3>" ++
     "<form action=\"/admin\" method=\"post\">" ++
-    "<input type=\"text\" size=\"200\" name=\"what\" value=\"Skriv inn ønske\" />" ++
-    "<input type=\"text\" size=\"200\" name=\"imgurl\" value=\"URL til bilde\" />" ++
-    "<input type=\"text\" size=\"200\" name=\"store\" value=\"Navn på butikk + evt. url\" />" ++
-    "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
+    "<input type=\"text\" size=\"200\" name=\"what\" value=\"Skriv inn ønske\" /><br />" ++
+    "<input type=\"text\" size=\"200\" name=\"imgurl\" value=\"URL til bilde\" /><br />" ++
+    "<input type=\"text\" size=\"200\" name=\"store\" value=\"Navn på butikk + evt. url\" /><br />" ++
+    "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" /><br />" ++
     "<input type=\"submit\" value=\"Registrer\" />" ++
-    "</form>" ++
-    "<a href=\"/logout\">Logg ut</a>"
+    "</form>"
 
 -- Insert handler deals with inserting new wishes into the database.
 insertHandler :: Handler App App () --MonadSnap m => m b -> Maybe ByteString -- Handler App App ()
@@ -196,7 +197,7 @@ insertHandler = do
                           let storeText = BS.unpack store
                           let amountValue = read (BS.unpack amount) :: Integer
                           insertWish (Wish 0 whatText urlText storeText amountValue 0)
-                          writeBS (BS.concat ["Inserted: '", what, "'. Amount: '", amount, "'"])
+                          -- writeBS (BS.concat ["Inserted: '", what, "'. Amount: '", amount, "'"])
          _            ->  return ()
 
 
@@ -206,7 +207,7 @@ wishViewHandler :: Handler App App ()
 wishViewHandler = do
     wishidParam <- getParam "wishid"
     amountParam <- getParam "amount"
-    render pageHeader
+    render $ pageHeader "Registre kjøpt ønske"
     case (wishidParam, amountParam) of
          (Just wishid, Just amount) -> do registerPurchase (read (BS.unpack wishid) ::Integer)
                                                            (read (BS.unpack amount) ::Integer)
@@ -225,8 +226,8 @@ registerPurchase wishid amount = do
     if remaining - amount >= 0
        then do
             updateWish wishid (bought + amount)
-            writeBS (BS.concat ["Har trukket ifra ", (fromString (show amount)), " stk. av type '", (fromString (wishName wish)), "'"])
-       else writeBS "Ikke nok ønsker igjen!"
+            -- writeBS (BS.concat ["Har trukket ifra ", (fromString (show amount)), " stk. av type '", (fromString (wishName wish)), "'"])
+       else return () --writeBS "Ikke nok ønsker igjen!"
 
 -- Display all wishes and a form for registering purchases
 printWishList :: Bool -> Handler App App ()
@@ -236,14 +237,13 @@ printWishList admin = do
 
 formatWishList :: [Wish] -> Bool -> String
 formatWishList wishList admin =
-        "<h1>Ønskeliste</h1>" ++
+        "<h3>Ønskeliste</h3>" ++
         "<table border=\"1\">" ++
         "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th>" ++
         userHeaders ++
         "</tr>" ++
         wishes ++
-        "</table>" ++
-        "<a href=\"/logout\">Logg ut</a>"
+        "</table>"
     where wishes      = concat (map (\x -> formatWishEntry x admin) wishList)
           userHeaders = if admin then "" else "<th>Antall</th><th>Registrer</th>"
 
@@ -268,9 +268,9 @@ formatWishEntry (Wish wishid name url store amount bought) admin =
                                 "</form>" ++
                                 "</td>"
 
-------------------------------------------
--- Functions for interacting with database
-------------------------------------------
+---------------------------------------------
+-- Functions for interacting with database --
+---------------------------------------------
 
 -- Get a list of all wishes
 getWishes :: HasHdbc m c s => m [Wish]

@@ -31,14 +31,14 @@ makeLenses [''App]
 
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
-    addRoutes [ ("", serveFile "static/index.html")
-              , ("wishlist", handleAsUser "bryllup" wishViewHandler)
+    addRoutes [ ("wishlist", handleAsUser "bryllup" wishViewHandler)
               , ("insert", handleAsUser "admin" insertHandler)
-              , ("login", loginHandler)
-              , ("logout", logoutHandler)
-              , ("loginpage/:ref", loginPageHandler)
               , ("register", handleAsUser "bryllup" registerHandler)
               , ("admin", handleAsUser "admin" (serveFile "static/admin.html")) ]
+    addRoutes [ ("", serveFile "static/index.html")
+              , ("login/:ref", loginHandler)
+              , ("login", loginHandler)
+              , ("logout", logoutHandler) ]
               
     _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing
     _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens "users.json"
@@ -59,7 +59,7 @@ redirectLogin :: MonadSnap m => m a
 redirectLogin = do
     req <- getRequest
     let uri = rqURI req
-    redirect $ BS.concat ["/loginpage", uri]
+    redirect $ BS.concat ["/login", uri]
 
 -- Creates the login page
 createLoginPage :: String -> String
@@ -76,12 +76,25 @@ createLoginPage referrer = "<html>" ++
                            "</html>"
 
 -- Displays the login page, and preserve the referrer header
-loginPageHandler :: Handler App App ()
-loginPageHandler = do
+loginForm :: Handler App (AuthManager b) ()
+loginForm = do
     ref <- getParam "ref"
     case ref of
              Nothing -> writeBS (BS.pack (createLoginPage ""))
              Just val  -> writeBS (BS.pack (createLoginPage (BS.unpack val)))
+
+
+-- Performs the actual login.
+loginHandler :: Handler App App ()
+loginHandler = with authLens $ do
+    loginUser "login" "password" (Just "remember") onFailure onSuccess
+    where onFailure _ = do loginForm
+          onSuccess = do
+                      mu <- currentUser
+                      case mu of
+                              Just _ -> do ref <- getParam "referrer"
+                                           redirectTo ref
+                              Nothing -> do loginForm -- Why does this happen?
 
 -- Verifies user credentials and username before running handler
 handleAsUser :: String -> (Handler App App ()) -> Handler App App ()
@@ -99,18 +112,6 @@ redirectTo dest = do
     case dest of
               Nothing -> redirect "/"
               Just _ -> redirect (fromJust dest)
-
--- Performs the actual login.
-loginHandler :: Handler App App ()
-loginHandler = with authLens $ do
-    loginUser "login" "password" (Just "remember") onFailure onSuccess
-    where onFailure _ = do redirectLogin
-          onSuccess = do
-                      mu <- currentUser
-                      case mu of
-                              Just _ -> do ref <- getParam "referrer"
-                                           redirectTo ref
-                              Nothing -> do redirectLogin -- Why does this happen?
 
 logoutHandler :: Handler App App ()
 logoutHandler = do

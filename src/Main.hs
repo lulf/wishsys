@@ -150,7 +150,7 @@ pageHeader header =
     "<html>" ++
     "<head>" ++
     "<title>Ønskesys</title>" ++
-    "<link rel=\"stylesheet\" href=\"style.css\">" ++
+    "<link rel=\"stylesheet\" href=\"/style.css\" />" ++
     "</head>" ++
     "<body>" ++
     "<h1>" ++ header ++ "</h1>"

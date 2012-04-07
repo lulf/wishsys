@@ -137,16 +137,29 @@ data Wish = Wish {
     wishBought :: Integer
 }
 
+pageHeader :: String
+pageHeader =
+    "<html>" ++
+    "<body>"
+
+pageFooter :: String
+pageFooter =
+    "</body>" ++
+    "</html>"
+
+render :: MonadSnap m => String -> m ()
+render text = writeBS (BS.pack text)
+
 adminHandler :: Handler App App ()
 adminHandler = do
-
+    render pageHeader
     insertHandler
-    writeBS (BS.pack createInsertForm)
+    printWishList True
+    render insertForm
+    render pageFooter
 
-createInsertForm :: String
-createInsertForm =
-    "<html>" ++
-    "<body>" ++
+insertForm :: String
+insertForm =
     "<h1>Sett inn i ønskeliste</h1>" ++
     "<form action=\"/admin\" method=\"post\">" ++
     "<input type=\"text\" size=\"200\" name=\"what\" value=\"Skriv inn ønske\" />" ++
@@ -155,12 +168,10 @@ createInsertForm =
     "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
     "<input type=\"submit\" value=\"Registrer\" />" ++
     "</form>" ++
-    "<a href=\"/logout\">Logg ut</a>" ++
-    "</body>" ++
-    "</html>"
+    "<a href=\"/logout\">Logg ut</a>"
 
 -- Insert handler deals with inserting new wishes into the database.
-insertHandler :: Handler App App ()
+insertHandler :: Handler App App () --MonadSnap m => m b -> Maybe ByteString -- Handler App App ()
 insertHandler = do
     whatParam <- getParam "what"
     imgurlParam <- getParam "imgurl"
@@ -189,8 +200,8 @@ wishViewHandler = do
     case (wishidParam, amountParam) of
          (Just wishid, Just amount) -> do registerPurchase (read (BS.unpack wishid) ::Integer)
                                                            (read (BS.unpack amount) ::Integer)
-                                          printWishList
-         _                          -> do printWishList
+                                          printWishList False
+         _                          -> do printWishList False
 
 -- Given a wish id and the amount of items, subtract this wish' remaining
 -- amount.
@@ -207,40 +218,46 @@ registerPurchase wishid amount = do
        else writeBS "Ikke nok ønsker igjen!"
 
 -- Display all wishes and a form for registering purchases
-printWishList :: Handler App App ()
-printWishList = do
+printWishList :: Bool -> Handler App App ()
+printWishList admin = do
+    render pageHeader
     wishList <- getWishes
-    writeBS $ BS.pack (formatWishList wishList)
+    render $ formatWishList wishList admin
+    render pageFooter
 
-formatWishList :: [Wish] -> String
-formatWishList wishList =
-        "<html>" ++ 
+formatWishList :: [Wish] -> Bool -> String
+formatWishList wishList admin =
         "<h1>Ønskeliste</h1>" ++
         "<table border=\"1\">" ++
-        "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th><th>Antall</th><th>Registrer</th></tr>" ++
+        "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th>" ++
+        userHeaders ++
+        "</tr>" ++
         wishes ++
         "</table>" ++
-        "<a href=\"/logout\">Logg ut</a>" ++
-        "</html>"
-    where wishes = concat (map formatWishEntry wishList)
+        "<a href=\"/logout\">Logg ut</a>"
+    where wishes      = concat (map (\x -> formatWishEntry x admin) wishList)
+          userHeaders = if admin then "" else "<th>Antall</th><th>Registrer</th>"
 
 -- Helper method for formatting a wish entry in the wish view.
-formatWishEntry :: Wish -> String
-formatWishEntry (Wish wishid name url store amount bought) =
+formatWishEntry :: Wish -> Bool -> String
+formatWishEntry (Wish wishid name url store amount bought) admin =
         "<tr>" ++
         "<td>" ++ name ++ "</td>" ++
         "<td><a href=\"" ++ url ++ "\"><img src=\"" ++ url ++ "\" width=\"100\" height=\"100\" /></a></td>" ++ 
         "<td>" ++ store ++ "</td>" ++
-        "<td>" ++ (show remaining) ++ "</td>" ++
-        "<td>" ++
-        "<form action=\"/wishlist\" method=\"post\">" ++
-        "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
-        "<input type=\"hidden\" name=\"wishid\" value=\"" ++ (show wishid) ++ "\" />" ++
-        "<input type=\"submit\" value=\"Registrer\" />" ++
-        "</form>" ++
-        "</td>" ++
+        userHeaders ++
         "</tr>"
-    where remaining = amount - bought
+    where remaining   = amount - bought
+          userHeaders = if admin
+                           then ""
+                           else "<td>" ++ (show remaining) ++ "</td>" ++
+                                "<td>" ++
+                                "<form action=\"/wishlist\" method=\"post\">" ++
+                                "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
+                                "<input type=\"hidden\" name=\"wishid\" value=\"" ++ (show wishid) ++ "\" />" ++
+                                "<input type=\"submit\" value=\"Registrer\" />" ++
+                                "</form>" ++
+                                "</td>"
 
 ------------------------------------------
 -- Functions for interacting with database

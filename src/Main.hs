@@ -238,12 +238,14 @@ printWishList admin = do
 formatWishList :: [Wish] -> Bool -> String
 formatWishList wishList admin =
         "<h3>Ønskeliste</h3>" ++
+        "<div class=\"centered\">" ++
         "<table border=\"1\">" ++
         "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th>" ++
         userHeaders ++
         "</tr>" ++
         wishes ++
-        "</table>"
+        "</table>" ++
+        "</div>"
     where wishes      = concat (map (\x -> formatWishEntry x admin) wishList)
           userHeaders = if admin then "" else "<th>Antall</th><th>Registrer</th>"
 

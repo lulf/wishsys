@@ -38,6 +38,15 @@ small {font-size:0.75em;}
 a:link, a:visited {color:#ff8a00; text-decoration:none;}
 a:hover {color:#feb925;}
 
+div.centered
+{
+    text-align: center;
+}
+div.centered table
+{
+    margin: 0 auto;
+    text-align: left;
+}
 .center-column img {margin:0 0 1.5em;}
 .center-column img.aligncenter {margin:0 auto 1.5em auto;}
 .center-column img.alignleft {margin-right:1.5em;}

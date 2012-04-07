@@ -43,7 +43,7 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addAuthRoutes [ ("wishlist", wishViewHandler, guestUsers)
                   , ("admin", adminHandler, adminUsers) ]
     addRoutes [ ("", serveFile "static/index.html")
-              , ("login/:referrer", loginHandler)
+              , ("login/:ref", loginHandler)
               , ("login", loginHandler)
               , ("logout", logoutHandler) ]
               
@@ -85,8 +85,9 @@ createLoginPage referrer = "<html>" ++
                            "<body>" ++
                            "<h1>Du må logge inn for å få tilgang til denne siden</h1>" ++
                            "<form action=\"/login/" ++ referrer ++ "\" method=\"post\">" ++
-                           "<input type=\"text\" size=\"10\" name=\"login\" value=\"\" />" ++
-                           "<input type=\"password\" size=\"20\" name=\"password\" value=\"\" />" ++
+                           "<p>Brukernavn:</p><input type=\"text\" size=\"20\" name=\"login\" value=\"\" /><br />" ++
+                           "<p>Passord:</p><input type=\"password\" size=\"20\" name=\"password\" value=\"\" /><br />" ++
+                           "<input type=\"hidden\" name=\"referrer\" value=\"/" ++ referrer ++ "\" /><br />" ++
                            "<input type=\"submit\" value=\"login\" />" ++
                            "</form>" ++
                            "</body>" ++
@@ -95,7 +96,7 @@ createLoginPage referrer = "<html>" ++
 -- Displays the login page, and preserve the referrer header
 loginForm :: Handler App (AuthManager b) ()
 loginForm = do
-    ref <- getParam "referrer"
+    ref <- getParam "ref"
     case ref of
              Nothing -> writeBS (BS.pack (createLoginPage ""))
              Just val  -> writeBS (BS.pack (createLoginPage (BS.unpack val)))
@@ -223,14 +224,9 @@ wishViewHandler = do
 registerPurchase :: Integer -> Integer -> Handler App App ()
 registerPurchase wishid amount = do
     wish <- getWish wishid
-    let wamount = (wishAmount wish)
     let bought = (wishBought wish)
-    let remaining = wamount - bought
-    if remaining - amount >= 0
-       then do
-            updateWish wishid (bought + amount)
+    updateWish wishid (bought + amount)
             -- writeBS (BS.concat ["Har trukket ifra ", (fromString (show amount)), " stk. av type '", (fromString (wishName wish)), "'"])
-       else return () --writeBS "Ikke nok ønsker igjen!"
 
 -- Display all wishes and a form for registering purchases
 printWishList :: Bool -> Handler App App ()
@@ -259,10 +255,13 @@ formatWishEntry (Wish wishid name url store amount bought) admin =
         "<td>" ++ store ++ "</td>" ++
         userHeaders ++
         "</tr>"
-    where remaining   = amount - bought
-          userHeaders = if admin
+    where remaining    = amount - bought
+          remainingCol = if remaining <= 0
+                            then "<p color=\"#00ff00\">" ++ (show remaining) ++ "</p>"
+                            else (show remaining)
+          userHeaders  = if admin
                            then ""
-                           else "<td>" ++ (show remaining) ++ "</td>" ++
+                           else "<td>" ++ remainingCol ++ "</td>" ++
                                 "<td>" ++
                                 "<form action=\"/wishlist\" method=\"post\">" ++
                                 "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++

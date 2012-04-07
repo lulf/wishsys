@@ -21,6 +21,15 @@ import            Snap.Snaplet.Session
 import            Snap.Snaplet.Session.Backends.CookieSession
 import            Snap.Util.FileServe
 
+-- User configurable
+
+guestUsers :: [String]
+guestUsers = ["bryllup"]
+adminUsers :: [String]
+adminUsers = ["admin"]
+
+-- Application setup
+
 data App = App
    { _authLens :: Snaplet (AuthManager App)
    , _sessLens :: Snaplet SessionManager
@@ -31,8 +40,8 @@ makeLenses [''App]
 
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
-    addAuthRoutes [ ("wishlist", wishViewHandler, ["bryllup"])
-                  , ("admin", adminHandler, ["admin"]) ]
+    addAuthRoutes [ ("wishlist", wishViewHandler, guestUsers)
+                  , ("admin", adminHandler, adminUsers) ]
     addRoutes [ ("", serveFile "static/index.html")
               , ("login/:ref", loginHandler)
               , ("login", loginHandler)
@@ -197,11 +206,13 @@ wishViewHandler :: Handler App App ()
 wishViewHandler = do
     wishidParam <- getParam "wishid"
     amountParam <- getParam "amount"
+    render pageHeader
     case (wishidParam, amountParam) of
          (Just wishid, Just amount) -> do registerPurchase (read (BS.unpack wishid) ::Integer)
                                                            (read (BS.unpack amount) ::Integer)
                                           printWishList False
          _                          -> do printWishList False
+    render pageFooter
 
 -- Given a wish id and the amount of items, subtract this wish' remaining
 -- amount.
@@ -220,10 +231,8 @@ registerPurchase wishid amount = do
 -- Display all wishes and a form for registering purchases
 printWishList :: Bool -> Handler App App ()
 printWishList admin = do
-    render pageHeader
     wishList <- getWishes
     render $ formatWishList wishList admin
-    render pageFooter
 
 formatWishList :: [Wish] -> Bool -> String
 formatWishList wishList admin =

@@ -148,7 +148,7 @@ createInsertForm =
     "<html>" ++
     "<body>" ++
     "<h1>Sett inn i ønskeliste</h1>" ++
-    "<form action=\"insert\" method=\"post\">" ++
+    "<form action=\"/admin\" method=\"post\">" ++
     "<input type=\"text\" size=\"200\" name=\"what\" value=\"Skriv inn ønske\" />" ++
     "<input type=\"text\" size=\"200\" name=\"imgurl\" value=\"URL til bilde\" />" ++
     "<input type=\"text\" size=\"200\" name=\"store\" value=\"Navn på butikk + evt. url\" />" ++

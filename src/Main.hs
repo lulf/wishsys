@@ -15,6 +15,7 @@ import qualified  Data.Text
 import            Database.HDBC.Sqlite3
 import            Snap
 import            Snap.Snaplet.Auth
+import            Snap.Snaplet.Heist
 import            Snap.Snaplet.Auth.Backends.JsonFile
 import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Session
@@ -31,9 +32,10 @@ adminUsers = ["admin"]
 -- Application setup
 
 data App = App
-   { _authLens :: Snaplet (AuthManager App)
-   , _sessLens :: Snaplet SessionManager
-   , _dbLens   :: Snaplet (HdbcSnaplet Connection IO)
+   { _heist     :: Snaplet (Heist App)
+   , _authLens  :: Snaplet (AuthManager App)
+   , _sessLens  :: Snaplet SessionManager
+   , _dbLens    :: Snaplet (HdbcSnaplet Connection IO)
    }
 
 makeLenses [''App]
@@ -48,13 +50,16 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
               , ("login", loginHandler)
               , ("logout", logoutHandler) ]
               
+    _heistlens' <- nestSnaplet "heist" heist $ heistInit "templates"
     _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing
     _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens "users.json"
     let sqli = connectSqlite3 "config/wishsys.db"
     _dblens'  <- nestSnaplet "hdbc" dbLens $ hdbcInit sqli
     -- Unable to make hdbc work yet
     -- _authlens' <- nestSnaplet "auth" authLens $ initHdbcAuthManager defAuthSettings sessLens sqli defAuthTable defQueries
-    return $ App _authlens' _sesslens' _dblens'
+    return $ App _heistlens' _authlens' _sesslens' _dblens'
+
+instance HasHeist App where heistLens = subSnaplet heist
 
 main :: IO ()
 main = serveSnaplet defaultConfig appInit
@@ -163,16 +168,16 @@ pageFooter =
     "</body>" ++
     "</html>"
 
-render :: MonadSnap m => String -> m ()
-render text = writeBS (BS.pack text)
+renderStuff :: MonadSnap m => String -> m ()
+renderStuff text = writeBS (BS.pack text)
 
 adminHandler :: Handler App App ()
 adminHandler = do
-    render $ pageHeader "Administrer ønskeliste"
+    renderStuff $ pageHeader "Administrer ønskeliste"
     insertHandler
     printWishList True
-    render insertForm
-    render pageFooter
+    renderStuff insertForm
+    renderStuff pageFooter
 
 insertForm :: String
 insertForm =
@@ -202,7 +207,7 @@ insertHandler = do
                           let storeText = BS.unpack store
                           let amountValue = read (BS.unpack amount) :: Integer
                           insertWish (Wish 0 whatText urlText storeText amountValue 0)
-                          render $ "La inn " ++ (show amountValue) ++ " stk. av '" ++ whatText ++ "'"
+                          renderStuff $ "La inn " ++ (show amountValue) ++ " stk. av '" ++ whatText ++ "'"
          _            ->  return ()
 
 
@@ -212,13 +217,13 @@ wishViewHandler :: Handler App App ()
 wishViewHandler = do
     wishidParam <- getParam "wishid"
     amountParam <- getParam "amount"
-    render $ pageHeader "Registrere kjøpt ønske"
+    renderStuff $ pageHeader "Registrere kjøpt ønske"
     case (wishidParam, amountParam) of
          (Just wishid, Just amount) -> do registerPurchase (read (BS.unpack wishid) ::Integer)
                                                            (read (BS.unpack amount) ::Integer)
                                           printWishList False
          _                          -> do printWishList False
-    render pageFooter
+    renderStuff pageFooter
 
 -- Given a wish id and the amount of items, subtract this wish' remaining
 -- amount.
@@ -227,13 +232,13 @@ registerPurchase wishid amount = do
     wish <- getWish wishid
     let bought = (wishBought wish)
     updateWish wishid (bought + amount)
-    render $ concat ["<p>Registrerte ", show amount, " stk. av '", wishName wish, "'</p>"]
+    renderStuff $ concat ["<p>Registrerte ", show amount, " stk. av '", wishName wish, "'</p>"]
 
 -- Display all wishes and a form for registering purchases
 printWishList :: Bool -> Handler App App ()
 printWishList admin = do
     wishList <- getWishes
-    render $ formatWishList wishList admin
+    renderStuff $ formatWishList wishList admin
 
 formatWishList :: [Wish] -> Bool -> String
 formatWishList wishList admin =

@@ -26,6 +26,7 @@ Executable wishsys
     data-lens-template == 2.1.*,
     HDBC-sqlite3 == 2.1.*,
     snaplet-hdbc == 0.8.*,
+    heist == 0.8.*,
     text == 0.11.*
 
   if impl(ghc >= 6.12.0)

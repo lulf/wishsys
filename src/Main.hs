@@ -21,6 +21,8 @@ import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Session
 import            Snap.Snaplet.Session.Backends.CookieSession
 import            Snap.Util.FileServe
+import            Text.XmlHtml as X
+import            Text.Templating.Heist
 
 -- User configurable
 

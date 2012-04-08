@@ -15,7 +15,7 @@ import qualified  Data.Text
 import            Database.HDBC.Sqlite3
 import            Snap
 import            Snap.Snaplet.Auth
-import            Snap.Snaplet.Heist
+import            Snap.Snaplet.Heist as H
 import            Snap.Snaplet.Auth.Backends.JsonFile
 import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Session
@@ -46,7 +46,8 @@ appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addAuthRoutes [ ("wishlist", wishViewHandler, guestUsers)
                   , ("admin", adminHandler, adminUsers) ]
-    addRoutes [ ("", serveFile "static/index.html")
+    addRoutes [ ("", mainHandler)
+              , ("test", heistServe)
               , ("public/stylesheets", serveDirectory "public/stylesheets")
               , ("login/:ref", loginHandler)
               , ("login", loginHandler)
@@ -65,6 +66,10 @@ instance HasHeist App where heistLens = subSnaplet heist
 
 main :: IO ()
 main = serveSnaplet defaultConfig appInit
+
+mainHandler :: Handler App App ()
+mainHandler = do
+    H.render "main"
 
 --------------------
 -- Authentication --

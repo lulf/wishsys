@@ -23,6 +23,9 @@ import            Snap.Snaplet.Session.Backends.CookieSession
 import            Snap.Util.FileServe
 import            Text.XmlHtml as X
 import            Text.Templating.Heist
+import qualified  Text.Blaze.Html5 as H
+import qualified  Text.Blaze.Html5.Attributes as A
+import            Text.Blaze.Renderer.XmlHtml
 
 -- User configurable
 
@@ -178,13 +181,22 @@ pageFooter =
 renderStuff :: MonadSnap m => String -> m ()
 renderStuff text = writeBS (BS.pack text)
 
+adminWishTableSplice :: SnapletSplice App App
+adminWishTableSplice = return . renderHtmlNodes $ do
+    H.tr $ do
+           H.td "foo"
+           H.td "bar"
+           H.td "baz"
+
 adminHandler :: Handler App App ()
 adminHandler = do
-    renderStuff $ pageHeader "Administrer ønskeliste"
-    insertHandler
-    printWishList True
-    renderStuff insertForm
-    renderStuff pageFooter
+    renderWithSplices "admin" [("wishTableContent", adminWishTableSplice)]
+
+--    renderStuff $ pageHeader "Administrer ønskeliste"
+--    insertHandler
+--    printWishList True
+--    renderStuff insertForm
+--    renderStuff pageFooter
 
 insertForm :: String
 insertForm =

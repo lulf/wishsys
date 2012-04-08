@@ -9,8 +9,6 @@ import            Data.ByteString.Char8 (ByteString)
 import qualified  Data.ByteString.Char8 as BS (concat, pack, unpack)
 import            Data.Lens.Template
 import            Data.Map ((!))
-import            Data.Maybe
-import            Data.String
 import qualified  Data.Text
 import            Database.HDBC.Sqlite3
 import            Snap
@@ -21,10 +19,8 @@ import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Session
 import            Snap.Snaplet.Session.Backends.CookieSession
 import            Snap.Util.FileServe
-import            Text.XmlHtml as X
-import            Text.Templating.Heist
-import qualified  Text.Blaze.Html5 as H
-import qualified  Text.Blaze.Html5.Attributes as A
+import qualified  Text.Blaze.Html5 as HTML
+import qualified  Text.Blaze.Html5.Attributes as ATTR
 import            Text.Blaze.Renderer.XmlHtml
 
 -- User configurable
@@ -181,16 +177,27 @@ pageFooter =
 renderStuff :: MonadSnap m => String -> m ()
 renderStuff text = writeBS (BS.pack text)
 
-adminWishTableSplice :: SnapletSplice App App
-adminWishTableSplice = return . renderHtmlNodes $ do
-    H.tr $ do
-           H.td "foo"
-           H.td "bar"
-           H.td "baz"
+imgUrl :: String -> HTML.Html
+imgUrl url = HTML.a HTML.! ATTR.href (HTML.toValue url) $ HTML.img HTML.!  ATTR.src (HTML.toValue url) HTML.!  ATTR.width "100" HTML.!  ATTR.height "100"
+
+formatWishAdmin :: Wish -> HTML.Html
+formatWishAdmin wish = do
+    HTML.tr $ do
+              HTML.td $ HTML.text name
+              HTML.td $ imgUrl url
+              HTML.td $ HTML.text store
+  where name  = Data.Text.pack (wishName wish)
+        url   = wishImg wish
+        store = Data.Text.pack (wishStore wish)
+
+adminWishTableContent :: [Wish] -> SnapletSplice App App
+adminWishTableContent wishList = return . renderHtmlNodes $ do
+    HTML.toHtml $ map formatWishAdmin wishList
 
 adminHandler :: Handler App App ()
 adminHandler = do
-    renderWithSplices "admin" [("wishTableContent", adminWishTableSplice)]
+    wishList <- getWishes
+    renderWithSplices "admin" [("wishTableContent", adminWishTableContent wishList)]
 
 --    renderStuff $ pageHeader "Administrer ønskeliste"
 --    insertHandler

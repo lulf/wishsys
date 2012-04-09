@@ -58,19 +58,25 @@ mainHandler = with authLens $ loginForm False
 imgUrl :: String -> HTML.Html
 imgUrl url = HTML.a HTML.! ATTR.href (HTML.toValue url) $ HTML.img HTML.!  ATTR.src (HTML.toValue url) HTML.!  ATTR.width "100" HTML.!  ATTR.height "100"
 
-formatWishAdmin :: Wish -> HTML.Html
-formatWishAdmin wish = do
-    HTML.tr $ do
-              HTML.td $ HTML.toHtml name
-              HTML.td $ imgUrl url
-              HTML.td $ HTML.toHtml store
-  where name  = wishName wish
-        url   = wishImg wish
-        store = wishStore wish
+editFormEntry :: String -> String -> String -> HTML.Html
+editFormEntry name value attrType =
+    HTML.input HTML.! ATTR.type_ (HTML.toValue attrType) HTML.! ATTR.name (HTML.toValue name) HTML.! ATTR.value (HTML.toValue value)
+
+editForm :: Wish -> HTML.Html
+editForm (Wish wishid name url store amount _ ) = do
+    HTML.form HTML.! ATTR.action "/admin/edit" HTML.! ATTR.method "post" $ do
+        HTML.tr $ do
+            editFormEntry "wishId" (show wishid) "hidden"
+            HTML.td $ editFormEntry "wishName" name "text"
+            HTML.td $ editFormEntry "wishUrl" url "text"
+            HTML.td $ editFormEntry "wishStore" store "text"
+            HTML.td $ editFormEntry "wishAmount" (show amount) "text"
+            HTML.td $ editFormEntry "wishDeleteFlag" "delete" "checkbox"
+            HTML.td $ HTML.input HTML.! ATTR.type_ "submit" HTML.! ATTR.value "Oppdater"
 
 adminWishTableContent :: [Wish] -> SnapletSplice App App
 adminWishTableContent wishList = return . renderHtmlNodes $ do
-    HTML.toHtml $ map formatWishAdmin wishList
+    HTML.toHtml $ map editForm wishList
 
 -- Splice to print the notification value
 adminInsertNotificationSplice :: (Maybe Wish) -> SnapletSplice App App

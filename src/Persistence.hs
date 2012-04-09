@@ -6,7 +6,6 @@
 module Persistence where
 
 import            Common
-import            Database.HDBC.Sqlite3
 import            Snap.Snaplet.Hdbc
 import            Data.Map ((!))
 ---------------------------------------------
@@ -47,3 +46,11 @@ insertWish (Wish _ name url store amount _ ) = do
     let sqlList = [toSql name, toSql url, toSql store, toSql amount]
     query' "INSERT INTO list (what, url, store, amount, bought) VALUES(?, ?, ?, ?, 0)" sqlList
     return ()
+
+
+-- Delete a wish (given its id) from the database.
+deleteWish :: HasHdbc m c s => Integer -> m ()
+deleteWish wishid = do
+    query' "DELETE FROM list WHERE id = ?" [toSql wishid]
+    return ()
+

@@ -4,42 +4,27 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Main where
 
+-- My own modules
+import            Config
+import            Auth
+import            Common
+
+-- Third party.
 import            Control.Monad.State
-import            Data.ByteString.Char8 (ByteString)
 import qualified  Data.ByteString.Char8 as BS (concat, pack, unpack)
 import            Data.Lens.Template
 import            Data.Map ((!))
-import qualified  Data.Text
 import            Database.HDBC.Sqlite3
 import            Snap
 import            Snap.Snaplet.Auth
 import            Snap.Snaplet.Heist as H
 import            Snap.Snaplet.Auth.Backends.JsonFile
 import            Snap.Snaplet.Hdbc
-import            Snap.Snaplet.Session
 import            Snap.Snaplet.Session.Backends.CookieSession
 import            Snap.Util.FileServe
 import qualified  Text.Blaze.Html5 as HTML
 import qualified  Text.Blaze.Html5.Attributes as ATTR
 import            Text.Blaze.Renderer.XmlHtml
-
--- User configurable
-
-guestUsers :: [String]
-guestUsers = ["bryllup"]
-adminUsers :: [String]
-adminUsers = ["admin"]
-
--- Application setup
-
-data App = App
-   { _heist     :: Snaplet (Heist App)
-   , _authLens  :: Snaplet (AuthManager App)
-   , _sessLens  :: Snaplet SessionManager
-   , _dbLens    :: Snaplet (HdbcSnaplet Connection IO)
-   }
-
-makeLenses [''App]
 
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
@@ -48,7 +33,6 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addRoutes [ ("", mainHandler)
               , ("test", heistServe)
               , ("public/stylesheets", serveDirectory "public/stylesheets")
-              , ("login/:ref", loginHandler)
               , ("login", loginHandler)
               , ("logout", logoutHandler) ]
               
@@ -60,83 +44,17 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     -- Unable to make hdbc work yet
     -- _authlens' <- nestSnaplet "auth" authLens $ initHdbcAuthManager defAuthSettings sessLens sqli defAuthTable defQueries
     addSplices [ ("ifLoggedIn", ifLoggedIn authLens)
+               , ("ifLoggedOut", ifLoggedOut authLens)
                , ("loggedInUser", loggedInUser authLens) ]
 
     return $ App _heistlens' _authlens' _sesslens' _dblens'
 
-instance HasHeist App where heistLens = subSnaplet heist
-
 main :: IO ()
 main = serveSnaplet defaultConfig appInit
 
+-- Render the login form page
 mainHandler :: Handler App App ()
-mainHandler = H.render "main"
-
---------------------
--- Authentication --
---------------------
-
--- Add routes that are authenticated by a user
-addAuthRoutes :: [(ByteString, Handler App App (), [String])] -> Initializer App App () 
-addAuthRoutes routeList = do
-    let authRouteList = map createAuthRoute routeList
-    addRoutes authRouteList
-    
--- FIXME: Support more than one user
-createAuthRoute :: (ByteString, Handler App App (), [String]) -> (ByteString, Handler App App ())
-createAuthRoute (routePath, handler, (user:_)) = (routePath, handleAsUser user handler)
-createAuthRoute (routePath, handler, []) = (routePath, handler)
-
-redirectLogin :: MonadSnap m => m a
-redirectLogin = do
-    req <- getRequest
-    let uri = rqURI req
-    redirect $ BS.concat ["/login", uri]
-
--- Displays the login page, and preserve the referrer header
-loginFormSplice :: (Maybe ByteString) -> SnapletSplice App (AuthManager App)
-loginFormSplice (Just value) = return . renderHtmlNodes $ HTML.toHtml (BS.unpack value)
-loginFormSplice Nothing      = return $ []
-
-loginForm :: Handler App (AuthManager App) () 
-loginForm = do
-    ref <- getParam "ref"
-    renderWithSplices "login" [ ("refpage", loginFormSplice ref) ]
-
--- Performs the actual login.
-loginHandler :: Handler App App ()
-loginHandler = with authLens $ do
-    loginUser "login" "password" (Just "remember") onFailure onSuccess
-    where onFailure _ = do loginForm
-          onSuccess   = do
-                        mu <- currentUser
-                        case mu of
-                                Just _ -> do ref <- getParam "referrer"
-                                             redirectTo ref
-                                Nothing -> do loginForm -- Why does this happen?
-
-
--- Verifies user credentials and username before running handler
-handleAsUser :: String -> (Handler App App ()) -> Handler App App ()
-handleAsUser user fn = do
-    mu <- with authLens currentUser
-    case mu of
-      Just u -> do if (userLogin u) == (Data.Text.pack user)
-                      then fn
-                      else redirectLogin
-      Nothing -> redirectLogin
-
--- Redirect to a value if set
-redirectTo :: MonadSnap m => Maybe ByteString -> m b
-redirectTo dest = do
-    case dest of
-              Nothing -> redirect "/"
-              Just uri -> redirect uri
-
-logoutHandler :: Handler App App ()
-logoutHandler = do
-  with authLens logout
-  redirect "/"
+mainHandler = with authLens $ loginForm False
 
 -- Wish data type
 data Wish = Wish {
@@ -165,9 +83,6 @@ adminWishTableContent :: [Wish] -> SnapletSplice App App
 adminWishTableContent wishList = return . renderHtmlNodes $ do
     HTML.toHtml $ map formatWishAdmin wishList
 
-insertNotification :: String -> HTML.Html
-insertNotification msg = HTML.div HTML.! ATTR.id "notification" $ HTML.p $ HTML.toHtml msg
-
 -- Splice to print the notification value
 adminInsertNotificationSplice :: (Maybe Wish) -> SnapletSplice App App
 adminInsertNotificationSplice (Just (Wish _ name _ _ amount _)) =
@@ -179,7 +94,7 @@ adminHandler :: Handler App App ()
 adminHandler = do
     wish <- insertHandler
     wishList <- getWishes
-    renderWithSplices "admin" [("insertNotification", adminInsertNotificationSplice wish)
+    renderWithSplices "admin" [("notification", adminInsertNotificationSplice wish)
                               ,("wishTableContent", adminWishTableContent wishList)]
 
 -- Insert handler deals with inserting new wishes into the database.
@@ -243,7 +158,7 @@ wishViewHandler :: Handler App App ()
 wishViewHandler = do
     ret <- purchaseHandler
     wishList <- getWishes
-    renderWithSplices "wishlist" [("insertNotification", registrationNotificationSplice ret)
+    renderWithSplices "wishlist" [("notification", registrationNotificationSplice ret)
                                  ,("wishTableContent", wishTableContent wishList)]
 
 -- Pull out parameters and perform purchase.

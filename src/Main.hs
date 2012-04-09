@@ -8,18 +8,16 @@ module Main where
 import            Config
 import            Auth
 import            Common
+import            Persistence
 
 -- Third party.
-import            Control.Monad.State
-import qualified  Data.ByteString.Char8 as BS (concat, pack, unpack)
-import            Data.Lens.Template
-import            Data.Map ((!))
-import            Database.HDBC.Sqlite3
+import qualified  Data.ByteString.Char8 as BS (unpack)
 import            Snap
+import            Database.HDBC.Sqlite3
+import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Auth
 import            Snap.Snaplet.Heist as H
 import            Snap.Snaplet.Auth.Backends.JsonFile
-import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Session.Backends.CookieSession
 import            Snap.Util.FileServe
 import qualified  Text.Blaze.Html5 as HTML
@@ -56,15 +54,6 @@ main = serveSnaplet defaultConfig appInit
 mainHandler :: Handler App App ()
 mainHandler = with authLens $ loginForm False
 
--- Wish data type
-data Wish = Wish {
-    wishId     :: Integer,
-    wishName   :: String,
-    wishImg    :: String,
-    wishStore  :: String,
-    wishAmount :: Integer,
-    wishBought :: Integer
-}
 
 imgUrl :: String -> HTML.Html
 imgUrl url = HTML.a HTML.! ATTR.href (HTML.toValue url) $ HTML.img HTML.!  ATTR.src (HTML.toValue url) HTML.!  ATTR.width "100" HTML.!  ATTR.height "100"
@@ -180,45 +169,3 @@ registerPurchase wishid amount = do
     let bought = wishBought wish
     updateWish wishid (bought + amount)
     return $ Just ((wishName wish), amount)
-
----------------------------------------------
--- Functions for interacting with database --
----------------------------------------------
-
--- Get a list of all wishes
-getWishes :: HasHdbc m c s => m [Wish]
-getWishes = do
-    rows <- query "SELECT * FROM list" []
-    return $ map constructWish rows
-
--- Constructs a wish from a database row
-constructWish :: Row -> Wish
-constructWish row = Wish (fromSql (row ! "id"))
-                         (fromSql (row ! "what"))
-                         (fromSql (row ! "url"))
-                         (fromSql (row ! "store"))
-                         (fromSql (row ! "amount"))
-                         (fromSql (row ! "bought"))
-
--- Get a specific wish given an id
-getWish :: HasHdbc m c s => Integer -> m Wish
-getWish wishid = do
-    rows <- query "SELECT * FROM list WHERE id = ?" [toSql wishid]
-    return $ head (map constructWish rows)
-
--- Update a wish (given its id) with a new value for the number of bought items
-updateWish :: HasHdbc m c s => Integer -> Integer -> m ()
-updateWish wishid bought = do
-    query' "UPDATE list SET bought = ? WHERE id = ?" [toSql bought, toSql wishid]
-    return ()
-
--- Insert a new wish entity into the database. The id and bought parameters to
--- the wish are ignored
-insertWish:: HasHdbc m c s => Wish -> m ()
-insertWish (Wish _ name url store amount _ ) = do
-    let sqlList = [toSql name, toSql url, toSql store, toSql amount]
-    query' "INSERT INTO list (what, url, store, amount, bought) VALUES(?, ?, ?, ?, 0)" sqlList
-    return ()
-
-instance HasHdbc (Handler App App) Connection IO where
-    getHdbcState = with dbLens get

@@ -43,3 +43,5 @@ data App = App
 makeLenses [''App]
 
 instance HasHeist App where heistLens = subSnaplet heist
+instance HasHdbc (Handler App App) Connection IO where
+    getHdbcState = with dbLens get

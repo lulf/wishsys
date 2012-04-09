@@ -26,3 +26,13 @@ import            Text.Blaze.Renderer.XmlHtml
 
 insertNotification :: String -> HTML.Html
 insertNotification msg = HTML.div HTML.! ATTR.id "notification" $ HTML.p $ HTML.toHtml msg
+
+-- Wish data type
+data Wish = Wish {
+    wishId     :: Integer,
+    wishName   :: String,
+    wishImg    :: String,
+    wishStore  :: String,
+    wishAmount :: Integer,
+    wishBought :: Integer
+}

@@ -15,7 +15,7 @@ import qualified  Data.ByteString.Char8 as BS (unpack)
 import            Snap
 import            Database.HDBC.Sqlite3
 import            Snap.Snaplet.Hdbc
-import            Snap.Snaplet.Auth
+import            Snap.Snaplet.Auth hiding (siteKey)
 import            Snap.Snaplet.Heist as H
 import            Snap.Snaplet.Auth.Backends.JsonFile
 import            Snap.Snaplet.Session.Backends.CookieSession

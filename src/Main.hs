@@ -158,22 +158,6 @@ data Wish = Wish {
     wishBought :: Integer
 }
 
-pageHeader :: String -> String
-pageHeader header =
-    "<html>" ++
-    "<head>" ++
-    "<title>Ønskesys</title>" ++
-    "<link rel=\"stylesheet\" href=\"public/stylesheets/style.css\" type=\"text/css\" />" ++
-    "</head>" ++
-    "<body>" ++
-    "<h1>" ++ header ++ "</h1>"
-
-pageFooter :: String
-pageFooter =
-    "<a href=\"/logout\">Logg ut</a>" ++
-    "</body>" ++
-    "</html>"
-
 renderStuff :: MonadSnap m => String -> m ()
 renderStuff text = writeBS (BS.pack text)
 
@@ -194,18 +178,21 @@ adminWishTableContent :: [Wish] -> SnapletSplice App App
 adminWishTableContent wishList = return . renderHtmlNodes $ do
     HTML.toHtml $ map formatWishAdmin wishList
 
+insertNotification :: String -> HTML.Html
+insertNotification msg = HTML.div HTML.! ATTR.id "notification" $ HTML.p $ HTML.toHtml msg
+
 -- Splice to print the notification value
-adminInsertNotification :: (Maybe Wish) -> SnapletSplice App App
-adminInsertNotification (Just (Wish _ name _ _ amount _)) =
-    return . renderHtmlNodes $ HTML.div HTML.! ATTR.id "notification" $ HTML.p $ HTML.toHtml msg
+adminInsertNotificationSplice :: (Maybe Wish) -> SnapletSplice App App
+adminInsertNotificationSplice (Just (Wish _ name _ _ amount _)) =
+    return . renderHtmlNodes $ insertNotification msg
   where msg = ("Satte inn " ++ (show amount) ++ " stykker av '" ++ name ++ "'.")
-adminInsertNotification Nothing                           = return $ []
+adminInsertNotificationSplice Nothing                           = return $ []
 
 adminHandler :: Handler App App ()
 adminHandler = do
     wish <- insertHandler
     wishList <- getWishes
-    renderWithSplices "admin" [("insertNotification", adminInsertNotification wish)
+    renderWithSplices "admin" [("insertNotification", adminInsertNotificationSplice wish)
                               ,("wishTableContent", adminWishTableContent wishList)]
 
 -- Insert handler deals with inserting new wishes into the database.
@@ -230,72 +217,67 @@ insertHandler = do
          _            ->  return $ Nothing
 
 
+-- 
+formatWish :: Wish -> HTML.Html
+formatWish wish = do
+    HTML.tr $ do
+              HTML.td $ HTML.toHtml name
+              HTML.td $ imgUrl url
+              HTML.td $ HTML.toHtml store
+              HTML.td $ HTML.toHtml remaining
+              HTML.td $ registrationForm wishid
+  where name      = wishName wish
+        url       = wishImg wish
+        store     = wishStore wish
+        remaining = (wishAmount wish) - (wishBought wish)
+        wishid    = (wishId wish)
+
+registrationForm :: Integer -> HTML.Html
+registrationForm wishid =
+    HTML.form HTML.! ATTR.action "/wishlist" HTML.!  ATTR.method "post" $ do
+              HTML.input HTML.! ATTR.type_ "text" HTML.! ATTR.size "2" HTML.!  ATTR.name "amount" HTML.! ATTR.value "0"
+              HTML.input HTML.! ATTR.type_ "hidden" HTML.! ATTR.name "wishid" HTML.! ATTR.value (HTML.toValue wishid)
+              HTML.input HTML.! ATTR.type_ "submit" HTML.! ATTR.value "Registrer"
+
+wishTableContent :: [Wish] -> SnapletSplice App App
+wishTableContent wishList = return . renderHtmlNodes $ do
+    HTML.toHtml $ map formatWish wishList
+
+-- Splice to print the notification value
+registrationNotificationSplice :: (Maybe (String, Integer)) -> SnapletSplice App App
+registrationNotificationSplice (Just (name, amount)) = 
+    return . renderHtmlNodes $ insertNotification msg
+  where msg = ("Registrerte " ++ (show amount) ++ " stykker av '" ++ name ++ "'.")
+registrationNotificationSplice Nothing             = return $ []
+
 -- Handler for the wishlist view. Registers any purchases and displays wish
 -- list.
 wishViewHandler :: Handler App App ()
 wishViewHandler = do
+    ret <- purchaseHandler
+    wishList <- getWishes
+    renderWithSplices "wishlist" [("insertNotification", registrationNotificationSplice ret)
+                                 ,("wishTableContent", wishTableContent wishList)]
+
+-- Pull out parameters and perform purchase.
+purchaseHandler :: Handler App App (Maybe (String, Integer))
+purchaseHandler = do
     wishidParam <- getParam "wishid"
     amountParam <- getParam "amount"
-    renderStuff $ pageHeader "Registrere kjøpt ønske"
     case (wishidParam, amountParam) of
-         (Just wishid, Just amount) -> do registerPurchase (read (BS.unpack wishid) ::Integer)
-                                                           (read (BS.unpack amount) ::Integer)
-                                          printWishList False
-         _                          -> do printWishList False
-    renderStuff pageFooter
+         (Just wishid, Just amount) -> registerPurchase (read (BS.unpack wishid) ::Integer)
+                                                        (read (BS.unpack amount) ::Integer)
+            
+         _                          -> return Nothing
 
 -- Given a wish id and the amount of items, subtract this wish' remaining
 -- amount.
-registerPurchase :: Integer -> Integer -> Handler App App ()
+registerPurchase :: Integer -> Integer -> Handler App App (Maybe (String, Integer))
 registerPurchase wishid amount = do
     wish <- getWish wishid
-    let bought = (wishBought wish)
+    let bought = wishBought wish
     updateWish wishid (bought + amount)
-    renderStuff $ concat ["<p>Registrerte ", show amount, " stk. av '", wishName wish, "'</p>"]
-
--- Display all wishes and a form for registering purchases
-printWishList :: Bool -> Handler App App ()
-printWishList admin = do
-    wishList <- getWishes
-    renderStuff $ formatWishList wishList admin
-
-formatWishList :: [Wish] -> Bool -> String
-formatWishList wishList admin =
-        "<h3>Ønskeliste</h3>" ++
-        "<div class=\"centered\">" ++
-        "<table border=\"1\">" ++
-        "<tr><th>Hva</th><th>Bilde</th><th>Butikk</th>" ++
-        userHeaders ++
-        "</tr>" ++
-        wishes ++
-        "</table>" ++
-        "</div>"
-    where wishes      = concat (map (\x -> formatWishEntry x admin) wishList)
-          userHeaders = if admin then "" else "<th>Antall</th><th>Registrer</th>"
-
--- Helper method for formatting a wish entry in the wish view.
-formatWishEntry :: Wish -> Bool -> String
-formatWishEntry (Wish wishid name url store amount bought) admin =
-        "<tr>" ++
-        "<td>" ++ name ++ "</td>" ++
-        "<td><a href=\"" ++ url ++ "\"><img src=\"" ++ url ++ "\" width=\"100\" height=\"100\" /></a></td>" ++ 
-        "<td>" ++ store ++ "</td>" ++
-        userHeaders ++
-        "</tr>"
-    where remaining    = amount - bought
-          remainingCol = if remaining <= 0
-                            then "<p color=\"#00ff00\">" ++ (show remaining) ++ "</p>"
-                            else (show remaining)
-          userHeaders  = if admin
-                           then ""
-                           else "<td>" ++ remainingCol ++ "</td>" ++
-                                "<td>" ++
-                                "<form action=\"/wishlist\" method=\"post\">" ++
-                                "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" />" ++
-                                "<input type=\"hidden\" name=\"wishid\" value=\"" ++ (show wishid) ++ "\" />" ++
-                                "<input type=\"submit\" value=\"Registrer\" />" ++
-                                "</form>" ++
-                                "</td>"
+    return $ Just ((wishName wish), amount)
 
 ---------------------------------------------
 -- Functions for interacting with database --

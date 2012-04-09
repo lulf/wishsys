@@ -59,6 +59,9 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     _dblens'  <- nestSnaplet "hdbc" dbLens $ hdbcInit sqli
     -- Unable to make hdbc work yet
     -- _authlens' <- nestSnaplet "auth" authLens $ initHdbcAuthManager defAuthSettings sessLens sqli defAuthTable defQueries
+    addSplices [("ifLoggedIn", ifLoggedIn authLens)
+               ,("loggedInUser", loggedInUser authLens)]
+
     return $ App _heistlens' _authlens' _sesslens' _dblens'
 
 instance HasHeist App where heistLens = subSnaplet heist
@@ -99,7 +102,8 @@ loginFormSplice Nothing      = return $ []
 loginForm :: Handler App (AuthManager App) () 
 loginForm = do
     ref <- getParam "ref"
-    renderWithSplices "login" [("refpage", loginFormSplice ref)]
+    renderWithSplices "login" [("refpage", loginFormSplice ref)
+                              ,("ifLoggedIn", ifLoggedIn authLens)]
 
 -- Performs the actual login.
 loginHandler :: Handler App App ()

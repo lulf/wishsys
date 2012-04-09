@@ -1,10 +1,11 @@
 Name:                wishsys
 Version:             0.1
-Synopsis:            Project Synopsis Here
-Description:         Project Description Here
-License:             AllRightsReserved
-Author:              Author
-Maintainer:          maintainer@example.com
+Synopsis:            Wish list web app
+Description:         Wish list web app where administrators can insert wishes,
+                     and guest users can register purchases.
+License:             MIT
+Author:              Ulf Lilleengen
+Maintainer:          lulf@pvv.ntnu.no
 Stability:           Experimental
 Category:            Web
 Build-type:          Simple

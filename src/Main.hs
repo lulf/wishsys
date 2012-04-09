@@ -91,28 +91,15 @@ redirectLogin = do
     let uri = rqURI req
     redirect $ BS.concat ["/login", uri]
 
--- Creates the login page
-createLoginPage :: String -> String
-createLoginPage referrer = "<html>" ++
-                           "<body>" ++
-                           "<h1>Du må logge inn for å få tilgang til denne siden</h1>" ++
-                           "<form action=\"/login/" ++ referrer ++ "\" method=\"post\">" ++
-                           "<p>Brukernavn:</p><input type=\"text\" size=\"20\" name=\"login\" value=\"\" /><br />" ++
-                           "<p>Passord:</p><input type=\"password\" size=\"20\" name=\"password\" value=\"\" /><br />" ++
-                           "<input type=\"hidden\" name=\"referrer\" value=\"/" ++ referrer ++ "\" /><br />" ++
-                           "<input type=\"submit\" value=\"login\" />" ++
-                           "</form>" ++
-                           "</body>" ++
-                           "</html>"
-
 -- Displays the login page, and preserve the referrer header
-loginForm :: Handler App (AuthManager b) ()
+loginFormSplice :: (Maybe ByteString) -> SnapletSplice App (AuthManager App)
+loginFormSplice (Just value) = return . renderHtmlNodes $ HTML.toHtml (BS.unpack value)
+loginFormSplice Nothing      = return $ []
+
+loginForm :: Handler App (AuthManager App) () 
 loginForm = do
     ref <- getParam "ref"
-    case ref of
-             Nothing -> writeBS (BS.pack (createLoginPage ""))
-             Just val  -> writeBS (BS.pack (createLoginPage (BS.unpack val)))
-
+    renderWithSplices "login" [("refpage", loginFormSplice ref)]
 
 -- Performs the actual login.
 loginHandler :: Handler App App ()
@@ -125,6 +112,7 @@ loginHandler = with authLens $ do
                                 Just _ -> do ref <- getParam "referrer"
                                              redirectTo ref
                                 Nothing -> do loginForm -- Why does this happen?
+
 
 -- Verifies user credentials and username before running handler
 handleAsUser :: String -> (Handler App App ()) -> Handler App App ()
@@ -157,9 +145,6 @@ data Wish = Wish {
     wishAmount :: Integer,
     wishBought :: Integer
 }
-
-renderStuff :: MonadSnap m => String -> m ()
-renderStuff text = writeBS (BS.pack text)
 
 imgUrl :: String -> HTML.Html
 imgUrl url = HTML.a HTML.! ATTR.href (HTML.toValue url) $ HTML.img HTML.!  ATTR.src (HTML.toValue url) HTML.!  ATTR.width "100" HTML.!  ATTR.height "100"

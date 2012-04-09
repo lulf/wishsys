@@ -35,9 +35,9 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
               , ("logout", logoutHandler) ]
               
     _heistlens' <- nestSnaplet "heist" heist $ heistInit "templates"
-    _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager "config/site.txt" "_session" Nothing
-    _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens "users.json"
-    let sqli = connectSqlite3 "config/wishsys.db"
+    _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager siteKey "_session" Nothing
+    _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens userDB
+    let sqli = connectSqlite3 wishDB
     _dblens'  <- nestSnaplet "hdbc" dbLens $ hdbcInit sqli
     -- Unable to make hdbc work yet
     -- _authlens' <- nestSnaplet "auth" authLens $ initHdbcAuthManager defAuthSettings sessLens sqli defAuthTable defQueries

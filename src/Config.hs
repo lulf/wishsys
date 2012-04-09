@@ -31,6 +31,15 @@ guestUsers = ["bryllup"]
 adminUsers :: [String]
 adminUsers = ["admin"]
 
+wishDB :: String
+wishDB = "config/wishsys.db"
+
+userDB :: String
+userDB = "users.json"
+
+siteKey :: String
+siteKey = "config/site.txt"
+
 -- Application setup
 
 data App = App

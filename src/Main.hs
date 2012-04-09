@@ -183,41 +183,33 @@ imgUrl url = HTML.a HTML.! ATTR.href (HTML.toValue url) $ HTML.img HTML.!  ATTR.
 formatWishAdmin :: Wish -> HTML.Html
 formatWishAdmin wish = do
     HTML.tr $ do
-              HTML.td $ HTML.text name
+              HTML.td $ HTML.toHtml name
               HTML.td $ imgUrl url
-              HTML.td $ HTML.text store
-  where name  = Data.Text.pack (wishName wish)
+              HTML.td $ HTML.toHtml store
+  where name  = wishName wish
         url   = wishImg wish
-        store = Data.Text.pack (wishStore wish)
+        store = wishStore wish
 
 adminWishTableContent :: [Wish] -> SnapletSplice App App
 adminWishTableContent wishList = return . renderHtmlNodes $ do
     HTML.toHtml $ map formatWishAdmin wishList
 
+-- Splice to print the notification value
+adminInsertNotification :: (Maybe Wish) -> SnapletSplice App App
+adminInsertNotification (Just (Wish _ name _ _ amount _)) =
+    return . renderHtmlNodes $ HTML.div HTML.! ATTR.id "notification" $ HTML.p $ HTML.toHtml msg
+  where msg = ("Satte inn " ++ (show amount) ++ " stykker av '" ++ name ++ "'.")
+adminInsertNotification Nothing                           = return $ []
+
 adminHandler :: Handler App App ()
 adminHandler = do
+    wish <- insertHandler
     wishList <- getWishes
-    renderWithSplices "admin" [("wishTableContent", adminWishTableContent wishList)]
-
---    renderStuff $ pageHeader "Administrer ønskeliste"
---    insertHandler
---    printWishList True
---    renderStuff insertForm
---    renderStuff pageFooter
-
-insertForm :: String
-insertForm =
-    "<h3>Sett inn nytt ønske</h3>" ++
-    "<form action=\"/admin\" method=\"post\">" ++
-    "<input type=\"text\" size=\"200\" name=\"what\" value=\"Skriv inn ønske\" /><br />" ++
-    "<input type=\"text\" size=\"200\" name=\"imgurl\" value=\"URL til bilde\" /><br />" ++
-    "<input type=\"text\" size=\"200\" name=\"store\" value=\"Navn på butikk + evt. url\" /><br />" ++
-    "<input type=\"text\" size=\"2\" name=\"amount\" value=\"0\" /><br />" ++
-    "<input type=\"submit\" value=\"Registrer\" />" ++
-    "</form>"
+    renderWithSplices "admin" [("insertNotification", adminInsertNotification wish)
+                              ,("wishTableContent", adminWishTableContent wishList)]
 
 -- Insert handler deals with inserting new wishes into the database.
-insertHandler :: Handler App App () --MonadSnap m => m b -> Maybe ByteString -- Handler App App ()
+insertHandler :: Handler App App (Maybe Wish)
 insertHandler = do
     whatParam <- getParam "what"
     imgurlParam <- getParam "imgurl"
@@ -232,9 +224,10 @@ insertHandler = do
                           let urlText = BS.unpack imgurl
                           let storeText = BS.unpack store
                           let amountValue = read (BS.unpack amount) :: Integer
-                          insertWish (Wish 0 whatText urlText storeText amountValue 0)
-                          renderStuff $ "La inn " ++ (show amountValue) ++ " stk. av '" ++ whatText ++ "'"
-         _            ->  return ()
+                          let wish = (Wish 0 whatText urlText storeText amountValue 0)
+                          insertWish wish
+                          return $ Just wish
+         _            ->  return $ Nothing
 
 
 -- Handler for the wishlist view. Registers any purchases and displays wish

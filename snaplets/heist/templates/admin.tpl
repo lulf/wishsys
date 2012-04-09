@@ -5,7 +5,7 @@
   <bind tag="wishTableHeader">
     <tr><th>Hva</th><th>Bilde</th><th>Butikk</th></tr>
   </bind>
-  <apply template="wishlist" />
+  <apply template="wishtable" />
   <h2>Sett inn ønske i ønskeliste</h2>
   <apply template="admin-insert" />
 </apply>

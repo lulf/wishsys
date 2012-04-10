@@ -1,5 +1,5 @@
 Name:                wishsys
-Version:             0.1
+Version:             0.2
 Synopsis:            Wish list web app
 Description:         Wish list web app where administrators can insert wishes,
                      and guest users can register purchases.

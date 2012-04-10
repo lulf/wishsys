@@ -68,7 +68,7 @@ editFormEntry name value attrType =
 
 editForm :: Wish -> HTML.Html
 editForm (Wish wishid name url store amount _ ) = do
-    HTML.form HTML.! ATTR.action "/admin/edit" HTML.! ATTR.method "post" do $
+    HTML.form HTML.! ATTR.action "/admin/edit" HTML.! ATTR.method "post" HTML.!  ATTR.acceptCharset "ISO8859-1" $ do
         HTML.tr $ do
             editFormEntry "wishId" (show wishid) "hidden"
             HTML.td $ editFormEntry "wishName" name "text"
@@ -94,16 +94,15 @@ adminInsertHandler = do
     wish <- insertHandler
     adminHandler [("notification", adminInsertNotificationSplice wish)]
 
-adminEditNotificationSplice :: (Maybe Wish) -> SnapletSplice App App
-adminEditNotificationSplice (Just (Wish _ name _ _ _ _)) =
+adminEditNotificationSplice :: (Maybe String) -> SnapletSplice App App
+adminEditNotificationSplice (Just msg) =
     return . renderHtmlNodes $ insertNotification msg
-  where msg = ("Oppdaterte '" ++ name ++ "'.")
 adminEditNotificationSplice Nothing = return $ []
 
 adminEditHandler :: Handler App App ()
 adminEditHandler = do
-    editHandler
-    adminHandler [] -- ("notification", adminEditNotificationSplice wish)]
+    msg <- editHandler
+    adminHandler [("notification", adminEditNotificationSplice msg)]
 
 adminHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
 adminHandler splices = do
@@ -111,7 +110,7 @@ adminHandler splices = do
     renderWithSplices "admin" (splices ++ [("wishTableContent", adminWishTableContent wishList)])
 
 -- Insert handler deals with inserting new wishes into the database.
-editHandler :: Handler App App ()
+editHandler :: Handler App App (Maybe String)
 editHandler = do
     idParam <- getParam "wishId"
     nameParam <- getParam "wishName"
@@ -125,7 +124,8 @@ editHandler = do
          Just url,
          Just store,
          Just amount,
-         Just "delete") -> deleteWish (read (BS.unpack wishid) :: Integer)
+         Just "delete") -> do deleteWish (read (BS.unpack wishid) :: Integer)
+                              return $ Just ("Deleted '" ++ (BS.unpack name) ++ "'.")
         (Just wishid,
          Just name,
          Just url,
@@ -138,7 +138,8 @@ editHandler = do
                                     (read (BS.unpack amount) :: Integer)
                                     0)
                    updateWish wish
-        _          -> return ()
+                   return $ Just ("Updated '" ++ (BS.unpack name) ++ "'.")
+        _   -> return $ Nothing
 
 -- Insert handler deals with inserting new wishes into the database.
 insertHandler :: Handler App App (Maybe Wish)
@@ -162,7 +163,7 @@ insertHandler = do
          _            ->  return $ Nothing
 
 
--- 
+-- Formats a wish entry in the guest table.
 formatWish :: Wish -> HTML.Html
 formatWish wish = do
     HTML.tr $ do
@@ -177,6 +178,7 @@ formatWish wish = do
         remaining = (wishAmount wish) - (wishBought wish)
         wishid    = (wishId wish)
 
+-- Create the registration form
 registrationForm :: Integer -> HTML.Html
 registrationForm wishid =
     HTML.form HTML.! ATTR.action "/wishlist" HTML.!  ATTR.method "post" $ do
@@ -212,7 +214,6 @@ purchaseHandler = do
     case (wishidParam, amountParam) of
          (Just wishid, Just amount) -> registerPurchase (read (BS.unpack wishid) ::Integer)
                                                         (read (BS.unpack amount) ::Integer)
-            
          _                          -> return Nothing
 
 -- Given a wish id and the amount of items, subtract this wish' remaining

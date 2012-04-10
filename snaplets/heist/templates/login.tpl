@@ -11,4 +11,10 @@
       <input type="submit" value="Logg inn" />
     </form>
   </ifLoggedOut>
+  <ifLoggedIn>
+    <ul>
+      <li><a href="/admin">Administrer ønskeliste</a></li>
+      <li><a href="/wishlist">Se på ønskeliste</a></li>
+    </ul>
+  </ifLoggedIn>
 </apply>

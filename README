@@ -7,6 +7,7 @@ administrators cannot see what the guests have purchased.
 
 To use:
 * Edit src/Config.hs with the desired users.
+* Initialize sqlite db with "sqlite3 config/wishsys.db < schema.db"
 * Run cabal install to create the snaplet, and just run with 'wishsys -p <portnumber>'
 
 To populate with users, use snap-auth-cli (https://github.com/dzhus/snap-auth-cli/)

@@ -34,9 +34,15 @@ getWish wishid = do
     return $ head (map constructWish rows)
 
 -- Update a wish (given its id) with a new value for the number of bought items
-updateWish :: HasHdbc m c s => Integer -> Integer -> m ()
-updateWish wishid bought = do
+updateWishBought :: HasHdbc m c s => Integer -> Integer -> m ()
+updateWishBought wishid bought = do
     query' "UPDATE list SET bought = ? WHERE id = ?" [toSql bought, toSql wishid]
+    return ()
+
+updateWish :: HasHdbc m c s => Wish -> m ()
+updateWish (Wish wishid name url store amount _ ) = do
+    let sqlList = [toSql name, toSql url, toSql store, toSql amount, toSql wishid]
+    query' "UPDATE list SET what = ?, url = ?, store = ?, amount = ? WHERE id = ?" sqlList
     return ()
 
 -- Insert a new wish entity into the database. The id and bought parameters to

@@ -1,4 +1,4 @@
-<form action="/admin" method="post">
+<form action="/admin/insert" method="post">
   Navn på ønske: <input type="text" size="200" name="what" value="" /><br />
   URL til bilde: <input type="text" size="200" name="imgurl" value="" /><br />
   Navn på butikk(er): <input type="text" size="200" name="store" value="" /><br />

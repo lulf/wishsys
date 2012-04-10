@@ -13,6 +13,7 @@ import            Persistence
 -- Third party.
 import qualified  Data.ByteString.Char8 as BS (unpack)
 import            Snap
+import            Data.Maybe
 import            Database.HDBC.Sqlite3
 import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Auth hiding (siteKey)
@@ -23,11 +24,14 @@ import            Snap.Util.FileServe
 import qualified  Text.Blaze.Html5 as HTML
 import qualified  Text.Blaze.Html5.Attributes as ATTR
 import            Text.Blaze.Renderer.XmlHtml
+import qualified  Data.Text
 
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addAuthRoutes [ ("wishlist", wishViewHandler, guestUsers)
-                  , ("admin", adminHandler, adminUsers) ]
+                  , ("admin", adminHandler [], adminUsers)
+                  , ("admin/insert", adminInsertHandler, adminUsers)
+                  , ("admin/edit", adminEditHandler, adminUsers) ]
     addRoutes [ ("", mainHandler)
               , ("test", heistServe)
               , ("public/stylesheets", serveDirectory "public/stylesheets")
@@ -64,7 +68,7 @@ editFormEntry name value attrType =
 
 editForm :: Wish -> HTML.Html
 editForm (Wish wishid name url store amount _ ) = do
-    HTML.form HTML.! ATTR.action "/admin/edit" HTML.! ATTR.method "post" $ do
+    HTML.form HTML.! ATTR.action "/admin/edit" HTML.! ATTR.method "post" do $
         HTML.tr $ do
             editFormEntry "wishId" (show wishid) "hidden"
             HTML.td $ editFormEntry "wishName" name "text"
@@ -85,12 +89,56 @@ adminInsertNotificationSplice (Just (Wish _ name _ _ amount _)) =
   where msg = ("Satte inn " ++ (show amount) ++ " stykker av '" ++ name ++ "'.")
 adminInsertNotificationSplice Nothing                           = return $ []
 
-adminHandler :: Handler App App ()
-adminHandler = do
+adminInsertHandler :: Handler App App ()
+adminInsertHandler = do
     wish <- insertHandler
+    adminHandler [("notification", adminInsertNotificationSplice wish)]
+
+adminEditNotificationSplice :: (Maybe Wish) -> SnapletSplice App App
+adminEditNotificationSplice (Just (Wish _ name _ _ _ _)) =
+    return . renderHtmlNodes $ insertNotification msg
+  where msg = ("Oppdaterte '" ++ name ++ "'.")
+adminEditNotificationSplice Nothing = return $ []
+
+adminEditHandler :: Handler App App ()
+adminEditHandler = do
+    editHandler
+    adminHandler [] -- ("notification", adminEditNotificationSplice wish)]
+
+adminHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
+adminHandler splices = do
     wishList <- getWishes
-    renderWithSplices "admin" [("notification", adminInsertNotificationSplice wish)
-                              ,("wishTableContent", adminWishTableContent wishList)]
+    renderWithSplices "admin" (splices ++ [("wishTableContent", adminWishTableContent wishList)])
+
+-- Insert handler deals with inserting new wishes into the database.
+editHandler :: Handler App App ()
+editHandler = do
+    idParam <- getParam "wishId"
+    nameParam <- getParam "wishName"
+    urlParam <- getParam "wishUrl"
+    storeParam <- getParam "wishStore"
+    amountParam <- getParam "wishAmount"
+    deleteFlagParam <- getParam "wishDeleteFlag"
+    case (idParam, nameParam, urlParam, storeParam, amountParam, deleteFlagParam) of
+        (Just wishid,
+         Just name,
+         Just url,
+         Just store,
+         Just amount,
+         Just "delete") -> deleteWish (read (BS.unpack wishid) :: Integer)
+        (Just wishid,
+         Just name,
+         Just url,
+         Just store,
+         Just amount,
+         _ ) -> do let wish = (Wish (read (BS.unpack wishid) :: Integer)
+                                    (BS.unpack name)
+                                    (BS.unpack url)
+                                    (BS.unpack store)
+                                    (read (BS.unpack amount) :: Integer)
+                                    0)
+                   updateWish wish
+        _          -> return ()
 
 -- Insert handler deals with inserting new wishes into the database.
 insertHandler :: Handler App App (Maybe Wish)
@@ -173,5 +221,5 @@ registerPurchase :: Integer -> Integer -> Handler App App (Maybe (String, Intege
 registerPurchase wishid amount = do
     wish <- getWish wishid
     let bought = wishBought wish
-    updateWish wishid (bought + amount)
+    updateWishBought wishid (bought + amount)
     return $ Just ((wishName wish), amount)

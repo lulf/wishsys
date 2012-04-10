@@ -1,2 +1,12 @@
-* Run cabal install to create the snaplet, and just run with 'wishsys <portnumber>'
-* To populate with users, use snap-auth-cli (https://github.com/dzhus/snap-auth-cli/)
+Wishsys is a simple web app in Haskell that can be used to maintain a wish list,
+having administrators that can put stuff into the list, and guests that can
+register purchases of those wishes.
+
+The view of the administrators and guests are separated, so that the
+administrators cannot see what the guests have purchased.
+
+To use:
+* Edit src/Config.hs with the desired users.
+* Run cabal install to create the snaplet, and just run with 'wishsys -p <portnumber>'
+
+To populate with users, use snap-auth-cli (https://github.com/dzhus/snap-auth-cli/)

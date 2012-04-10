@@ -72,7 +72,8 @@ editForm (Wish wishid name url store amount _ ) = do
         HTML.tr $ do
             editFormEntry "wishId" (show wishid) "hidden"
             HTML.td $ editFormEntry "wishName" name "text"
-            HTML.td $ editFormEntry "wishUrl" url "text"
+            HTML.td $ do editFormEntry "wishUrl" url "text" 
+                         imgUrl url
             HTML.td $ editFormEntry "wishStore" store "text"
             HTML.td $ editFormEntry "wishAmount" (show amount) "text"
             HTML.td $ editFormEntry "wishDeleteFlag" "delete" "checkbox"

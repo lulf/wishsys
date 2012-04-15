@@ -29,9 +29,13 @@ import qualified  Data.Text
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     addAuthRoutes [ ("wishlist", wishViewHandler, guestUsers)
+                  , ("wishlist/inserted", wishInsertedViewHandler, guestUsers)
+                  , ("wishlist/insert", wishInsertHandler, guestUsers)
                   , ("admin", adminHandler [], adminUsers)
                   , ("admin/insert", adminInsertHandler, adminUsers)
-                  , ("admin/edit", adminEditHandler, adminUsers) ]
+                  , ("admin/inserted", adminInsertedHandler, adminUsers)
+                  , ("admin/edit", adminEditHandler, adminUsers)
+                  , ("admin/edited", adminEditedHandler, adminUsers) ]
     addRoutes [ ("", mainHandler)
               , ("test", heistServe)
               , ("public/stylesheets", serveDirectory "public/stylesheets")
@@ -83,27 +87,23 @@ adminWishTableContent :: [Wish] -> SnapletSplice App App
 adminWishTableContent wishList = return . renderHtmlNodes $ do
     HTML.toHtml $ map editForm wishList
 
--- Splice to print the notification value
-adminInsertNotificationSplice :: (Maybe Wish) -> SnapletSplice App App
-adminInsertNotificationSplice (Just (Wish _ name _ _ amount _)) =
-    return . renderHtmlNodes $ insertNotification msg
-  where msg = ("Satte inn " ++ (show amount) ++ " stykker av '" ++ name ++ "'.")
-adminInsertNotificationSplice Nothing                           = return $ []
-
 adminInsertHandler :: Handler App App ()
 adminInsertHandler = do
     wish <- insertHandler
-    adminHandler [("notification", adminInsertNotificationSplice wish)]
+    redirect' "/admin/inserted" 303
 
-adminEditNotificationSplice :: (Maybe String) -> SnapletSplice App App
-adminEditNotificationSplice (Just msg) =
-    return . renderHtmlNodes $ insertNotification msg
-adminEditNotificationSplice Nothing = return $ []
+adminInsertedHandler :: Handler App App ()
+adminInsertedHandler =
+    adminHandler [ ("notification", notificationSplice "Ditt ønske ble satt inn i databasen!") ]
 
 adminEditHandler :: Handler App App ()
 adminEditHandler = do
     msg <- editHandler
-    adminHandler [("notification", adminEditNotificationSplice msg)]
+    redirect' "/admin/edited" 303
+
+adminEditedHandler :: Handler App App ()
+adminEditedHandler = do
+    adminHandler [("notification", notificationSplice "Ønsket ble oppdatert!")]
 
 adminHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
 adminHandler splices = do
@@ -182,7 +182,7 @@ formatWish wish = do
 -- Create the registration form
 registrationForm :: Integer -> HTML.Html
 registrationForm wishid =
-    HTML.form HTML.! ATTR.action "/wishlist" HTML.!  ATTR.method "post" $ do
+    HTML.form HTML.! ATTR.action "/wishlist/insert" HTML.!  ATTR.method "post" $ do
               HTML.input HTML.! ATTR.type_ "text" HTML.! ATTR.size "2" HTML.!  ATTR.name "amount" HTML.! ATTR.value "0"
               HTML.input HTML.! ATTR.type_ "hidden" HTML.! ATTR.name "wishid" HTML.! ATTR.value (HTML.toValue wishid)
               HTML.input HTML.! ATTR.type_ "submit" HTML.! ATTR.value "Registrer"
@@ -192,20 +192,30 @@ wishTableContent wishList = return . renderHtmlNodes $ do
     HTML.toHtml $ map formatWish wishList
 
 -- Splice to print the notification value
-registrationNotificationSplice :: (Maybe (String, Integer)) -> SnapletSplice App App
-registrationNotificationSplice (Just (name, amount)) = 
+notificationSplice :: String -> SnapletSplice App App
+notificationSplice msg =
     return . renderHtmlNodes $ insertNotification msg
-  where msg = ("Registrerte " ++ (show amount) ++ " stykker av '" ++ name ++ "'.")
-registrationNotificationSplice Nothing             = return $ []
 
 -- Handler for the wishlist view. Registers any purchases and displays wish
 -- list.
 wishViewHandler :: Handler App App ()
 wishViewHandler = do
-    ret <- purchaseHandler
     wishList <- getWishes
-    renderWithSplices "wishlist" [("notification", registrationNotificationSplice ret)
-                                 ,("wishTableContent", wishTableContent wishList)]
+    renderWithSplices "wishlist" [("wishTableContent", wishTableContent wishList)]
+
+-- Handler for the case where a wish was inserted
+wishInsertedViewHandler :: Handler App App ()
+wishInsertedViewHandler = do
+    wishList <- getWishes
+    renderWithSplices "wishlist" [ ("notification", notificationSplice "Ditt kjøp ble registrert!")
+                                 , ("wishTableContent", wishTableContent wishList)]
+
+-- Handler that performs the insert and does a redirect
+wishInsertHandler :: Handler App App ()
+wishInsertHandler = do
+    ret <- purchaseHandler
+    redirect' "/wishlist/inserted" 303
+
 
 -- Pull out parameters and perform purchase.
 purchaseHandler :: Handler App App (Maybe (String, Integer))

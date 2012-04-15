@@ -21,8 +21,6 @@ import            Snap.Snaplet.Heist as H
 import            Snap.Snaplet.Auth.Backends.JsonFile
 import            Snap.Snaplet.Session.Backends.CookieSession
 import            Snap.Util.FileServe
-import qualified  Text.Blaze.Html5 as HTML
-import qualified  Text.Blaze.Html5.Attributes as ATTR
 import            Text.Blaze.Renderer.XmlHtml
 import qualified  Data.Text
 
@@ -62,27 +60,33 @@ main = serveSnaplet defaultConfig appInit
 mainHandler :: Handler App App ()
 mainHandler = with authLens $ loginForm False
 
+-- Splice for displaying the admin table
 adminWishTableSplice :: [Wish] -> SnapletSplice App App
 adminWishTableSplice wishList = return . renderHtmlNodes $ wishEditFormTable wishList
 
+-- Insert handler, inserts wish and redirects to view page again.
 adminInsertHandler :: Handler App App ()
 adminInsertHandler = do
     insertHandler
     redirect' "/admin/inserted" 303
 
+-- Wraps adminHandler and adds a notification message
 adminInsertedHandler :: Handler App App ()
 adminInsertedHandler =
     adminHandler [ ("notification", notificationSplice "Ditt ønske ble satt inn i databasen!") ]
 
+-- Edit handler, updates wish entry and redirects
 adminEditHandler :: Handler App App ()
 adminEditHandler = do
     editHandler
     redirect' "/admin/edited" 303
 
+-- Wraps adminHandler and adds a notification message
 adminEditedHandler :: Handler App App ()
 adminEditedHandler = do
     adminHandler [("notification", notificationSplice "Ønsket ble oppdatert!")]
 
+-- Displays the wish list as editable form entries
 adminHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
 adminHandler splices = do
     wishList <- getWishes
@@ -136,32 +140,9 @@ insertHandler = do
          _            ->  return $ Nothing
 
 
--- Formats a wish entry in the guest table.
-formatWish :: Wish -> HTML.Html
-formatWish wish = do
-    HTML.tr $ do
-              HTML.td $ HTML.toHtml name
-              HTML.td $ imgUrl url
-              HTML.td $ HTML.toHtml store
-              HTML.td $ HTML.toHtml remaining
-              HTML.td $ registrationForm wishid
-  where name      = wishName wish
-        url       = wishImg wish
-        store     = wishStore wish
-        remaining = (wishAmount wish) - (wishBought wish)
-        wishid    = (wishId wish)
-
--- Create the registration form
-registrationForm :: Integer -> HTML.Html
-registrationForm wishid =
-    HTML.form HTML.! ATTR.action "/wishlist/insert" HTML.!  ATTR.method "post" $ do
-              HTML.input HTML.! ATTR.type_ "text" HTML.! ATTR.size "2" HTML.!  ATTR.name "amount" HTML.! ATTR.value "0"
-              HTML.input HTML.! ATTR.type_ "hidden" HTML.! ATTR.name "wishid" HTML.! ATTR.value (HTML.toValue wishid)
-              HTML.input HTML.! ATTR.type_ "submit" HTML.! ATTR.value "Registrer"
-
-wishTableContent :: [Wish] -> SnapletSplice App App
-wishTableContent wishList = return . renderHtmlNodes $ do
-    HTML.toHtml $ map formatWish wishList
+-- Splice displaying a wish list
+wishTableSplice :: [Wish] -> SnapletSplice App App
+wishTableSplice wishList = return . renderHtmlNodes $ wishTable wishList
 
 -- Splice to print the notification value
 notificationSplice :: String -> SnapletSplice App App
@@ -173,7 +154,7 @@ notificationSplice msg =
 wishViewHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
 wishViewHandler splices = do
     wishList <- getWishes
-    renderWithSplices "wishlist" (splices ++ [ ("wishTableContent", wishTableContent wishList) ])
+    renderWithSplices "wishlist" (splices ++ [ ("wishTableContent", wishTableSplice wishList) ])
 
 -- Handler for the case where a wish was inserted
 wishInsertedViewHandler :: Handler App App ()
@@ -199,7 +180,7 @@ purchaseHandler = do
 
 -- Given a wish id and the amount of items, subtract this wish' remaining
 -- amount.
-registerPurchase :: Integer -> Integer -> Handler App App (Maybe (String, Integer))
+registerPurchase :: WishID -> Integer -> Handler App App (Maybe (String, Integer))
 registerPurchase wishid amount = do
     wish <- getWish wishid
     let bought = wishBought wish

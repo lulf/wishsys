@@ -27,7 +27,7 @@ import qualified  Data.Text
 
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
-    addAuthRoutes [ ("wishlist", wishViewHandler, guestUsers)
+    addAuthRoutes [ ("wishlist", wishViewHandler [], guestUsers)
                   , ("wishlist/inserted", wishInsertedViewHandler, guestUsers)
                   , ("wishlist/insert", wishInsertHandler, guestUsers)
                   , ("admin", adminHandler [], adminUsers)
@@ -191,17 +191,15 @@ notificationSplice msg =
 
 -- Handler for the wishlist view. Registers any purchases and displays wish
 -- list.
-wishViewHandler :: Handler App App ()
-wishViewHandler = do
+wishViewHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
+wishViewHandler splices = do
     wishList <- getWishes
-    renderWithSplices "wishlist" [("wishTableContent", wishTableContent wishList)]
+    renderWithSplices "wishlist" (splices ++ [ ("wishTableContent", wishTableContent wishList) ])
 
 -- Handler for the case where a wish was inserted
 wishInsertedViewHandler :: Handler App App ()
-wishInsertedViewHandler = do
-    wishList <- getWishes
-    renderWithSplices "wishlist" [ ("notification", notificationSplice "Ditt kjøp ble registrert!")
-                                 , ("wishTableContent", wishTableContent wishList)]
+wishInsertedViewHandler =
+    wishViewHandler [ ("notification", notificationSplice "Ditt kjøp ble registrert!") ]
 
 -- Handler that performs the insert and does a redirect
 wishInsertHandler :: Handler App App ()

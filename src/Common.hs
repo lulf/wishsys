@@ -5,14 +5,7 @@
 module Common where
 
 -- Third party.
-import            Snap.Snaplet.Heist as H
-import qualified  Text.Blaze.Html5 as HTML
-import qualified  Text.Blaze.Html5.Attributes as ATTR
-import            Text.Blaze.Renderer.XmlHtml
 import            Data.String
-
-insertNotification :: String -> HTML.Html
-insertNotification msg = HTML.div HTML.! ATTR.id "notification" $ HTML.p $ HTML.toHtml msg
 
 type WishID = Integer
 

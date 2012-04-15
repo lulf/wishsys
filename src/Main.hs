@@ -9,6 +9,7 @@ import            Config
 import            Auth
 import            Common
 import            Persistence
+import            Render
 
 -- Third party.
 import qualified  Data.ByteString.Char8 as BS (unpack)
@@ -61,30 +62,8 @@ main = serveSnaplet defaultConfig appInit
 mainHandler :: Handler App App ()
 mainHandler = with authLens $ loginForm False
 
-
-imgUrl :: String -> HTML.Html
-imgUrl url = HTML.a HTML.! ATTR.href (HTML.toValue url) $ HTML.img HTML.!  ATTR.src (HTML.toValue url) HTML.!  ATTR.width "100" HTML.!  ATTR.height "100"
-
-editFormEntry :: String -> String -> String -> HTML.Html
-editFormEntry name value attrType =
-    HTML.input HTML.! ATTR.type_ (HTML.toValue attrType) HTML.! ATTR.name (HTML.toValue name) HTML.! ATTR.value (HTML.toValue value)
-
-editForm :: Wish -> HTML.Html
-editForm (Wish wishid name url store amount _ ) = do
-    HTML.form HTML.! ATTR.action "/admin/edit" HTML.! ATTR.method "post" HTML.!  ATTR.acceptCharset "ISO8859-1" $ do
-        HTML.tr $ do
-            editFormEntry "wishId" (show wishid) "hidden"
-            HTML.td $ editFormEntry "wishName" name "text"
-            HTML.td $ do editFormEntry "wishUrl" url "text" 
-                         imgUrl url
-            HTML.td $ editFormEntry "wishStore" store "text"
-            HTML.td $ editFormEntry "wishAmount" (show amount) "text"
-            HTML.td $ editFormEntry "wishDeleteFlag" "delete" "checkbox"
-            HTML.td $ HTML.input HTML.! ATTR.type_ "submit" HTML.! ATTR.value "Oppdater"
-
-adminWishTableContent :: [Wish] -> SnapletSplice App App
-adminWishTableContent wishList = return . renderHtmlNodes $ do
-    HTML.toHtml $ map editForm wishList
+adminWishTableSplice :: [Wish] -> SnapletSplice App App
+adminWishTableSplice wishList = return . renderHtmlNodes $ wishEditFormTable wishList
 
 adminInsertHandler :: Handler App App ()
 adminInsertHandler = do
@@ -107,7 +86,7 @@ adminEditedHandler = do
 adminHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
 adminHandler splices = do
     wishList <- getWishes
-    renderWithSplices "admin" (splices ++ [("wishTableContent", adminWishTableContent wishList)])
+    renderWithSplices "admin" (splices ++ [("wishTableContent", adminWishTableSplice wishList)])
 
 -- Insert handler deals with inserting new wishes into the database.
 editHandler :: Handler App App ()

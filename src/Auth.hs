@@ -5,7 +5,7 @@
 module Auth where
 
 import            Config
-import            Common
+import            Render
 import            Data.ByteString.Char8 (ByteString)
 import qualified  Data.Text
 import            Snap

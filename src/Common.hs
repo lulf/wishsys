@@ -14,9 +14,11 @@ import            Data.String
 insertNotification :: String -> HTML.Html
 insertNotification msg = HTML.div HTML.! ATTR.id "notification" $ HTML.p $ HTML.toHtml msg
 
+type WishID = Integer
+
 -- Wish data type
 data Wish = Wish {
-    wishId     :: Integer,
+    wishId     :: WishID,
     wishName   :: String,
     wishImg    :: String,
     wishStore  :: String,

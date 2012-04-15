@@ -13,7 +13,6 @@ import            Persistence
 -- Third party.
 import qualified  Data.ByteString.Char8 as BS (unpack)
 import            Snap
-import            Data.Maybe
 import            Database.HDBC.Sqlite3
 import            Snap.Snaplet.Hdbc
 import            Snap.Snaplet.Auth hiding (siteKey)
@@ -89,7 +88,7 @@ adminWishTableContent wishList = return . renderHtmlNodes $ do
 
 adminInsertHandler :: Handler App App ()
 adminInsertHandler = do
-    wish <- insertHandler
+    insertHandler
     redirect' "/admin/inserted" 303
 
 adminInsertedHandler :: Handler App App ()
@@ -98,7 +97,7 @@ adminInsertedHandler =
 
 adminEditHandler :: Handler App App ()
 adminEditHandler = do
-    msg <- editHandler
+    editHandler
     redirect' "/admin/edited" 303
 
 adminEditedHandler :: Handler App App ()
@@ -111,7 +110,7 @@ adminHandler splices = do
     renderWithSplices "admin" (splices ++ [("wishTableContent", adminWishTableContent wishList)])
 
 -- Insert handler deals with inserting new wishes into the database.
-editHandler :: Handler App App (Maybe String)
+editHandler :: Handler App App ()
 editHandler = do
     idParam <- getParam "wishId"
     nameParam <- getParam "wishName"
@@ -120,13 +119,8 @@ editHandler = do
     amountParam <- getParam "wishAmount"
     deleteFlagParam <- getParam "wishDeleteFlag"
     case (idParam, nameParam, urlParam, storeParam, amountParam, deleteFlagParam) of
-        (Just wishid,
-         Just name,
-         Just url,
-         Just store,
-         Just amount,
+        (Just wishid, _, _, _, _,
          Just "delete") -> do deleteWish (read (BS.unpack wishid) :: Integer)
-                              return $ Just ("Deleted '" ++ (BS.unpack name) ++ "'.")
         (Just wishid,
          Just name,
          Just url,
@@ -139,8 +133,7 @@ editHandler = do
                                     (read (BS.unpack amount) :: Integer)
                                     0)
                    updateWish wish
-                   return $ Just ("Updated '" ++ (BS.unpack name) ++ "'.")
-        _   -> return $ Nothing
+        _   -> return ()
 
 -- Insert handler deals with inserting new wishes into the database.
 insertHandler :: Handler App App (Maybe Wish)
@@ -213,7 +206,7 @@ wishInsertedViewHandler = do
 -- Handler that performs the insert and does a redirect
 wishInsertHandler :: Handler App App ()
 wishInsertHandler = do
-    ret <- purchaseHandler
+    purchaseHandler
     redirect' "/wishlist/inserted" 303
 
 

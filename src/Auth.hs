@@ -24,10 +24,9 @@ addAuthRoutes routeList = do
     let authRouteList = map createAuthRoute routeList
     addRoutes authRouteList
     
--- FIXME: Support more than one user
 createAuthRoute :: (ByteString, Handler App App (), [String]) -> (ByteString, Handler App App ())
-createAuthRoute (routePath, handler, (user:_)) = (routePath, handleAsUser user handler)
 createAuthRoute (routePath, handler, []) = (routePath, handler)
+createAuthRoute (routePath, handler, userList) = (routePath, handleAsUser userList handler)
 
 -- Performs the actual login.
 loginHandler :: Handler App App ()
@@ -66,11 +65,12 @@ dispatchUser authUser = do
   where user = Data.Text.unpack (userLogin authUser)
 
 -- Verifies user credentials and username before running handler
-handleAsUser :: String -> (Handler App App ()) -> Handler App App ()
-handleAsUser user fn = do
+handleAsUser :: [String] -> (Handler App App ()) -> Handler App App ()
+handleAsUser userList fn = do
     mu <- with authLens currentUser
     case mu of
-      Just u -> do if (userLogin u) == (Data.Text.pack user)
+      Just u -> let userName = Data.Text.unpack (userLogin u)
+                in if userName `elem` userList
                       then fn
                       else redirect "/" 
       Nothing -> redirect "/"

@@ -1,13 +1,13 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 
 module Persistence where
 
-import            Common
-import            Snap.Snaplet.Hdbc
-import            Data.Map ((!))
+import           Common
+import           Data.Map          ((!))
+import           Snap.Snaplet.Hdbc
 ---------------------------------------------
 -- Functions for interacting with database --
 ---------------------------------------------

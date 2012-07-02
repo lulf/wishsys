@@ -1,17 +1,17 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 module Auth where
 
-import            Config
-import            Render
-import            Data.ByteString.Char8 (ByteString)
-import qualified  Data.Text
-import            Snap
-import            Snap.Snaplet.Auth
-import            Snap.Snaplet.Heist as H
-import            Text.Blaze.Renderer.XmlHtml
+import           Config
+import           Data.ByteString.Char8       (ByteString)
+import qualified Data.Text
+import           Render
+import           Snap
+import           Snap.Snaplet.Auth
+import           Snap.Snaplet.Heist          as H
+import           Text.Blaze.Renderer.XmlHtml
 
 --------------------
 -- Authentication --
@@ -19,11 +19,11 @@ import            Text.Blaze.Renderer.XmlHtml
 
 -- Add routes that are authenticated by a user. Essentially wraps handlers in
 -- the handleAsUser function.
-addAuthRoutes :: [(ByteString, Handler App App (), [String])] -> Initializer App App () 
+addAuthRoutes :: [(ByteString, Handler App App (), [String])] -> Initializer App App ()
 addAuthRoutes routeList = do
     let authRouteList = map createAuthRoute routeList
     addRoutes authRouteList
-    
+
 createAuthRoute :: (ByteString, Handler App App (), [String]) -> (ByteString, Handler App App ())
 createAuthRoute (routePath, handler, []) = (routePath, handler)
 createAuthRoute (routePath, handler, userList) = (routePath, handleAsUser userList handler)
@@ -72,7 +72,7 @@ handleAsUser userList fn = do
       Just u -> let userName = Data.Text.unpack (userLogin u)
                 in if userName `elem` userList
                       then fn
-                      else redirect "/" 
+                      else redirect "/"
       Nothing -> redirect "/"
 
 -- Redirect to a value if set

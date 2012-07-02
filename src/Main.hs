@@ -1,28 +1,28 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 module Main where
 
 -- My own modules
-import            Config
-import            Auth
-import            Common
-import            Persistence
-import            Render
+import           Auth
+import           Common
+import           Config
+import           Persistence
+import           Render
 
 -- Third party.
-import qualified  Data.ByteString.Char8 as BS (unpack)
-import            Snap
-import            Database.HDBC.Sqlite3
-import            Snap.Snaplet.Hdbc
-import            Snap.Snaplet.Auth hiding (siteKey)
-import            Snap.Snaplet.Heist as H
-import            Snap.Snaplet.Auth.Backends.JsonFile
-import            Snap.Snaplet.Session.Backends.CookieSession
-import            Snap.Util.FileServe
-import            Text.Blaze.Renderer.XmlHtml
-import qualified  Data.Text
+import qualified Data.ByteString.Char8                       as BS (unpack)
+import qualified Data.Text
+import           Database.HDBC.Sqlite3
+import           Snap
+import           Snap.Snaplet.Auth                           hiding (siteKey)
+import           Snap.Snaplet.Auth.Backends.JsonFile
+import           Snap.Snaplet.Hdbc
+import           Snap.Snaplet.Heist                          as H
+import           Snap.Snaplet.Session.Backends.CookieSession
+import           Snap.Util.FileServe
+import           Text.Blaze.Renderer.XmlHtml
 
 appInit :: SnapletInit App App
 appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
@@ -39,7 +39,7 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
               , ("public/stylesheets", serveDirectory "public/stylesheets")
               , ("login", loginHandler)
               , ("logout", logoutHandler) ]
-              
+
     _heistlens' <- nestSnaplet "heist" heist $ heistInit "templates"
     _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager siteKey "_session" Nothing
     _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens userDB

@@ -1,7 +1,7 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 
 -- This module contains all rendering functions
 module Render (
@@ -12,9 +12,9 @@ module Render (
 ) where
 
 -- Third party.
-import qualified  Text.Blaze.Html5 as HTML
-import qualified  Text.Blaze.Html5.Attributes as ATTR
-import            Common
+import           Common
+import qualified Text.Blaze.Html5            as HTML
+import qualified Text.Blaze.Html5.Attributes as ATTR
 
 -- Creates a insert notification HTML tag.
 insertNotification :: String -> HTML.Html
@@ -36,7 +36,7 @@ wishEditForm (Wish wishid name url store amount _ ) = do
         HTML.tr $ do
             editFormEntry "wishId" (show wishid) "hidden"
             HTML.td $ editFormEntry "wishName" name "text"
-            HTML.td $ do editFormEntry "wishUrl" url "text" 
+            HTML.td $ do editFormEntry "wishUrl" url "text"
                          imgUrl url
             HTML.td $ editFormEntry "wishStore" store "text"
             HTML.td $ editFormEntry "wishAmount" (show amount) "text"

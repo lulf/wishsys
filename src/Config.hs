@@ -1,18 +1,18 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 module Config where
 
 -- Third party.
-import            Control.Monad.State
-import            Data.Lens.Template
-import            Database.HDBC.Sqlite3
-import            Snap
-import            Snap.Snaplet.Auth
-import            Snap.Snaplet.Heist as H
-import            Snap.Snaplet.Hdbc
-import            Snap.Snaplet.Session
+import           Control.Monad.State
+import           Data.Lens.Template
+import           Database.HDBC.Sqlite3
+import           Snap
+import           Snap.Snaplet.Auth
+import           Snap.Snaplet.Hdbc
+import           Snap.Snaplet.Heist    as H
+import           Snap.Snaplet.Session
 
 -- User configurable
 

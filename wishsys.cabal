@@ -1,5 +1,5 @@
 Name:                wishsys
-Version:             0.3
+Version:             0.4
 Synopsis:            Wish list web app
 Description:         Wish list web app where administrators can insert wishes,
                      and guest users can register purchases.
@@ -29,7 +29,10 @@ Executable wishsys
     heist == 0.11.*,
     xmlhtml == 0.2.*,
     blaze-html == 0.5.*,
-    text == 0.11.*
+    text == 0.11.*,
+    ConfigFile == 1.1.*,
+    MissingH == 1.2.*,
+    split    == 0.2.*
 
   if impl(ghc >= 6.12.0)
     ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2

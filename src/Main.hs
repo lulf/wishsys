@@ -8,12 +8,14 @@ module Main where
 import           Auth
 import           Common
 import           Config
+import           SnapConfig
 import           Persistence
 import           Render
 
 -- Third party.
 import qualified Data.ByteString.Char8                       as BS (unpack)
 import qualified Data.Text
+import           Data.Maybe
 import           Database.HDBC.Sqlite3
 import           Snap
 import           Snap.Snaplet.Auth                           hiding (siteKey)
@@ -24,26 +26,28 @@ import           Snap.Snaplet.Session.Backends.CookieSession
 import           Snap.Util.FileServe
 import           Text.Blaze.Renderer.XmlHtml
 
-appInit :: SnapletInit App App
-appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
-    addAuthRoutes [ ("wishlist", wishViewHandler [], guestUsers)
-                  , ("wishlist/inserted", wishInsertedViewHandler, guestUsers)
-                  , ("wishlist/insert", wishInsertHandler, guestUsers)
-                  , ("admin", adminHandler [], adminUsers)
-                  , ("admin/insert", adminInsertHandler, adminUsers)
-                  , ("admin/inserted", adminInsertedHandler, adminUsers)
-                  , ("admin/edit", adminEditHandler, adminUsers)
-                  , ("admin/edited", adminEditedHandler, adminUsers) ]
+import           System.Environment
+
+appInit :: WishsysConfig -> SnapletInit App App
+appInit config = makeSnaplet "wishsys" "Wish list application" Nothing $ do
+    addAuthRoutes [ ("wishlist", wishViewHandler [], guestUsers config)
+                  , ("wishlist/inserted", wishInsertedViewHandler, guestUsers config)
+                  , ("wishlist/insert", wishInsertHandler, guestUsers config)
+                  , ("admin", adminHandler [], adminUsers config)
+                  , ("admin/insert", adminInsertHandler, adminUsers config)
+                  , ("admin/inserted", adminInsertedHandler, adminUsers config)
+                  , ("admin/edit", adminEditHandler, adminUsers config)
+                  , ("admin/edited", adminEditedHandler, adminUsers config) ]
     addRoutes [ ("", mainHandler)
               , ("test", heistServe)
               , ("public/stylesheets", serveDirectory "public/stylesheets")
-              , ("login", loginHandler)
+              , ("login", loginHandler config)
               , ("logout", logoutHandler) ]
 
     _heistlens' <- nestSnaplet "heist" heist $ heistInit "templates"
-    _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager siteKey "_session" Nothing
-    _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens userDB
-    let sqli = connectSqlite3 wishDB
+    _sesslens' <- nestSnaplet "session" sessLens $ initCookieSessionManager (siteKey config) "_session" Nothing
+    _authlens' <- nestSnaplet "auth" authLens $ initJsonFileAuthManager defAuthSettings sessLens $ userDB config
+    let sqli = connectSqlite3 $ wishDB config
     _dblens'  <- nestSnaplet "hdbc" dbLens $ hdbcInit sqli
     -- Unable to make hdbc work yet
     -- _authlens' <- nestSnaplet "auth" authLens $ initHdbcAuthManager defAuthSettings sessLens sqli defAuthTable defQueries
@@ -54,7 +58,19 @@ appInit = makeSnaplet "wishsys" "Wish list application" Nothing $ do
     return $ App _heistlens' _authlens' _sesslens' _dblens'
 
 main :: IO ()
-main = serveSnaplet defaultConfig appInit
+main = do
+  args <- getArgs
+  let configFile = findConfigFile args
+  config <- fromConfigFile $ fromMaybe "config.cfg" configFile
+  serveSnaplet defaultConfig (appInit config)
+
+findConfigFile :: [String] -> Maybe String
+findConfigFile [] = Nothing
+findConfigFile (_:[]) = Nothing
+findConfigFile (arg:file:args) =
+  if arg == "--config"
+  then Just file
+  else findConfigFile (file:args)
 
 -- Render the login form page
 mainHandler :: Handler App App ()

@@ -5,6 +5,7 @@
 module Auth where
 
 import           Config
+import           SnapConfig
 import           Data.ByteString.Char8       (ByteString)
 import qualified Data.Text
 import           Render
@@ -29,14 +30,14 @@ createAuthRoute (routePath, handler, []) = (routePath, handler)
 createAuthRoute (routePath, handler, userList) = (routePath, handleAsUser userList handler)
 
 -- Performs the actual login.
-loginHandler :: Handler App App ()
-loginHandler = with authLens $ do
+loginHandler :: WishsysConfig -> Handler App App ()
+loginHandler config = with authLens $ do
     loginUser "login" "password" (Just "remember") onFailure onSuccess
     where onFailure _ = loginForm True
           onSuccess   = do
                         mu <- currentUser
                         case mu of
-                                Just user -> dispatchUser user
+                                Just user -> dispatchUser user config
                                 Nothing -> loginForm True
 
 
@@ -46,20 +47,20 @@ loginForm True = do
     renderWithSplices "login" [("notification", loginFailedNotification)]
 loginForm False = H.render "login"
 
-loginFailedNotification :: SnapletISplice App --(AuthManager App)
+loginFailedNotification :: SnapletISplice App
 loginFailedNotification = return . renderHtmlNodes $ insertNotification "Kunne ikke logge inn: brukernavn/passord er ugyldig"
 
-isAdmin :: String -> Bool
-isAdmin user = user `elem` adminUsers
+isAdmin :: String -> WishsysConfig -> Bool
+isAdmin user config = user `elem` (adminUsers config)
 
-isGuest:: String -> Bool
-isGuest user = user `elem` guestUsers
+isGuest:: String -> WishsysConfig -> Bool
+isGuest user config = user `elem` (guestUsers config)
 
-dispatchUser :: AuthUser -> Handler App (AuthManager App) ()
-dispatchUser authUser = do
-    if isGuest user
+dispatchUser :: AuthUser -> WishsysConfig -> Handler App (AuthManager App) ()
+dispatchUser authUser config = do
+    if isGuest user config
        then redirect "/wishlist"
-       else if isAdmin user
+       else if isAdmin user config
                then redirect "/admin"
                else redirect "/"
   where user = Data.Text.unpack (userLogin authUser)

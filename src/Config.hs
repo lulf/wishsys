@@ -1,47 +1,34 @@
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE UndecidableInstances, OverlappingInstances #-}
 module Config where
 
 -- Third party.
-import           Control.Monad.State
-import           Control.Lens
-import           Database.HDBC.Sqlite3
-import           Snap
-import           Snap.Snaplet.Auth
-import           Snap.Snaplet.Hdbc
-import           Snap.Snaplet.Heist    as H
-import           Snap.Snaplet.Session
+import Data.ConfigFile
+import Data.Either.Utils
+import Data.List.Split
 
 -- User configurable
 
-guestUsers :: [String]
-guestUsers = [""]
-adminUsers :: [String]
-adminUsers = [""]
+data WishsysConfig = WishsysConfig {
+  guestUsers :: [String],
+  adminUsers :: [String],
+  wishDB :: String,
+  siteKey :: String,
+  userDB :: String
+} deriving (Show)
 
-wishDB :: String
-wishDB = "config/wishsys.db"
-
-userDB :: String
-userDB = "config/users.json"
-
-siteKey :: String
-siteKey = "config/site.txt"
-
--- Application setup
-
-data App = App
-   { _heist     :: Snaplet (Heist App)
-   , _authLens  :: Snaplet (AuthManager App)
-   , _sessLens  :: Snaplet SessionManager
-   , _dbLens    :: Snaplet (HdbcSnaplet Connection IO)
-   }
-
-makeLenses ''App
-
-instance HasHeist App where
-    heistLens = subSnaplet heist
-instance HasHdbc (Handler App App) Connection IO where
-    getHdbcState = with dbLens get
+fromConfigFile :: String -> IO WishsysConfig
+fromConfigFile fileName = do
+  cf <- readfile emptyCP fileName :: IO (Either CPError ConfigParser)
+  let cp = forceEither cf
+  let wishdb = (forceEither $ get cp "DEFAULT" "wish_db") :: String
+  let userdb = (forceEither $ get cp "DEFAULT" "user_db") :: String
+  let sitekey = (forceEither $ get cp "DEFAULT" "site_key") :: String
+  let guests = (forceEither $ get cp "DEFAULT" "guest_users") :: String
+  let admins = (forceEither $ get cp "DEFAULT" "admin_users") :: String
+  let config = WishsysConfig (splitOn "," guests)
+                             (splitOn "," admins)
+                             wishdb
+                             sitekey
+                             userdb
+  putStrLn $ "String up with following config: " ++ (show config)
+  return $ config

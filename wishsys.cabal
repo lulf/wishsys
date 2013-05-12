@@ -1,5 +1,5 @@
 Name:                wishsys
-Version:             0.2
+Version:             0.3
 Synopsis:            Wish list web app
 Description:         Wish list web app where administrators can insert wishes,
                      and guest users can register purchases.
@@ -18,18 +18,17 @@ Executable wishsys
   Build-depends:
     base >= 4 && < 5,
     bytestring >= 0.9.1 && < 0.10,
-    MonadCatchIO-transformers >= 0.2.1 && < 0.3,
-    mtl >= 2 && < 3,
-    snap        == 0.8.*,
-    snap-core   == 0.8.*,
-    snap-server == 0.8.*,
+    MonadCatchIO-transformers >= 0.2.1 && < 0.4,
+    mtl >= 2 && < 2.2,
+    snap        == 0.11.*,
+    snap-core   == 0.9.*,
     containers  == 0.4.*,
-    data-lens-template == 2.1.*,
+    lens	== 3.9.*,
     HDBC-sqlite3 == 2.1.*,
-    snaplet-hdbc == 0.8.*,
-    heist == 0.8.*,
-    xmlhtml == 0.1.*,
-    blaze-html == 0.4.*,
+    snaplet-hdbc == 0.11,
+    heist == 0.11.*,
+    xmlhtml == 0.2.*,
+    blaze-html == 0.5.*,
     text == 0.11.*
 
   if impl(ghc >= 6.12.0)

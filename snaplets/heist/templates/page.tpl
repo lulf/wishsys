@@ -2,7 +2,7 @@
 <html>
   <apply template="page-head" />
   <body>
-  <content />
+  <apply-content />
   <apply template="page-footer" />
   </body>
 </html>

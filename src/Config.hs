@@ -6,7 +6,7 @@ module Config where
 
 -- Third party.
 import           Control.Monad.State
-import           Data.Lens.Template
+import           Control.Lens
 import           Database.HDBC.Sqlite3
 import           Snap
 import           Snap.Snaplet.Auth
@@ -17,15 +17,15 @@ import           Snap.Snaplet.Session
 -- User configurable
 
 guestUsers :: [String]
-guestUsers = ["bryllup"]
+guestUsers = [""]
 adminUsers :: [String]
-adminUsers = ["admin"]
+adminUsers = [""]
 
 wishDB :: String
 wishDB = "config/wishsys.db"
 
 userDB :: String
-userDB = "users.json"
+userDB = "config/users.json"
 
 siteKey :: String
 siteKey = "config/site.txt"
@@ -39,8 +39,9 @@ data App = App
    , _dbLens    :: Snaplet (HdbcSnaplet Connection IO)
    }
 
-makeLenses [''App]
+makeLenses ''App
 
-instance HasHeist App where heistLens = subSnaplet heist
+instance HasHeist App where
+    heistLens = subSnaplet heist
 instance HasHdbc (Handler App App) Connection IO where
     getHdbcState = with dbLens get

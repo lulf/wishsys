@@ -61,7 +61,7 @@ mainHandler :: Handler App App ()
 mainHandler = with authLens $ loginForm False
 
 -- Splice for displaying the admin table
-adminWishTableSplice :: [Wish] -> SnapletSplice App App
+adminWishTableSplice :: [Wish] -> SnapletISplice App
 adminWishTableSplice wishList = return . renderHtmlNodes $ wishEditFormTable wishList
 
 -- Insert handler, inserts wish and redirects to view page again.
@@ -87,7 +87,7 @@ adminEditedHandler = do
     adminHandler [("notification", notificationSplice "Ønsket ble oppdatert!")]
 
 -- Displays the wish list as editable form entries
-adminHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
+adminHandler :: [(Data.Text.Text, SnapletISplice App)] -> Handler App App ()
 adminHandler splices = do
     wishList <- getWishes
     renderWithSplices "admin" (splices ++ [("wishTableContent", adminWishTableSplice wishList)])
@@ -141,17 +141,17 @@ insertHandler = do
 
 
 -- Splice displaying a wish list
-wishTableSplice :: [Wish] -> SnapletSplice App App
+wishTableSplice :: [Wish] -> SnapletISplice App
 wishTableSplice wishList = return . renderHtmlNodes $ wishTable wishList
 
 -- Splice to print the notification value
-notificationSplice :: String -> SnapletSplice App App
+notificationSplice :: String -> SnapletISplice App
 notificationSplice msg =
     return . renderHtmlNodes $ insertNotification msg
 
 -- Handler for the wishlist view. Registers any purchases and displays wish
 -- list.
-wishViewHandler :: [(Data.Text.Text, SnapletSplice App App)] -> Handler App App ()
+wishViewHandler :: [(Data.Text.Text, SnapletISplice App)] -> Handler App App ()
 wishViewHandler splices = do
     wishList <- getWishes
     renderWithSplices "wishlist" (splices ++ [ ("wishTableContent", wishTableSplice wishList) ])

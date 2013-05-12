@@ -46,7 +46,7 @@ loginForm True = do
     renderWithSplices "login" [("notification", loginFailedNotification)]
 loginForm False = H.render "login"
 
-loginFailedNotification :: SnapletSplice App (AuthManager App)
+loginFailedNotification :: SnapletISplice App --(AuthManager App)
 loginFailedNotification = return . renderHtmlNodes $ insertNotification "Kunne ikke logge inn: brukernavn/passord er ugyldig"
 
 isAdmin :: String -> Bool

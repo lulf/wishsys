@@ -23,7 +23,7 @@ Executable wishsys
     snap        == 0.11.*,
     snap-core   == 0.9.*,
     containers  == 0.4.*,
-    lens	== 3.9.*,
+    lens	== 3.8.*,
     HDBC-sqlite3 == 2.1.*,
     snaplet-hdbc == 0.11,
     heist == 0.11.*,

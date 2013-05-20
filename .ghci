@@ -1,4 +1,2 @@
-:set -isrc
-:set -hide-package MonadCatchIO-mtl
-:set -hide-package monads-fd
-:set -XOverloadedStrings
+:set -i.:config:dist/build/autogen
+:set -XCPP -XTemplateHaskell -XQuasiQuotes -XTypeFamilies -XFlexibleContexts -XGADTs -XOverloadedStrings -XMultiParamTypeClasses -XGeneralizedNewtypeDeriving -XEmptyDataDecls

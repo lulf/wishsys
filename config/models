@@ -12,10 +12,14 @@ Wish
     name Text
     imageUrl Text
     stores Text
-    amount Int
-    bought Int
-WishStore
+    amount Int64
+    bought Int64
+WishOwner
     wish WishId
     user UserId
+WishViewer
+    wish WishId
+    user UserId
+
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

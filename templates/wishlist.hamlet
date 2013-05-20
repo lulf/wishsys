@@ -1,0 +1,19 @@
+<h1>_{MsgRegister}
+
+<p>_{MsgRegisterExplanation}
+<p>Number of wishes: #{numWishes}
+<table>
+    <tr>
+        <th>_{MsgHeaderWishName}
+        <th>_{MsgHeaderWishPhoto}
+        <th>_{MsgHeaderWishStores}
+        <th>_{MsgHeaderWishRemaining}
+        <th>_{MsgHeaderWishRegister}
+$forall Entity wishId wish <- wishes
+    <tr>
+        <td>#{wishName wish}
+        <td>#{wishImageUrl wish}
+        <td>#{wishStores wish}
+        <td>#{show $ wishAmount wish}
+        <td>#{show $ wishBought wish}
+<p>_{MsgRegisterTip}

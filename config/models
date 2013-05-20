@@ -12,8 +12,8 @@ Wish
     name Text
     imageUrl Text
     stores Text
-    amount Integer
-    bought Integer
+    amount Int
+    bought Int
 WishStore
     wish WishId
     user UserId

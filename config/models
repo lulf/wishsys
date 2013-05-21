@@ -8,17 +8,20 @@ Email
     user UserId Maybe
     verkey Text Maybe
     UniqueEmail email
+Wishlist
+    name Text
 Wish
     name Text
     imageUrl Text
     stores Text
     amount Int64
     bought Int64
+    list WishlistId
 WishOwner
-    wish WishId
+    list WishlistId
     user UserId
 WishViewer
-    wish WishId
+    list WishlistId
     user UserId
 
 

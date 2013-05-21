@@ -4,8 +4,8 @@ module Handler.WishList where
 
 import Import
 
-getWishListR :: Text -> Handler RepHtml
-getWishListR listName = do
+getWishListR :: WishlistId -> Handler RepHtml
+getWishListR _ = do
     wishes <- runDB $ selectList ([] :: [Filter Wish]) []
     let numWishes = length wishes
     let handlerName = "getWishListR" :: Text

@@ -132,7 +132,7 @@ instance YesodAuth App where
     -- Where to send a user after successful login
     loginDest _ = WishListViewR
     -- Where to send a user after logout
-    logoutDest _ = HomeR
+    logoutDest _ = AuthR LoginR
 
     getAuthId creds = runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds

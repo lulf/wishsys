@@ -1,0 +1,8 @@
+<h1>_{MsgOwnerWishes}
+<ul>
+$forall Entity wishListId wishList <- ownerWishes
+    <li>#{wishlistName wishList}
+<h1>_{MsgViewWishes}
+<ul>
+$forall Entity wishListId wishList <- viewableWishes
+    <li>#{wishlistName wishList}

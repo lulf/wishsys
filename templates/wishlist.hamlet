@@ -1,5 +1,7 @@
 <h1>_{MsgRegister}
 
+<h2>#{listName}
+
 <p>_{MsgRegisterExplanation}
 <p>Number of wishes: #{numWishes}
 <table>

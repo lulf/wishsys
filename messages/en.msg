@@ -7,3 +7,5 @@ HeaderWishStores: Butikker
 HeaderWishRemaining: Gjenværende
 HeaderWishRegister: Registrer
 HeaderWishName: Hva
+OwnerWishes: Dine ønskelister
+ViewWishes: Ønskelister delt med deg

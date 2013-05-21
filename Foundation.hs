@@ -97,6 +97,19 @@ instance Yesod App where
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
 
+    isAuthorized HomeR _ = return Authorized
+    isAuthorized WishListViewR _ = return Authorized
+    isAuthorized (WishListR id) _ = do
+        mauth <- maybeAuth
+        case mauth of
+            Nothing -> return AuthenticationRequired
+            Just (Entity userid _) -> runDB $ do
+                                        wishList <- selectList [WishOwnerList ==. id, WishOwnerUser ==. userid] []
+                                        case wishList of
+                                            [] -> return $ Unauthorized "You do not have permission to view this wish list"
+                                            _ -> return Authorized
+    isAuthorized _ _ = return Authorized
+
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
     -- expiration dates to be set far in the future without worry of

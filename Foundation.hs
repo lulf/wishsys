@@ -130,7 +130,7 @@ instance YesodAuth App where
     type AuthId App = UserId
 
     -- Where to send a user after successful login
-    loginDest _ = HomeR
+    loginDest _ = WishListR
     -- Where to send a user after logout
     logoutDest _ = HomeR
 

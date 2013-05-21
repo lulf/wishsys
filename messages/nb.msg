@@ -1,1 +1,0 @@
-Register: Registrere kjøp

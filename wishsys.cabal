@@ -21,7 +21,6 @@ library
                      Settings.Development
                      Handler.Home
                      Handler.WishList
-                     Handler.WishListView
                      Handler.Register
 
     if flag(dev) || flag(library-only)

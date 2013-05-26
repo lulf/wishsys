@@ -99,17 +99,12 @@ instance Yesod App where
     authRoute _ = Just $ AuthR LoginR
 
     isAuthorized HomeR _ = return Authorized
-    isAuthorized WishListViewR _ = do
-        mauth <- maybeAuth
-        case mauth of
-            Nothing -> return AuthenticationRequired
-            _ -> return Authorized
     isAuthorized (WishListR id) _ = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
             Just (Entity userid _) -> runDB $ do
-                                        wishList <- selectList [WishlistId ==. id, WishlistOwner ==. userid] []
+                                        wishList <- selectList [WishlistViewerListId ==. id, WishlistViewerOwner ==. userid] []
                                         case wishList of
                                             [] -> return $ Unauthorized "You do not have permission to view this wish list"
                                             _ -> return Authorized
@@ -148,7 +143,7 @@ instance YesodAuth App where
     type AuthId App = UserId
 
     -- Where to send a user after successful login
-    loginDest _ = WishListViewR
+    loginDest _ = RegisterR
     -- Where to send a user after logout
     logoutDest _ = AuthR LoginR
 

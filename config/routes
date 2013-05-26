@@ -5,6 +5,5 @@
 /robots.txt RobotsR GET
 
 / HomeR GET POST
-/register RegisterR GET POST
-/wishlist WishListViewR GET POST
+/wishlist RegisterR GET POST
 /wishlist/#WishlistId WishListR GET

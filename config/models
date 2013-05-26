@@ -4,10 +4,15 @@ User
     salt Text
     UniqueUser name
     deriving Typeable
+
 Wishlist
     name Text
-    guestPassword Text
+
+WishlistViewer
+    listId WishlistId
     owner UserId
+    guest UserId
+
 Wish
     name Text
     imageUrl Text

@@ -17,16 +17,17 @@ postRegisterR :: Handler RepHtml
 postRegisterR = do
     ((result, _), _) <- runFormPost registerForm
     case result of
-        FormSuccess (email, password) -> do
-            user <- liftIO $ H.setPassword password (User email "" "")
+        FormSuccess (name, adminPassword, guestPassword) -> do
+            user <- liftIO $ H.setPassword adminPassword (User name "" "")
             _ <- runDB $ insert user
-            setMessage "You have been registered!" -- I18n
+            setMessage "Wish list successfully created!" -- i18n
             redirect $ AuthR LoginR
         _ -> do
-            setMessage "Error registering user" -- I18n
+            setMessage "Error creating with list " -- i18n
             redirect $ RegisterR
 
-registerForm :: Form (Text, Text)
-registerForm = renderBootstrap $ (,)
-    <$> areq textField "Email" Nothing
-    <*> areq passwordField "Password" Nothing
+registerForm :: Form (Text, Text, Text)
+registerForm = renderBootstrap $ (,,)
+    <$> areq textField "Wish list name" Nothing
+    <*> areq passwordField "Admin password" Nothing
+    <*> areq passwordField "Guest password" Nothing

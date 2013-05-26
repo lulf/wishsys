@@ -152,7 +152,7 @@ instance YesodAuth App where
     -- Where to send a user after logout
     logoutDest _ = AuthR LoginR
 
-    getAuthId creds = getAuthIdHashDB AuthR (Just . UniqueEmail) creds
+    getAuthId creds = getAuthIdHashDB AuthR (Just . UniqueUser) creds
     --getAuthId creds = runDB $ do
     --    x <- getBy $ UniqueEmail $ credsIdent creds
     --    case x of
@@ -160,7 +160,7 @@ instance YesodAuth App where
     --        Nothing -> do
     --            fmap Just $ insert $ User (credsIdent creds) Nothing
 
-    authPlugins _ = [authHashDB (Just . UniqueEmail)]
+    authPlugins _ = [authHashDB (Just . UniqueUser)]
 
     authHttpManager = httpManager
 

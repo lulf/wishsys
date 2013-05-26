@@ -1,8 +1,8 @@
 User
-    email Text
+    name Text
     password Text
     salt Text
-    UniqueEmail email
+    UniqueUser name
     deriving Typeable
 Wishlist
     name Text

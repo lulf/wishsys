@@ -9,3 +9,5 @@ HeaderWishRegister: Registrer
 HeaderWishName: Hva
 OwnerWishes: Dine ønskelister
 ViewWishes: Ønskelister delt med deg
+AddWishList: Lag ny ønskeliste
+RegisterHeader: Registrere ny bruker

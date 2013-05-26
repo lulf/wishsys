@@ -19,6 +19,7 @@ import Model
 import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import System.Log.FastLogger (Logger)
+import Yesod.Auth.HashDB (authHashDB, getAuthIdHashDB)
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -98,13 +99,17 @@ instance Yesod App where
     authRoute _ = Just $ AuthR LoginR
 
     isAuthorized HomeR _ = return Authorized
-    isAuthorized WishListViewR _ = return Authorized
+    isAuthorized WishListViewR _ = do
+        mauth <- maybeAuth
+        case mauth of
+            Nothing -> return AuthenticationRequired
+            _ -> return Authorized
     isAuthorized (WishListR id) _ = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
             Just (Entity userid _) -> runDB $ do
-                                        wishList <- selectList [WishOwnerList ==. id, WishOwnerUser ==. userid] []
+                                        wishList <- selectList [WishlistId ==. id, WishlistOwner ==. userid] []
                                         case wishList of
                                             [] -> return $ Unauthorized "You do not have permission to view this wish list"
                                             _ -> return Authorized
@@ -147,15 +152,15 @@ instance YesodAuth App where
     -- Where to send a user after logout
     logoutDest _ = AuthR LoginR
 
-    getAuthId creds = runDB $ do
-        x <- getBy $ UniqueUser $ credsIdent creds
-        case x of
-            Just (Entity uid _) -> return $ Just uid
-            Nothing -> do
-                fmap Just $ insert $ User (credsIdent creds) Nothing
+    getAuthId creds = getAuthIdHashDB AuthR (Just . UniqueEmail) creds
+    --getAuthId creds = runDB $ do
+    --    x <- getBy $ UniqueEmail $ credsIdent creds
+    --    case x of
+    --        Just (Entity uid _) -> return $ Just uid
+    --        Nothing -> do
+    --            fmap Just $ insert $ User (credsIdent creds) Nothing
 
-    -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def, authGoogleEmail]
+    authPlugins _ = [authHashDB (Just . UniqueEmail)]
 
     authHttpManager = httpManager
 

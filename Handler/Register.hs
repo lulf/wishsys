@@ -4,6 +4,7 @@ module Handler.Register where
 import Import
 import qualified Yesod.Auth.HashDB as H
 import Yesod.Auth
+import qualified Data.Text as T
 
 getRegisterR :: Handler RepHtml
 getRegisterR = do
@@ -18,8 +19,13 @@ postRegisterR = do
     ((result, _), _) <- runFormPost registerForm
     case result of
         FormSuccess (name, adminPassword, guestPassword) -> do
-            user <- liftIO $ H.setPassword adminPassword (User name "" "")
-            _ <- runDB $ insert user
+            let adminName = T.pack ("admin_" ++ (T.unpack name))
+            let guestName = T.pack ("guest_" ++ (T.unpack name))
+            adminUser <- liftIO $ H.setPassword adminPassword (User adminName "" "")
+            guestUser <- liftIO $ H.setPassword guestPassword (User guestName "" "")
+            adminId <- runDB $ insert adminUser
+            guestId <- runDB $ insert guestUser
+            _ <- runDB $ insert (Wishlist name adminId guestId)
             setMessage "Wish list successfully created!" -- i18n
             redirect $ AuthR LoginR
         _ -> do

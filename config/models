@@ -7,9 +7,6 @@ User
 
 Wishlist
     name Text
-
-WishlistViewer
-    listId WishlistId
     owner UserId
     guest UserId
 

@@ -45,7 +45,7 @@ doLogin mu mp = do
     let uid = Just $ UniqueUser mu 
     isValid <- fromMaybe (return False) (validateUser <$> uid <*> (Just mp))
     if isValid 
-       then setCreds True $ Creds "hashdb" mu []
+       then setCreds False $ Creds "hashdb" mu []
        else loginErrorMessage (AuthR LoginR) "Invalid username/password"
     --defaultLayout $ do
     --    aDomId <- newIdent

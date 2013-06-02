@@ -56,7 +56,7 @@ doLogin mu mp = do
 guestForm :: Form (Text, Text, AccessLevel)
 guestForm = renderBootstrap $ (,,)
     <$> areq textField "Name of wish list" Nothing
-    <*> areq textField "Password" Nothing
+    <*> areq passwordField "Password" Nothing
     <*> areq (radioFieldList accessLevels) "" Nothing
   where accessLevels :: [(Text, AccessLevel)]
         accessLevels = map (pack . show &&& id) $ [minBound..maxBound]

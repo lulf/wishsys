@@ -145,9 +145,9 @@ instance YesodAuth App where
     type AuthId App = UserId
 
     -- Where to send a user after successful login
-    loginDest _ = RegisterR
+    loginDest _ = HomeR
     -- Where to send a user after logout
-    logoutDest _ = AuthR LoginR
+    logoutDest _ = HomeR
 
     getAuthId creds = getAuthIdHashDB AuthR (Just . UniqueUser) creds
     --getAuthId creds = runDB $ do

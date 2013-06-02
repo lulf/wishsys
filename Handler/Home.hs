@@ -13,7 +13,7 @@ data AccessLevel = Guest | Admin
 
 getHomeR :: Handler RepHtml
 getHomeR = do
-    (formWidget, enctype) <- generateFormPost guestForm
+    (formWidget, enctype) <- generateFormPost loginForm
     defaultLayout $ do
         aDomId <- newIdent
         setTitle "Wish sys"
@@ -21,7 +21,7 @@ getHomeR = do
 
 postHomeR :: Handler RepHtml
 postHomeR = do
-    ((result, _), _) <- runFormPost guestForm
+    ((result, _), _) <- runFormPost loginForm
     case result of 
         FormSuccess (name, password, accessLevel) -> do
             let loginName = case accessLevel of
@@ -53,8 +53,8 @@ doLogin mu mp = do
     --    $(widgetFile "homepage")
             
 
-guestForm :: Form (Text, Text, AccessLevel)
-guestForm = renderBootstrap $ (,,)
+loginForm :: Form (Text, Text, AccessLevel)
+loginForm = renderBootstrap $ (,,)
     <$> areq textField "Name of wish list" Nothing
     <*> areq passwordField "Password" Nothing
     <*> areq (radioFieldList accessLevels) "" Nothing

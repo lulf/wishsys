@@ -9,9 +9,10 @@ HeaderWishName: Hva
 OwnerWishes: Dine ønskelister
 ViewWishes: Ønskelister delt med deg
 AddWishList: Lag ny ønskeliste
-RegisterHeader: Registrere ny bruker
+RegisterHeader: Lage ny ønskeliste
 HomeHeader: Ønskesys
 HomeWelcome: Velkommen til ønskesys! Hvis du er gjest, logg inn med navn på ønskeliste og gjestepassord under.
 LoginGuest: Logg inn
-HomeAdminInstructions: Hvis du skal forandre på en ønskeliste, kan du logge inn
-HomeAdminLoginLink: her
+HomeRegisterPreInstructions: Klikk
+HomeRegisterLink: her
+HomeRegisterPostInstructions: for å registrere en ny ønskeliste.

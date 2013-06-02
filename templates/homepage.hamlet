@@ -6,4 +6,4 @@
     ^{formWidget}
     <input type="submit" value="_{MsgLoginGuest}">
 
-<p>_{MsgHomeAdminInstructions} <a href=@{AuthR LoginR}>_{MsgHomeAdminLoginLink}</a>.
+<p>_{MsgHomeRegisterPreInstructions} <a href=@{RegisterR}>_{MsgHomeRegisterLink}</a> _{MsgHomeRegisterPostInstructions}

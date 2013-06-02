@@ -3,6 +3,11 @@ module Handler.Home where
 
 import Yesod.Auth
 import Import
+import Data.Text (pack)
+import Control.Arrow
+
+data AccessLevel = Guest | Admin
+    deriving (Show, Eq, Enum, Bounded)
 
 getHomeR :: Handler RepHtml
 getHomeR = do
@@ -20,7 +25,10 @@ postHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
-guestForm :: Form (Text, Text)
-guestForm = renderBootstrap $ (,)
+guestForm :: Form (Text, Text, AccessLevel)
+guestForm = renderBootstrap $ (,,)
     <$> areq textField "Name of wish list" Nothing
-    <*> areq textField "Guest password" Nothing
+    <*> areq textField "Password" Nothing
+    <*> areq (radioFieldList accessLevels) "" Nothing
+  where accessLevels :: [(Text, AccessLevel)]
+        accessLevels = map (pack . show &&& id) $ [minBound..maxBound]

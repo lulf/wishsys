@@ -10,8 +10,7 @@ getRegisterR :: Handler RepHtml
 getRegisterR = do
     (formWidget, enctype) <- generateFormPost registerForm
     defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Register"
+        setTitleI MsgRegisterTitle
         $(widgetFile "register")
 
 postRegisterR :: Handler RepHtml

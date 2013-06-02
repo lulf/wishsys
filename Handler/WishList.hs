@@ -10,6 +10,5 @@ getWishListR _ = do
     let numWishes = length wishes
     let handlerName = "getWishListR" :: Text
     defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Wish list"
+        setTitleI MsgWishListTitle
         $(widgetFile "wishlist")

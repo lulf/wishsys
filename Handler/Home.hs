@@ -15,8 +15,7 @@ getHomeR :: Handler RepHtml
 getHomeR = do
     (formWidget, enctype) <- generateFormPost loginForm
     defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Wish sys"
+        setTitleI MsgHomeTitle
         $(widgetFile "homepage")
 
 postHomeR :: Handler RepHtml
@@ -47,10 +46,6 @@ doLogin mu mp = do
     if isValid 
        then setCreds False $ Creds "hashdb" mu []
        else loginErrorMessage (AuthR LoginR) "Invalid username/password"
-    --defaultLayout $ do
-    --    aDomId <- newIdent
-    --    setTitle "Welcome To Yesod!"
-    --    $(widgetFile "homepage")
             
 
 loginForm :: Form (Text, Text, AccessLevel)

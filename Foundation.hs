@@ -170,6 +170,15 @@ instance RenderMessage App FormMessage where
 
 renderMsg = renderMessage App ["en"]
 
+-- For access levels data type
+instance RenderMessage App AccessLevel where
+    renderMessage _ [] = renderEnglish
+    renderMessage _ ("en":ls) = renderEnglish
+    renderMessage m (_   :ls) = renderMessage m ls
+
+renderEnglish Guest = "Guest"
+renderEnglish Admin = "Admin"
+
 -- | Get the 'Extra' value, used to hold data from the settings.yml file.
 getExtra :: Handler Extra
 getExtra = fmap (appExtra . settings) getYesod

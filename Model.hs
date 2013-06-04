@@ -22,3 +22,5 @@ instance HashDBUser User where
                                      , userPassword = h
                                      }
 
+data AccessLevel = Guest | Admin
+    deriving (Show, Eq, Enum, Bounded)

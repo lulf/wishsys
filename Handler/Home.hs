@@ -46,18 +46,6 @@ doLogin mu mp = do
        then setCreds False $ Creds "hashdb" mu []
        else loginErrorMessage (AuthR LoginR) "Invalid username/password"
 
-data AccessLevel = Guest | Admin
-    deriving (Show, Eq, Enum, Bounded)
-
--- For access levels data type
-instance RenderMessage App AccessLevel where
-    renderMessage _ [] = renderEnglish
-    renderMessage _ ("en":ls) = renderEnglish
-    renderMessage m (_   :ls) = renderMessage m ls
-
-renderEnglish Guest = "Guest"
-renderEnglish Admin = "Admin"
-
 generateLoginForm :: Handler (Form (Text, Text, AccessLevel))
 generateLoginForm = do
     render <- getMessageRender

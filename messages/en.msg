@@ -19,3 +19,5 @@ HomeRegisterPostInstructions: for å registrere en ny ønskeliste.
 HomeTitle: Ønskesys
 RegisterTitle: Registrer ny ønskeliste
 WishListTitle: Ønskeliste
+LoginFormListName: Navn på ønskeliste
+LoginFormPassword: Passord

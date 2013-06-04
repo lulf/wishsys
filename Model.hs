@@ -21,3 +21,4 @@ instance HashDBUser User where
     setSaltAndPasswordHash s h u = u { userSalt     = s
                                      , userPassword = h
                                      }
+

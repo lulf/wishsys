@@ -164,7 +164,11 @@ instance YesodAuth App where
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
 instance RenderMessage App FormMessage where
-    renderMessage _ _ = defaultFormMessage
+    renderMessage _ [] = defaultFormMessage
+    renderMessage _ ("en":ls) = defaultFormMessage
+    renderMessage m (_   :ls) = renderMessage m ls
+
+renderMsg = renderMessage App ["en"]
 
 -- | Get the 'Extra' value, used to hold data from the settings.yml file.
 getExtra :: Handler Extra

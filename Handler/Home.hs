@@ -8,11 +8,9 @@ import Data.Text (pack, unpack)
 import Control.Arrow
 import Data.Maybe
 
-data AccessLevel = Guest | Admin
-    deriving (Show, Eq, Enum, Bounded)
-
 getHomeR :: Handler RepHtml
 getHomeR = do
+    loginForm <- generateLoginForm
     (formWidget, enctype) <- generateFormPost loginForm
     defaultLayout $ do
         setTitleI MsgHomeTitle
@@ -20,6 +18,7 @@ getHomeR = do
 
 postHomeR :: Handler RepHtml
 postHomeR = do
+    loginForm <- generateLoginForm
     ((result, _), _) <- runFormPost loginForm
     case result of 
         FormSuccess (name, password, accessLevel) -> do
@@ -46,12 +45,24 @@ doLogin mu mp = do
     if isValid 
        then setCreds False $ Creds "hashdb" mu []
        else loginErrorMessage (AuthR LoginR) "Invalid username/password"
-            
 
-loginForm :: Form (Text, Text, AccessLevel)
-loginForm = renderBootstrap $ (,,)
-    <$> areq textField "Name of wish list" Nothing
-    <*> areq passwordField "Password" Nothing
-    <*> areq (radioFieldList accessLevels) "" Nothing
-  where accessLevels :: [(Text, AccessLevel)]
-        accessLevels = map (pack . show &&& id) $ [minBound..maxBound]
+data AccessLevel = Guest | Admin
+    deriving (Show, Eq, Enum, Bounded)
+
+-- For access levels data type
+instance RenderMessage App AccessLevel where
+    renderMessage _ [] = renderEnglish
+    renderMessage _ ("en":ls) = renderEnglish
+    renderMessage m (_   :ls) = renderMessage m ls
+
+renderEnglish Guest = "Guest"
+renderEnglish Admin = "Admin"
+
+generateLoginForm :: Handler (Form (Text, Text, AccessLevel))
+generateLoginForm = do
+    render <- getMessageRender
+    let accessLevels = (map (\x -> (render x, x)) $ [minBound..maxBound]) :: [(Text, AccessLevel)]
+    return $ renderBootstrap $ (,,)
+            <$> areq textField (fieldSettingsLabel MsgLoginFormListName) Nothing
+            <*> areq passwordField (fieldSettingsLabel MsgLoginFormPassword) Nothing
+            <*> areq (radioFieldList accessLevels) "" Nothing

@@ -21,3 +21,6 @@ RegisterTitle: Registrer ny ønskeliste
 WishListTitle: Ønskeliste
 LoginFormListName: Navn på ønskeliste
 LoginFormPassword: Passord
+WishListNotFound: Fant ikke ønskeliste
+ErrorDuringLogin: En feil oppstod under innlogging
+InvalidUserOrPassword: Ugyldig ønskeliste/passord

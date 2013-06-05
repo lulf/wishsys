@@ -2,6 +2,7 @@
 module Handler.Home where
 
 import Yesod.Auth
+import Yesod.Auth.Message
 import Yesod.Auth.HashDB (validateUser)
 import Import
 import Data.Text (pack, unpack)
@@ -18,6 +19,7 @@ getHomeR = do
 
 postHomeR :: Handler RepHtml
 postHomeR = do
+    render <- getMessageRender
     loginForm <- generateLoginForm
     ((result, _), _) <- runFormPost loginForm
     case result of 
@@ -29,12 +31,12 @@ postHomeR = do
             wl <- runDB $ selectList [WishlistName ==. name] [LimitTo 1]
             case wl of
                 [] -> do
-                    setMessage "Wish list not found"
+                    setMessage $ toHtml $ render MsgWishListNotFound
                     redirect $ HomeR
                 (Entity wid _):_ -> do
                     redirect $ (WishListR wid)
         _ -> do
-            setMessage "Error login in" -- i18n
+            setMessage $ toHtml $ render MsgErrorDuringLogin
             redirect $ HomeR
 
 
@@ -44,7 +46,9 @@ doLogin mu mp = do
     isValid <- fromMaybe (return False) (validateUser <$> uid <*> (Just mp))
     if isValid 
        then setCreds False $ Creds "hashdb" mu []
-       else loginErrorMessage (AuthR LoginR) "Invalid username/password"
+       else do
+            render <- getMessageRender
+            loginErrorMessage (AuthR LoginR) (render MsgInvalidUserOrPassword)
 
 generateLoginForm :: Handler (Form (Text, Text, AccessLevel))
 generateLoginForm = do

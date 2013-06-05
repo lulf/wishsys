@@ -30,3 +30,4 @@ RegisterFormListName: Navn på ønskeliste
 RegisterFormAdminPassword: Passord for administrator
 RegisterFormGuestPassword: Passord for gjest
 RegisterFormSubmit: Registrér
+LoginFormAccessLevel: Bruker

@@ -23,7 +23,7 @@ postHomeR = do
     loginForm <- generateLoginForm
     ((result, _), _) <- runFormPost loginForm
     case result of 
-        FormSuccess (name, password, accessLevel) -> do
+        FormSuccess (accessLevel, name, password) -> do
             let loginName = case accessLevel of
                                 Admin -> pack $ "admin_" ++ (unpack name)
                                 Guest -> pack $ "guest_" ++ (unpack name)
@@ -50,11 +50,11 @@ doLogin mu mp = do
             render <- getMessageRender
             loginErrorMessage (AuthR LoginR) (render MsgInvalidUserOrPassword)
 
-generateLoginForm :: Handler (Form (Text, Text, AccessLevel))
+generateLoginForm :: Handler (Form (AccessLevel, Text, Text))
 generateLoginForm = do
     render <- getMessageRender
     let accessLevels = (map (\x -> (render x, x)) $ [minBound..maxBound]) :: [(Text, AccessLevel)]
     return $ renderBootstrap $ (,,)
-            <$> areq textField (fieldSettingsLabel MsgLoginFormListName) Nothing
+            <$> areq (radioFieldList accessLevels) (fieldSettingsLabel MsgLoginFormAccessLevel) Nothing
+            <*> areq textField (fieldSettingsLabel MsgLoginFormListName) Nothing
             <*> areq passwordField (fieldSettingsLabel MsgLoginFormPassword) Nothing
-            <*> areq (radioFieldList accessLevels) "" Nothing

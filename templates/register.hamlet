@@ -1,4 +1,4 @@
 <h1>_{MsgRegisterHeader}
 <form method=post enctype=#{enctype}>
     ^{formWidget}
-    <input type=submit>
+    <input type=submit value=_{MsgRegisterFormSubmit}>

@@ -29,3 +29,4 @@ WishListCreateError: En feil oppstod under oppretting av ønskelisten
 RegisterFormListName: Navn på ønskeliste
 RegisterFormAdminPassword: Passord for administrator
 RegisterFormGuestPassword: Passord for gjest
+RegisterFormSubmit: Registrér

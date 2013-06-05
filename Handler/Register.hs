@@ -15,6 +15,7 @@ getRegisterR = do
 
 postRegisterR :: Handler RepHtml
 postRegisterR = do
+    render <- getMessageRender
     ((result, _), _) <- runFormPost registerForm
     case result of
         FormSuccess (name, adminPassword, guestPassword) -> do
@@ -25,14 +26,14 @@ postRegisterR = do
             adminId <- runDB $ insert adminUser
             guestId <- runDB $ insert guestUser
             _ <- runDB $ insert (Wishlist name adminId guestId)
-            setMessage "Wish list successfully created!" -- i18n
+            setMessage $ toHtml $ render MsgWishListCreateSuccess
             redirect $ AuthR LoginR
         _ -> do
-            setMessage "Error creating with list " -- i18n
+            setMessage $ toHtml $ render MsgWishListCreateError
             redirect $ RegisterR
 
 registerForm :: Form (Text, Text, Text)
 registerForm = renderBootstrap $ (,,)
-    <$> areq textField "Wish list name" Nothing
-    <*> areq passwordField "Admin password" Nothing
-    <*> areq passwordField "Guest password" Nothing
+    <$> areq textField (fieldSettingsLabel MsgRegisterFormListName) Nothing
+    <*> areq passwordField (fieldSettingsLabel MsgRegisterFormAdminPassword) Nothing
+    <*> areq passwordField (fieldSettingsLabel MsgRegisterFormGuestPassword) Nothing

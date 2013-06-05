@@ -176,8 +176,8 @@ instance RenderMessage App AccessLevel where
     renderMessage _ ("en":ls) = renderEnglish
     renderMessage m (_   :ls) = renderMessage m ls
 
-renderEnglish Guest = "Guest"
-renderEnglish Admin = "Admin"
+renderEnglish Guest = "Gjest"
+renderEnglish Admin = "Administrator"
 
 -- | Get the 'Extra' value, used to hold data from the settings.yml file.
 getExtra :: Handler Extra

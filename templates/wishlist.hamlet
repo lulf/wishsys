@@ -1,7 +1,6 @@
 <h1>_{MsgRegister}
 
 <p>_{MsgRegisterExplanation}
-<p>Number of wishes: #{numWishes}
 <table>
     <tr>
         <th>_{MsgHeaderWishName}

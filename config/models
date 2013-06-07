@@ -16,7 +16,7 @@ Wish
     stores Text
     amount Int64
     bought Int64
-    list WishlistId
+    wlist WishlistId
 
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

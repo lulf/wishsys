@@ -10,11 +10,12 @@ getWishListR listId = do
     userId <- requireAuthId
     wishes <- runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) []
     case maybeList of
-        Just list@(Wishlist _ ownerId guestId) -> if userId == guestId
-                                             then getGuestWishList list wishes
-                                             else if userId == ownerId
-                                                  then getOwnerWishList list wishes
-                                                  else redirect HomeR
+        Just list@(Wishlist _ ownerId guestId) ->
+          if userId == guestId
+          then getGuestWishList list wishes
+          else if userId == ownerId
+               then getOwnerWishList list wishes
+               else redirect HomeR
         _ -> redirect HomeR
 
 getOwnerWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml

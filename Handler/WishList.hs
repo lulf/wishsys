@@ -24,3 +24,8 @@ getWidget (Just (Wishlist _ ownerId guestId)) wishes userId =
   else if userId == ownerId
        then $(widgetFile "wishlist_owner")
        else $(widgetFile "impossible")
+
+createWishEditFormWidget :: WishId -> Wish -> Widget
+createWishEditFormWidget _ _ = [whamlet|
+<p>HELLO</p>
+|]

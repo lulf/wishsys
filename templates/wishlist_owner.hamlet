@@ -6,13 +6,9 @@
         <th>_{MsgHeaderWishName}
         <th>_{MsgHeaderWishPhoto}
         <th>_{MsgHeaderWishStores}
-        <th>_{MsgHeaderWishRemaining}
-        <th>_{MsgHeaderWishRegister}
+        <th>_{MsgHeaderWishAmount}
+        <th>_{MsgHeaderWishUpdate}
+        <th>_{MsgHeaderWishDelete}
 $forall Entity wishId wish <- wishes
-    <tr>
-        <td>#{wishName wish}
-        <td>#{wishImageUrl wish}
-        <td>#{wishStores wish}
-        <td>#{show $ wishAmount wish}
-        <td>#{show $ wishBought wish}
+    ^{createWishEditFormWidget wishId wish}
 <p>_{MsgRegisterTip}

@@ -6,6 +6,9 @@ HeaderWishStores: Butikker
 HeaderWishRemaining: Gjenværende
 HeaderWishRegister: Registrer
 HeaderWishName: Hva
+HeaderWishAmount: Antall
+HeaderWishUpdate: Oppdater
+HeaderWishDelete: Slett
 OwnerWishes: Dine ønskelister
 ViewWishes: Ønskelister delt med deg
 AddWishList: Lag ny ønskeliste

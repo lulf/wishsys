@@ -10,5 +10,5 @@
         <th>_{MsgHeaderWishUpdate}
         <th>_{MsgHeaderWishDelete}
 $forall Entity wishId wish <- wishes
-    ^{createWishEditFormWidget wishId wish}
+    ^{wishEditWidget wishId wish}
 <p>_{MsgRegisterTip}

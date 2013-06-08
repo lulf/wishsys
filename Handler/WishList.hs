@@ -30,7 +30,7 @@ getGuestWishList listId wishes = do
       setTitleI MsgWishListTitle
       $(widgetFile "wishlist_guest")
 
-createWishEditFormWidget :: WishId -> Wish -> Widget
-createWishEditFormWidget _ _ = [whamlet|
+wishEditWidget :: WishId -> Wish -> Widget
+wishEditWidget _ _ = [whamlet|
 <p>HELLO</p>
 |]

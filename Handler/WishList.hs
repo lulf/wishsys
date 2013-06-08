@@ -6,24 +6,28 @@ import Yesod.Auth
 
 getWishListR :: WishlistId -> Handler RepHtml
 getWishListR listId = do
-    list <- runDB $ get listId
-    wishes <- runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) []
+    maybeList <- runDB $ get listId
     userId <- requireAuthId
-    let numWishes = length wishes
-    let handlerName = "getWishListR" :: Text
-    let widget = getWidget list wishes userId
-    defaultLayout $ do
-      setTitleI MsgWishListTitle
-      widget
+    wishes <- runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) []
+    case maybeList of
+        Just list@(Wishlist _ ownerId guestId) -> if userId == guestId
+                                             then getGuestWishList list wishes
+                                             else if userId == ownerId
+                                                  then getOwnerWishList list wishes
+                                                  else redirect HomeR
+        _ -> redirect HomeR
 
-getWidget :: Maybe Wishlist -> [Entity Wish] -> UserId -> Widget
-getWidget Nothing _ _ = $(widgetFile "impossible")
-getWidget (Just (Wishlist _ ownerId guestId)) wishes userId =
-  if userId == guestId
-  then $(widgetFile "wishlist_guest")
-  else if userId == ownerId
-       then $(widgetFile "wishlist_owner")
-       else $(widgetFile "impossible")
+getOwnerWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml
+getOwnerWishList listId wishes = do
+  defaultLayout $ do
+      setTitleI MsgWishListTitle
+      $(widgetFile "wishlist_owner")
+
+getGuestWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml
+getGuestWishList listId wishes = do
+  defaultLayout $ do
+      setTitleI MsgWishListTitle
+      $(widgetFile "wishlist_guest")
 
 createWishEditFormWidget :: WishId -> Wish -> Widget
 createWishEditFormWidget _ _ = [whamlet|

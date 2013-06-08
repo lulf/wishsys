@@ -96,7 +96,7 @@ instance Yesod App where
     urlRenderOverride _ _ = Nothing
 
     -- The page to be redirected to when authentication is required.
-    authRoute _ = Just $ AuthR LoginR
+    authRoute _ = Just HomeR
 
     isAuthorized HomeR _ = return Authorized
     isAuthorized (WishListR id) _ = do

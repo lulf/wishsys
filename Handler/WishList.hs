@@ -21,16 +21,20 @@ getWishListR listId = do
 
 getOwnerWishList :: WishlistId -> [Entity Wish] -> Handler RepHtml
 getOwnerWishList listId wishes = do
-  (wishRegisterWidget, enctype) <- generateFormPost (wishRegisterForm listId)
-  defaultLayout $ do
-      setTitleI MsgWishListTitle
-      $(widgetFile "wishlist_owner")
+    (wishRegisterWidget, enctype) <- generateFormPost (wishRegisterForm listId)
+    defaultLayout $ do
+        setTitleI MsgWishListTitle
+        $(widgetFile "wishlist_owner")
 
 getGuestWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml
 getGuestWishList listId wishes = do
   defaultLayout $ do
       setTitleI MsgWishListTitle
       $(widgetFile "wishlist_guest")
+
+--postWishListR :: WishlistId -> Handler RepHtml
+--postWishListR _ = do
+--    
 
 wishRegisterForm :: WishlistId -> Form (Wish)
 wishRegisterForm listId = renderBootstrap $ Wish
@@ -46,7 +50,7 @@ wishListIdField = Field
     { fieldParse = \rawVals _ ->
         case rawVals of
             [a] -> return $ Right $ Just (read (unpack a) :: WishlistId)
-            _ -> return $ Left MsgWishlistIdFieldError
+            _ -> return $ Left "Error setting list id value"
     , fieldView = \idAttr nameAttr _ eResult isReq -> [whamlet|
 <input id=#{idAttr} name=#{nameAttr} type=hidden>
 |]

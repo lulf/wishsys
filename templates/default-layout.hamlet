@@ -1,3 +1,5 @@
 $maybe msg <- mmsg
     <div #message>#{msg}
 ^{widget}
+$maybe _ <- maid
+  <p><a href="@{AuthR LogoutR}">Logout</a></p>

@@ -48,3 +48,4 @@ RegisterWishWishUpdated: Ønsket ble oppdatert
 RegisterWishErrorChangingWish: En feil oppstod under forandring/sletting av ønske
 RegisterWishWishDeleted: Ønsket ble slettet
 GuestWishUpdate: Utfør
+RegisterPurchasedError: En feil skjedde under registrering av kjøp

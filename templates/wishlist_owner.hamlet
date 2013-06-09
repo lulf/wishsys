@@ -5,7 +5,9 @@
     ^{wishRegisterWidget}
     <input type="submit" value="_{MsgRegisterNewWishSubmit}">
 
-<p>_{MsgRegisterExplanation}
+$if null wishes
+  <p>_{MsgRegisterOwnerEmptyList}
+$else
 <table>
     <tr>
         <th>_{MsgHeaderWishName}
@@ -16,4 +18,3 @@
         <th>_{MsgHeaderWishDelete}
 $forall Entity wishId wish <- wishes
     ^{wishEditWidget wishId wish}
-<p>_{MsgRegisterTip}

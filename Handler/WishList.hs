@@ -50,6 +50,7 @@ wishListIdField = Field
     , fieldView = \idAttr nameAttr _ eResult isReq -> [whamlet|
 <input id=#{idAttr} name=#{nameAttr} type=hidden>
 |]
+    , fieldEnctype = UrlEncoded
     }
 
 wishEditWidget :: WishId -> Wish -> Widget

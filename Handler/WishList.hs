@@ -5,6 +5,7 @@ import Import
 import Yesod.Auth
 import Data.Text (unpack)
 import Data.Maybe
+import Data.List (head)
 
 getWishListR :: WishlistId -> Handler RepHtml
 getWishListR listId = do
@@ -23,9 +24,16 @@ getWishListR listId = do
 getOwnerWishList :: WishlistId -> [Entity Wish] -> Handler RepHtml
 getOwnerWishList listId wishes = do
     (wishRegisterWidget, enctype) <- generateFormPost $ wishForm listId Nothing
+    editWishForms <- generateEditWidgets listId wishes
     defaultLayout $ do
         setTitleI MsgWishListTitle
         $(widgetFile "wishlist_owner")
+
+generateEditWidgets :: WishlistId -> [Entity Wish] -> Handler ([(Widget, Enctype)])
+generateEditWidgets listId wishEntities = do
+    let wishes = map (\(Entity id wish) -> Just wish) wishEntities
+    let forms = map (wishForm listId) wishes
+    mapM generateFormPost forms
 
 getGuestWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml
 getGuestWishList listId wishes = do
@@ -46,9 +54,8 @@ postWishListR listId = do
             setMessage $ toHtml $ render MsgRegisterWishErrorAdding
             redirect $ (WishListR listId)
 
-
 wishForm :: WishlistId -> Maybe Wish -> Form (Wish)
-wishForm listId wish = renderBootstrap $ Wish
+wishForm listId wish = renderEditWidget $ Wish
     <$> areq textField (fieldSettingsLabel MsgWishRegisterFormName) (wishName <$> wish)
     <*> areq textField (fieldSettingsLabel MsgWishRegisterFormImage) (wishImageUrl <$> wish)
     <*> areq textField (fieldSettingsLabel MsgWishRegisterFormStores) (wishStores <$> wish)
@@ -64,8 +71,7 @@ renderEditWidget aform fragment = do
 $newline never
 \#{fragment}
 $forall view <- views
-    <tr :fvRequired view:.required :not $ fvRequired view:.optional>
-        <td>^{fvInput view}
+    <td>^{fvInput view}
 |]
     return (res, widget)
 

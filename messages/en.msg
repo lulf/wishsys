@@ -9,8 +9,8 @@ HeaderWishRemaining: Gjenværende
 HeaderWishRegister: Registrer
 HeaderWishName: Hva
 HeaderWishAmount: Antall
-HeaderWishUpdate: Oppdater
-HeaderWishDelete: Slett
+SubmitWishUpdate: Oppdater
+SubmitWishDelete: Slett
 OwnerWishes: Dine ønskelister
 ViewWishes: Ønskelister delt med deg
 AddWishList: Lag ny ønskeliste

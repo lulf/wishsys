@@ -1,9 +1,6 @@
 <h1>_{MsgRegister}
 
 <h2>_{MsgRegisterNewWish}
-<form method=post action=@{WishListR listId} enctype=#{enctype}>
-    ^{wishRegisterWidget}
-    <input type="submit" value="_{MsgRegisterNewWishSubmit}">
 
 $if null wishes
   <p>_{MsgRegisterOwnerEmptyList}
@@ -14,7 +11,20 @@ $else
         <th>_{MsgHeaderWishPhoto}
         <th>_{MsgHeaderWishStores}
         <th>_{MsgHeaderWishAmount}
-        <th>_{MsgHeaderWishUpdate}
-        <th>_{MsgHeaderWishDelete}
-$forall Entity wishId wish <- wishes
-    ^{wishEditWidget wishId wish}
+        <th></th>
+        <th></th>
+    <tr>
+        <form method=post action=@{WishListR listId} enctype=#{enctype}>
+            ^{wishRegisterWidget}
+            <td>
+                <input type="submit" value="_{MsgRegisterNewWishSubmit}">
+            <td></td>
+    $forall (editWishWidget, editWishEnctype) <- editWishForms
+        <tr>
+            <form method=post action="nothing" enctype=#{editWishEnctype}>
+              ^{editWishWidget}
+              <td>
+                  <input type="submit" value="_{MsgSubmitWishUpdate}">
+              <td>
+                  <input type="submit" value="_{MsgSubmitWishDelete}">
+

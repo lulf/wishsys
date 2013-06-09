@@ -41,3 +41,5 @@ WishRegisterFormImage: URL til bilde
 WishRegisterFormStores: Navn på butikker
 WishRegisterFormAmount: Antall
 RegisterOwnerEmptyList: Du har ikke lagt til noen ønsker ennå
+RegisterWishWishAdded: Ønsket ble lagt til
+RegisterWishErrorAdding: En feil oppstod ved opprettelse av ønske

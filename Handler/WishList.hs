@@ -32,9 +32,19 @@ getGuestWishList listId wishes = do
       setTitleI MsgWishListTitle
       $(widgetFile "wishlist_guest")
 
---postWishListR :: WishlistId -> Handler RepHtml
---postWishListR _ = do
---    
+postWishListR :: WishlistId -> Handler RepHtml
+postWishListR listId = do
+    render <- getMessageRender
+    ((result, _), _) <- runFormPost $ wishRegisterForm listId
+    case result of
+        FormSuccess (wish) -> do
+            runDB $ insert wish
+            setMessage $ toHtml $ render MsgRegisterWishWishAdded
+            redirect $ (WishListR listId)
+        _ -> do
+            setMessage $ toHtml $ render MsgRegisterWishErrorAdding
+            redirect $ (WishListR listId)
+
 
 wishRegisterForm :: WishlistId -> Form (Wish)
 wishRegisterForm listId = renderBootstrap $ Wish
@@ -42,20 +52,8 @@ wishRegisterForm listId = renderBootstrap $ Wish
     <*> areq textField (fieldSettingsLabel MsgWishRegisterFormImage) Nothing
     <*> areq textField (fieldSettingsLabel MsgWishRegisterFormStores) Nothing
     <*> areq intField (fieldSettingsLabel MsgWishRegisterFormAmount) Nothing
-    <*> areq hiddenField "" Nothing
-    <*> areq wishListIdField "" Nothing
-
-wishListIdField :: Monad m => RenderMessage (HandlerSite m) FormMessage => Field m WishlistId
-wishListIdField = Field
-    { fieldParse = \rawVals _ ->
-        case rawVals of
-            [a] -> return $ Right $ Just (read (unpack a) :: WishlistId)
-            _ -> return $ Left "Error setting list id value"
-    , fieldView = \idAttr nameAttr _ eResult isReq -> [whamlet|
-<input id=#{idAttr} name=#{nameAttr} type=hidden>
-|]
-    , fieldEnctype = UrlEncoded
-    }
+    <*> pure 0
+    <*> pure listId
 
 wishEditWidget :: WishId -> Wish -> Widget
 wishEditWidget _ _ = [whamlet|

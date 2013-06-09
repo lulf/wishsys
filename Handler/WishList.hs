@@ -21,7 +21,7 @@ getWishListR listId = do
 
 getOwnerWishList :: WishlistId -> [Entity Wish] -> Handler RepHtml
 getOwnerWishList listId wishes = do
-    (wishRegisterWidget, enctype) <- generateFormPost (wishRegisterForm listId)
+    (wishRegisterWidget, enctype) <- generateFormPost $ wishRegisterForm listId
     defaultLayout $ do
         setTitleI MsgWishListTitle
         $(widgetFile "wishlist_owner")

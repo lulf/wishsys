@@ -45,4 +45,5 @@ RegisterOwnerEmptyList: Du har ikke lagt til noen ønsker ennå
 RegisterWishWishAdded: Ønsket ble lagt til
 RegisterWishErrorAdding: En feil oppstod ved opprettelse av ønske
 RegisterWishWishUpdated: Ønsket ble oppdatert
-RegisterWishErrorUpdatingWish: En feil oppstod under oppdatering av ønske
+RegisterWishErrorChangingWish: En feil oppstod under forandring/sletting av ønske
+RegisterWishWishDeleted: Ønsket ble slettet

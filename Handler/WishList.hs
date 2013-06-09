@@ -23,7 +23,7 @@ getWishListR listId = do
 
 getOwnerWishList :: WishlistId -> [Entity Wish] -> Handler RepHtml
 getOwnerWishList listId wishes = do
-    (wishRegisterWidget, enctype) <- generateFormPost $ wishForm listId Nothing
+    (wishRegisterWidget, enctype) <- generateFormPost $ wishOwnerForm listId Nothing
     editWishForms <- generateEditWidgets listId wishes
     defaultLayout $ do
         setTitleI MsgWishListTitle
@@ -33,7 +33,7 @@ generateEditWidgets :: WishlistId -> [Entity Wish] -> Handler ([(WishId, (Widget
 generateEditWidgets listId wishEntities = do
     let wishes = map (\(Entity id wish) -> Just wish) wishEntities
     let wishIds = map (\(Entity id wish) -> id) wishEntities
-    let forms = map (wishForm listId) wishes
+    let forms = map (wishOwnerForm listId) wishes
     let deleteForms = map deleteWishForm wishIds
     deletePosts <- mapM generateFormPost deleteForms
     posts <- mapM generateFormPost forms
@@ -48,7 +48,7 @@ getGuestWishList listId wishes = do
 postWishListR :: WishlistId -> Handler RepHtml
 postWishListR listId = do
     render <- getMessageRender
-    ((result, _), _) <- runFormPost $ wishForm listId Nothing
+    ((result, _), _) <- runFormPost $ wishOwnerForm listId Nothing
     case result of
         FormSuccess (wish) -> do
             runDB $ insert wish
@@ -58,8 +58,8 @@ postWishListR listId = do
             setMessage $ toHtml $ render MsgRegisterWishErrorAdding
             redirect $ (WishListR listId)
 
-wishForm :: WishlistId -> Maybe Wish -> Form (Wish)
-wishForm listId wish = renderEditWidget $ Wish
+wishOwnerForm :: WishlistId -> Maybe Wish -> Form (Wish)
+wishOwnerForm listId wish = renderEditWidget $ Wish
     <$> areq textField (fieldSettingsLabel MsgWishRegisterFormName) (wishName <$> wish)
     <*> areq textField (fieldSettingsLabel MsgWishRegisterFormImage) (wishImageUrl <$> wish)
     <*> areq textField (fieldSettingsLabel MsgWishRegisterFormStores) (wishStores <$> wish)

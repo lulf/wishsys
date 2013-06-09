@@ -63,6 +63,9 @@ wishForm listId wish = renderEditWidget $ Wish
     <*> pure (fromMaybe 0 (wishBought <$> wish))
     <*> pure listId
 
+deleteWishForm :: WishId -> Form (WishId)
+deleteWishForm wishId = renderBootstrap $ pure wishId
+
 renderEditWidget :: Monad m => FormRender m a
 renderEditWidget aform fragment = do
     (res, views') <- aFormToForm aform

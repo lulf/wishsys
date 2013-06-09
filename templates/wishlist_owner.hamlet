@@ -22,9 +22,10 @@ $else
     $forall (editWishWidget, editWishEnctype) <- editWishForms
         <tr>
             <form method=post action="nothing" enctype=#{editWishEnctype}>
-              ^{editWishWidget}
-              <td>
-                  <input type="submit" value="_{MsgSubmitWishUpdate}">
-              <td>
-                  <input type="submit" value="_{MsgSubmitWishDelete}">
+                ^{editWishWidget}
+                <td>
+                    <input type="submit" value="_{MsgSubmitWishUpdate}">
+            <form method=post action="foobar" enctype=#{editWishEnctype}>
+                <td>
+                    <input type="submit" value="_{MsgSubmitWishDelete}">
 

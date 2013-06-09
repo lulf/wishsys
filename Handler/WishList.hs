@@ -23,13 +23,13 @@ getOwnerWishList :: WishlistId -> [Entity Wish] -> Handler RepHtml
 getOwnerWishList listId wishes = do
   (wishRegisterWidget, enctype) <- generateFormPost (wishRegisterForm listId)
   defaultLayout $ do
-      -- setTitleI MsgWishListTitle
+      setTitleI MsgWishListTitle
       $(widgetFile "wishlist_owner")
 
 getGuestWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml
 getGuestWishList listId wishes = do
   defaultLayout $ do
-      -- setTitleI MsgWishListTitle
+      setTitleI MsgWishListTitle
       $(widgetFile "wishlist_guest")
 
 wishRegisterForm :: WishlistId -> Form (Wish)

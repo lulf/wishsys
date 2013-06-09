@@ -15,7 +15,7 @@ getWishListR listId = do
     case maybeList of
         Just list@(Wishlist _ ownerId guestId) ->
           if userId == guestId
-          then getGuestWishList list wishes
+          then getGuestWishList listId wishes
           else if userId == ownerId
                then getOwnerWishList listId wishes
                else redirect HomeR
@@ -39,11 +39,20 @@ generateEditWidgets listId wishEntities = do
     posts <- mapM generateFormPost forms
     return $ zip3 wishIds posts deletePosts
 
-getGuestWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml
+getGuestWishList :: WishlistId -> [Entity Wish] -> Handler RepHtml
 getGuestWishList listId wishes = do
+  guestForms <- generateGuestForms wishes
   defaultLayout $ do
       setTitleI MsgWishListTitle
       $(widgetFile "wishlist_guest")
+
+generateGuestForms :: [Entity Wish] -> Handler ([(Widget, Enctype)])
+generateGuestForms wishEntities = do
+    let forms = map (\x -> wishGuestForm) wishEntities
+    mapM generateFormPost forms
+
+wishGuestForm :: Form (Int)
+wishGuestForm = renderEditWidget $ areq intField "" (Just 0)
 
 postWishListR :: WishlistId -> Handler RepHtml
 postWishListR listId = do

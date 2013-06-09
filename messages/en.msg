@@ -47,3 +47,4 @@ RegisterWishErrorAdding: En feil oppstod ved opprettelse av ønske
 RegisterWishWishUpdated: Ønsket ble oppdatert
 RegisterWishErrorChangingWish: En feil oppstod under forandring/sletting av ønske
 RegisterWishWishDeleted: Ønsket ble slettet
+GuestWishUpdate: Utfør

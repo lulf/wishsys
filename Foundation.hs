@@ -100,7 +100,7 @@ instance Yesod App where
     authRoute _ = Just HomeR
 
     isAuthorized HomeR _ = return Authorized
-    isAuthorized (WishListR id) _ = do
+    isAuthorized (WishListR id) False = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
@@ -111,6 +111,28 @@ instance Yesod App where
                                         case wishList of
                                             [] -> return $ Unauthorized "You do not have permission to view this wish list"
                                             _ -> return Authorized
+    isAuthorized (WishListR id) True = do
+        mauth <- maybeAuth
+        case mauth of
+            Nothing -> return AuthenticationRequired
+            Just (Entity userid _) -> runDB $ do
+                                        wishList <- selectList ([WishlistId ==.  id, WishlistOwner ==. userid])
+                                                               []
+                                        case wishList of
+                                            [] -> return $ Unauthorized "You do not have permission to view this wish list"
+                                            _ -> return Authorized
+    isAuthorized (WishHandlerR listId wishId) _ = do
+        mauth <- maybeAuth
+        case mauth of
+            Nothing -> return AuthenticationRequired
+            Just (Entity userid _) -> runDB $ do
+                                        wishList <- selectList ([WishlistId ==.  listId, WishlistOwner ==. userid] ||.
+                                                                [WishlistId ==.  listId, WishlistGuest ==. userid])
+                                                               []
+                                        case wishList of
+                                            [] -> return $ Unauthorized "You do not have permission to view this wish list"
+                                            _ -> return Authorized
+
     isAuthorized _ _ = return Authorized
 
     -- This function creates static content files in the static folder

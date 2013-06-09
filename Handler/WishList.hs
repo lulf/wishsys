@@ -29,13 +29,15 @@ getOwnerWishList listId wishes = do
         setTitleI MsgWishListTitle
         $(widgetFile "wishlist_owner")
 
-generateEditWidgets :: WishlistId -> [Entity Wish] -> Handler ([(WishId, (Widget, Enctype))])
+generateEditWidgets :: WishlistId -> [Entity Wish] -> Handler ([(WishId, (Widget, Enctype), (Widget, Enctype))])
 generateEditWidgets listId wishEntities = do
     let wishes = map (\(Entity id wish) -> Just wish) wishEntities
     let wishIds = map (\(Entity id wish) -> id) wishEntities
     let forms = map (wishForm listId) wishes
+    let deleteForms = map deleteWishForm wishIds
+    deletePosts <- mapM generateFormPost deleteForms
     posts <- mapM generateFormPost forms
-    return $ zip wishIds posts
+    return $ zip3 wishIds posts deletePosts
 
 getGuestWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml
 getGuestWishList listId wishes = do

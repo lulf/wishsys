@@ -29,11 +29,13 @@ getOwnerWishList listId wishes = do
         setTitleI MsgWishListTitle
         $(widgetFile "wishlist_owner")
 
-generateEditWidgets :: WishlistId -> [Entity Wish] -> Handler ([(Widget, Enctype)])
+generateEditWidgets :: WishlistId -> [Entity Wish] -> Handler ([(WishId, (Widget, Enctype))])
 generateEditWidgets listId wishEntities = do
     let wishes = map (\(Entity id wish) -> Just wish) wishEntities
+    let wishIds = map (\(Entity id wish) -> id) wishEntities
     let forms = map (wishForm listId) wishes
-    mapM generateFormPost forms
+    posts <- mapM generateFormPost forms
+    return $ zip wishIds posts
 
 getGuestWishList :: Wishlist -> [Entity Wish] -> Handler RepHtml
 getGuestWishList listId wishes = do
@@ -77,10 +79,3 @@ $forall view <- views
     <td>^{fvInput view}
 |]
     return (res, widget)
-
-wishEditWidget :: WishId -> Wish -> Widget
-wishEditWidget wishId wish = [whamlet|
-|]
--- <tr>
---  <form method=post action=@{WishR wishId} enctype=#{enctype}>
---  <td>

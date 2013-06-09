@@ -1,4 +1,5 @@
 Register: Registrere kjøp
+AdminWishes: Administrer ønskeliste
 RegisterNewWish: Legg til nytt ønske
 RegisterNewWishSubmit: Legg til
 RegisterExplanation: I kolonnen 'Gjenværende' vises det hvor mange av en gjenstand vi ønsker oss som fortsatt ikke har blitt kjøpt. For å registrere et kjøp: fyll inn hvor mange du har kjøpt av en gjenstand og trykk 'Registrer'.  Siden blir da lastet på nytt og antall gjenværende blir oppdatert. Når gjenværende er 0, betyr det at vi i utgangspunktet ikke ønsker oss flere av denne gjenstanden.
@@ -43,3 +44,5 @@ WishRegisterFormAmount: Antall
 RegisterOwnerEmptyList: Du har ikke lagt til noen ønsker ennå
 RegisterWishWishAdded: Ønsket ble lagt til
 RegisterWishErrorAdding: En feil oppstod ved opprettelse av ønske
+RegisterWishWishUpdated: Ønsket ble oppdatert
+RegisterWishErrorUpdatingWish: En feil oppstod under oppdatering av ønske

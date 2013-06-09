@@ -1,5 +1,10 @@
 <h1>_{MsgRegister}
 
+<h2>_{MsgRegisterNewWish}
+<form method=post action=@{WishListR listId} enctype=#{enctype}>
+    ^{wishRegisterWidget}
+    <input type="submit" value="_{MsgRegisterNewWishSubmit}">
+
 <p>_{MsgRegisterExplanation}
 <table>
     <tr>

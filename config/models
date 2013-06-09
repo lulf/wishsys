@@ -14,8 +14,8 @@ Wish
     name Text
     imageUrl Text
     stores Text
-    amount Int64
-    bought Int64
+    amount Int
+    bought Int
     wlist WishlistId
 
 

@@ -46,7 +46,7 @@ wishListIdField = Field
     { fieldParse = \rawVals _ ->
         case rawVals of
             [a] -> return $ Right $ Just (read (unpack a) :: WishlistId)
-            _ -> return $ Left "You must enter a valid id"
+            _ -> return $ Left MsgWishlistIdFieldError
     , fieldView = \idAttr nameAttr _ eResult isReq -> [whamlet|
 <input id=#{idAttr} name=#{nameAttr} type=hidden>
 |]

@@ -41,3 +41,4 @@ WishRegisterFormImage: URL til bilde
 WishRegisterFormStores: Navn på butikker
 WishRegisterFormAmount: Antall
 RegisterOwnerEmptyList: Du har ikke lagt til noen ønsker ennå
+WishlistIdFieldError: Ugyldig verdi

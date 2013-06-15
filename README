@@ -6,8 +6,6 @@ The view of the administrators and guests are separated, so that the
 administrators cannot see what the guests have purchased.
 
 To use:
-* Edit src/Config.hs with the desired users.
-* Initialize sqlite db with "sqlite3 config/wishsys.db < schema.db"
-* Run cabal install to create the snaplet, and just run with 'wishsys -p <portnumber>'
-
-To populate with users, use snap-auth-cli (https://github.com/dzhus/snap-auth-cli/)
+* You need to edit config/postgres.yml and config/settings.yml to configure  it to your liking.
+* Just compile it using cabal and run it.
+* The default web interface supports registering multiple wish lists.

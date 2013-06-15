@@ -49,3 +49,4 @@ RegisterWishErrorChangingWish: En feil oppstod under forandring/sletting av øns
 RegisterWishWishDeleted: Ønsket ble slettet
 GuestWishUpdate: Utfør
 RegisterPurchasedError: En feil skjedde under registrering av kjøp
+WishImageAlt: Bilde av ønske

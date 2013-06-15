@@ -52,7 +52,7 @@ generateGuestForms wishEntities = do
     mapM generateFormPost forms
 
 wishGuestForm :: Form (Int)
-wishGuestForm = renderEditWidget $ areq intField "" (Just 0)
+wishGuestForm = renderBootstrap $ areq intField "" (Just 0)
 
 postWishListR :: WishlistId -> Handler RepHtml
 postWishListR listId = do

@@ -2,23 +2,26 @@
 
 <p>_{MsgRegisterExplanation}
 
-<table>
+<table border="1">
     <tr>
         <th>_{MsgHeaderWishName}
         <th>_{MsgHeaderWishPhoto}
         <th>_{MsgHeaderWishStores}
         <th>_{MsgHeaderWishRemaining}
         <th>_{MsgHeaderWishRegister}
+        <th>
     $forall (Entity wishId wish, (editPurchaseWidget, enctype)) <- zip wishes guestForms
         <tr>
+          <form method=post action=@{WishHandlerR listId wishId} enctype=#{enctype}>
             <td>#{wishName wish}
-            <td>#{wishImageUrl wish}
+            <td>
+              <a href="#{wishImageUrl wish}">
+                <img src="#{wishImageUrl wish}" width="32%" height="20%" halt=_{MsgWishImageAlt}>
             <td>#{wishStores wish}
             <td>#{show $ ((wishAmount wish) - (wishBought wish))}
-            <form method=post action=@{WishHandlerR listId wishId} enctype=#{enctype}>
-                <td>
-                    ^{editPurchaseWidget}
-                <td>
-                    <input type="submit" value=_{MsgGuestWishUpdate}>
+            <td>
+              ^{editPurchaseWidget}
+            <td>
+              <input type="submit" value=_{MsgGuestWishUpdate}>
 
 <p>_{MsgRegisterTip}

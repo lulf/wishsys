@@ -5,6 +5,7 @@ import Import
 import qualified Yesod.Auth.HashDB as H
 import Yesod.Auth
 import qualified Data.Text as T
+import Handler.Login
 
 getRegisterR :: Handler RepHtml
 getRegisterR = do
@@ -25,9 +26,10 @@ postRegisterR = do
             guestUser <- liftIO $ H.setPassword guestPassword (User guestName "" "")
             adminId <- runDB $ insert adminUser
             guestId <- runDB $ insert guestUser
-            _ <- runDB $ insert (Wishlist name adminId guestId)
+            listId <- runDB $ insert (Wishlist name adminId guestId)
             setMessage $ toHtml $ render MsgWishListCreateSuccess
-            redirect $ AuthR LoginR
+            doLogin adminName adminPassword
+            redirect $ WishListR listId
         _ -> do
             setMessage $ toHtml $ render MsgWishListCreateError
             redirect $ RegisterR

@@ -23,6 +23,7 @@ library
                      Handler.WishList
                      Handler.Register
                      Handler.WishHandler
+                     Handler.Login
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

@@ -3,7 +3,7 @@
 $if null wishes
   <p>_{MsgRegisterOwnerEmptyList}
 $else
-<table>
+<table border="1">
     <tr>
         <th>_{MsgHeaderWishName}
         <th>_{MsgHeaderWishPhoto}

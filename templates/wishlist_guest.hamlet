@@ -1,6 +1,6 @@
 <h1>_{MsgRegister}
 
-<p>_{MsgRegisterExplanation}
+<p><b>_{MsgRegisterExplanationHeader}</b>: _{MsgRegisterExplanation}
 
 <table border="1">
     <tr>

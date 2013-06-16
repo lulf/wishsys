@@ -2,7 +2,8 @@
 
 <p><b>_{MsgRegisterExplanationHeader}</b>: _{MsgRegisterExplanation}
 
-<table border="1">
+<div class="centered">
+  <table border="1">
     <tr>
         <th>_{MsgHeaderWishName}
         <th>_{MsgHeaderWishPhoto}
@@ -16,12 +17,11 @@
             <td>#{wishName wish}
             <td>
               <a href="#{wishImageUrl wish}">
-                <img src="#{wishImageUrl wish}" width="32%" height="20%" halt=_{MsgWishImageAlt}>
+                <img src="#{wishImageUrl wish}" width="16%" height="10%" halt=_{MsgWishImageAlt}>
             <td>#{wishStores wish}
             <td>#{show $ ((wishAmount wish) - (wishBought wish))}
             <td>
               ^{editPurchaseWidget}
             <td>
               <input type="submit" value=_{MsgGuestWishUpdate}>
-
 <p>_{MsgRegisterTip}

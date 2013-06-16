@@ -7,11 +7,14 @@ import Data.Text (unpack)
 import Data.Maybe
 import Data.List (head)
 
+getWishes :: WishlistId -> Handler ([Entity Wish])
+getWishes listId = runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) [Asc WishName]
+
 getWishListR :: WishlistId -> Handler RepHtml
 getWishListR listId = do
     maybeList <- runDB $ get listId
     userId <- requireAuthId
-    wishes <- runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) []
+    wishes <- getWishes listId
     case maybeList of
         Just list@(Wishlist _ ownerId guestId) ->
           if userId == guestId

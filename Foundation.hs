@@ -35,7 +35,7 @@ data App = App
     }
 
 -- Set up i18n messages. See the message folder.
-mkMessage "App" "messages" "en"
+mkMessage "App" "messages" "no"
 
 -- This is where we define all of the routes in our application. For a full
 -- explanation of the syntax, please see:
@@ -188,18 +188,17 @@ instance YesodAuth App where
 -- achieve customized and internationalized form validation messages.
 instance RenderMessage App FormMessage where
     renderMessage _ [] = defaultFormMessage
+    renderMessage _ ("no":ls) = defaultFormMessage
     renderMessage _ ("en":ls) = defaultFormMessage
     renderMessage m (_   :ls) = renderMessage m ls
 
-renderMsg = renderMessage App ["nb", "en"]
+renderMsg = renderMessage App ["no", "en"]
 
 -- For access levels data type
 instance RenderMessage App AccessLevel where
     renderMessage _ [] = renderNorwegian
-    renderMessage _ ("en":ls) = renderEnglish
-    renderMessage _ ("nb":ls) = renderNorwegian
-    renderMessage _ ("nn":ls) = renderNorwegian
     renderMessage _ ("no":ls) = renderNorwegian
+    renderMessage _ ("en":ls) = renderEnglish
     renderMessage m (_   :ls) = renderMessage m ls
 
 renderEnglish Guest = "Guest"

@@ -45,6 +45,6 @@ generateLoginForm = do
     render <- getMessageRender
     let accessLevels = (map (\x -> (render x, x)) $ [minBound..maxBound]) :: [(Text, AccessLevel)]
     return $ renderBootstrap $ (,,)
-            <$> areq (radioFieldList accessLevels) "" Nothing
+            <$> areq (radioFieldList accessLevels) "" (Just Guest)
             <*> areq textField (fieldSettingsLabel MsgLoginFormListName) Nothing
             <*> areq passwordField (fieldSettingsLabel MsgLoginFormPassword) Nothing

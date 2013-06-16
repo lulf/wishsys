@@ -20,5 +20,6 @@ Staging:
 
 Production:
   database: wishsys_production
+  host: wishsys.dimling.net
   poolsize: 100
   <<: *defaults

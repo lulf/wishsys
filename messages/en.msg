@@ -1,53 +1,53 @@
-Register: Registrere kjøp
-AdminWishes: Administrer ønskeliste
-RegisterNewWish: Legg til nytt ønske
-RegisterNewWishSubmit: Legg til
-RegisterExplanationHeader: Forklaring
-RegisterExplanation: I kolonnen 'Gjenværende' vises det hvor mange av en gjenstand vi ønsker oss som fortsatt ikke har blitt kjøpt. For å registrere et kjøp: fyll inn hvor mange du har kjøpt av en gjenstand og trykk 'Registrer'.  Siden blir da lastet på nytt og antall gjenværende blir oppdatert. Når gjenværende er 0, betyr det at vi i utgangspunktet ikke ønsker oss flere av denne gjenstanden.
-RegisterTip: Et lite tips: Om du skulle være uheldig å fylle inn eller trykke feil (f.eks. at du registrerte 3 i stedet for 2), så kan du registrere en gang til med negativt tall (skriv inn -1, og trykk 'Registrer') for å rette opp feilen.
-HeaderWishPhoto: Bilde
-HeaderWishStores: Butikker
-HeaderWishRemaining: Gjenværende
-HeaderWishRegister: Registrer
-HeaderWishName: Hva
-HeaderWishAmount: Antall
-SubmitWishUpdate: Oppdater
-SubmitWishDelete: Slett
-OwnerWishes: Dine ønskelister
-ViewWishes: Ønskelister delt med deg
-AddWishList: Lag ny ønskeliste
-RegisterHeader: Lage ny ønskeliste
-HomeHeader: Ønskesys
-HomeWelcome: Velkommen til ønskesys! Hvis du er gjest, logg inn med navn på ønskeliste og gjestepassord under.
-LoginGuest: Logg inn
-HomeRegisterPreInstructions: Klikk
-HomeRegisterLink: her
-HomeRegisterPostInstructions: for å registrere en ny ønskeliste.
-HomeTitle: Ønskesys
-RegisterTitle: Registrer ny ønskeliste
-WishListTitle: Ønskeliste
-LoginFormListName: Navn på ønskeliste
-LoginFormPassword: Passord
-WishListNotFound: Fant ikke ønskeliste
-ErrorDuringLogin: En feil oppstod under innlogging
-InvalidUserOrPassword: Ugyldig ønskeliste/passord
-WishListCreateSuccess: Ønskeliste har blitt opprettet
-WishListCreateError: En feil oppstod under oppretting av ønskelisten
-RegisterFormListName: Navn på ønskeliste
-RegisterFormAdminPassword: Passord for administrator
-RegisterFormGuestPassword: Passord for gjest
-RegisterFormSubmit: Registrér
-LoginFormAccessLevel: Bruker
-WishRegisterFormName: Navn på ønske
-WishRegisterFormImage: URL til bilde
-WishRegisterFormStores: Navn på butikker
-WishRegisterFormAmount: Antall
-RegisterOwnerEmptyList: Du har ikke lagt til noen ønsker ennå
-RegisterWishWishAdded: Ønsket ble lagt til
-RegisterWishErrorAdding: En feil oppstod ved opprettelse av ønske
-RegisterWishWishUpdated: Ønsket ble oppdatert
-RegisterWishErrorChangingWish: En feil oppstod under forandring/sletting av ønske
-RegisterWishWishDeleted: Ønsket ble slettet
-GuestWishUpdate: Utfør
-RegisterPurchasedError: En feil skjedde under registrering av kjøp
-WishImageAlt: Bilde av ønske
+Register: Register purchase
+AdminWishes: Administer wish list
+RegisterNewWish: Add new wish
+RegisterNewWishSubmit: Add
+RegisterExplanationHeader: Explanation
+RegisterExplanation: The column 'Remaining' display how many of an item that is wished but still not bought. To register a purchase: enter the number of items you've bought and click 'Register'. The page will be reloaded and the remaining number of items will be updated. When remaining is 0, it means that the 'quota' is filled for that item.
+RegisterTip: Tip: If you by any chance should be unlucky and register the wrong amount of items, you can correct it by entering a negative number and press register.
+HeaderWishPhoto: Photo
+HeaderWishStores: Stores
+HeaderWishRemaining: Remaining
+HeaderWishRegister: Register
+HeaderWishName: What
+HeaderWishAmount: Amount
+SubmitWishUpdate: Update
+SubmitWishDelete: Delete
+OwnerWishes: Your wish lists
+ViewWishes: Wish lists shared with you
+AddWishList: Create new wish list
+RegisterHeader: Create new wish list
+HomeHeader: Wishsys
+HomeWelcome: Welcome to wishsys. If you're a guest, please login using the name of the wish list and the guest password.
+LoginGuest: Log in
+HomeRegisterPreInstructions: Click
+HomeRegisterLink: here
+HomeRegisterPostInstructions: to register a new wish list.
+HomeTitle: Wishsys
+RegisterTitle: Register new wish list
+WishListTitle: Wish list
+LoginFormListName: Name of wish list
+LoginFormPassword: Password
+WishListNotFound: Unable to find wish list
+ErrorDuringLogin: An error occured while logging in
+InvalidUserOrPassword: Unknown wish list/wrong password
+WishListCreateSuccess: Your wish list has been created
+WishListCreateError: An error occured when creating wish list
+RegisterFormListName: Name of wish list
+RegisterFormAdminPassword: Administrator password
+RegisterFormGuestPassword: Guest password
+RegisterFormSubmit: Register
+LoginFormAccessLevel: User
+WishRegisterFormName: Name of wish
+WishRegisterFormImage: Photo URL
+WishRegisterFormStores: Name of stores
+WishRegisterFormAmount: Amount
+RegisterOwnerEmptyList: You have not added any wishes yet
+RegisterWishWishAdded: Your wish was added
+RegisterWishErrorAdding: An error occured while creating your wish
+RegisterWishWishUpdated: Wish updated 
+RegisterWishErrorChangingWish: An error occured during change/deletion of wish
+RegisterWishWishDeleted: Wish deleted
+GuestWishUpdate: Update
+RegisterPurchasedError: An error occured when registering purchase
+WishImageAlt: Photo of wish

@@ -191,16 +191,22 @@ instance RenderMessage App FormMessage where
     renderMessage _ ("en":ls) = defaultFormMessage
     renderMessage m (_   :ls) = renderMessage m ls
 
-renderMsg = renderMessage App ["en"]
+renderMsg = renderMessage App ["nb", "en"]
 
 -- For access levels data type
 instance RenderMessage App AccessLevel where
-    renderMessage _ [] = renderEnglish
+    renderMessage _ [] = renderNorwegian
     renderMessage _ ("en":ls) = renderEnglish
+    renderMessage _ ("nb":ls) = renderNorwegian
+    renderMessage _ ("nn":ls) = renderNorwegian
+    renderMessage _ ("no":ls) = renderNorwegian
     renderMessage m (_   :ls) = renderMessage m ls
 
-renderEnglish Guest = "Gjest"
+renderEnglish Guest = "Guest"
 renderEnglish Admin = "Administrator"
+
+renderNorwegian Guest = "Gjest"
+renderNorwegian Admin = "Administrator"
 
 -- | Get the 'Extra' value, used to hold data from the settings.yml file.
 getExtra :: Handler Extra

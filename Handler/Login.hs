@@ -1,10 +1,9 @@
 {-# LANGUAGE TupleSections, OverloadedStrings #-}
 module Handler.Login where
 
-import Yesod.Auth
-import Yesod.Auth.Message
-import Yesod.Auth.HashDB (validateUser)
 import Import
+import Yesod.Auth (setCreds, Creds(Creds), loginErrorMessage)
+import Yesod.Auth.HashDB (validateUser)
 import Data.Text (pack, unpack)
 import Data.Maybe
 

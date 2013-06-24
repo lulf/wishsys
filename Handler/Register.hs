@@ -3,7 +3,6 @@ module Handler.Register where
 
 import Import
 import qualified Yesod.Auth.HashDB as H
-import Yesod.Auth
 import qualified Data.Text as T
 import Handler.Login
 

@@ -10,7 +10,7 @@ postWishHandlerR listId wishId = do
     maybeList <- runDB $ get listId
     userId <- requireAuthId
     case maybeList of
-        Just list@(Wishlist _ ownerId guestId) ->
+        Just (Wishlist _ ownerId guestId) ->
           if userId == guestId
           then postGuestWishHandlerR listId wishId
           else if userId == ownerId

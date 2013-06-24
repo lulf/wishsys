@@ -11,6 +11,7 @@ import Test.Hspec (hspec)
 import Application (makeFoundation)
 
 import HomeTest
+import RegisterTest
 
 main :: IO ()
 main = do
@@ -21,3 +22,4 @@ main = do
     hspec $ do
         yesodSpec foundation $ do
             homeSpecs
+            registerSpecs

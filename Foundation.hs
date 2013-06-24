@@ -196,7 +196,7 @@ renderMsg = renderMessage App ["no", "en"]
 
 -- For access levels data type
 instance RenderMessage App AccessLevel where
-    renderMessage _ [] = renderNorwegian
+    renderMessage _ [] = renderEnglish
     renderMessage _ ("no":ls) = renderNorwegian
     renderMessage _ ("en":ls) = renderEnglish
     renderMessage m (_   :ls) = renderMessage m ls

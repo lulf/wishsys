@@ -16,4 +16,4 @@ homeSpecs =
             htmlAllContain "h1" "Wishsys"
             bodyContains "Welcome to wishsys"
             bodyContains "Copyright Ulf Lilleengen"
-            bodyContains "checked>Gjest"
+            bodyContains "checked>Guest"

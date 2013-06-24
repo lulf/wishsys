@@ -22,4 +22,4 @@ doLogin mu mp = do
        then setCreds False $ Creds "hashdb" mu []
        else do
             render <- getMessageRender
-            loginErrorMessage (AuthR LoginR) (render MsgInvalidUserOrPassword)
+            loginErrorMessage (HomeR) (render MsgInvalidUserOrPassword)

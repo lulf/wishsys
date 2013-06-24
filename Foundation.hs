@@ -4,8 +4,6 @@ import Prelude
 import Yesod
 import Yesod.Static
 import Yesod.Auth
-import Yesod.Auth.BrowserId
-import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Network.HTTP.Conduit (Manager)
@@ -16,6 +14,7 @@ import Database.Persist.Sql (SqlPersistT)
 import Settings.StaticFiles
 import Settings (widgetFile, Extra (..))
 import Model
+import Data.Text
 import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import System.Log.FastLogger (Logger)
@@ -88,7 +87,7 @@ instance Yesod App where
                 , css_bootstrap_css
                 ])
             $(widgetFile "default-layout")
-        hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
+        giveUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- This is done to provide an optimization for serving static files from
     -- a separate domain. Please see the staticRoot setting in Settings.hs
@@ -100,28 +99,28 @@ instance Yesod App where
     authRoute _ = Just HomeR
 
     isAuthorized HomeR _ = return Authorized
-    isAuthorized (WishListR id) False = do
+    isAuthorized (WishListR listId) False = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
             Just (Entity userid _) -> runDB $ do
-                                        wishList <- selectList ([WishlistId ==.  id, WishlistOwner ==. userid] ||.
-                                                                [WishlistId ==.  id, WishlistGuest ==. userid])
+                                        wishList <- selectList ([WishlistId ==.  listId, WishlistOwner ==. userid] ||.
+                                                                [WishlistId ==.  listId, WishlistGuest ==. userid])
                                                                []
                                         case wishList of
                                             [] -> return $ Unauthorized "You do not have permission to view this wish list"
                                             _ -> return Authorized
-    isAuthorized (WishListR id) True = do
+    isAuthorized (WishListR listId) True = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
             Just (Entity userid _) -> runDB $ do
-                                        wishList <- selectList ([WishlistId ==.  id, WishlistOwner ==. userid])
+                                        wishList <- selectList ([WishlistId ==.  listId, WishlistOwner ==. userid])
                                                                []
                                         case wishList of
                                             [] -> return $ Unauthorized "You do not have permission to view this wish list"
                                             _ -> return Authorized
-    isAuthorized (WishHandlerR listId wishId) _ = do
+    isAuthorized (WishHandlerR listId _) _ = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
@@ -188,8 +187,8 @@ instance YesodAuth App where
 -- achieve customized and internationalized form validation messages.
 instance RenderMessage App FormMessage where
     renderMessage _ [] = defaultFormMessage
-    renderMessage _ ("no":ls) = defaultFormMessage
-    renderMessage _ ("en":ls) = defaultFormMessage
+    renderMessage _ ("no":_ ) = defaultFormMessage
+    renderMessage _ ("en":_ ) = defaultFormMessage
     renderMessage m (_   :ls) = renderMessage m ls
 
 renderMsg = renderMessage App ["no", "en"]
@@ -197,13 +196,15 @@ renderMsg = renderMessage App ["no", "en"]
 -- For access levels data type
 instance RenderMessage App AccessLevel where
     renderMessage _ [] = renderEnglish
-    renderMessage _ ("no":ls) = renderNorwegian
-    renderMessage _ ("en":ls) = renderEnglish
+    renderMessage _ ("no":_) = renderNorwegian
+    renderMessage _ ("en":_) = renderEnglish
     renderMessage m (_   :ls) = renderMessage m ls
 
+renderEnglish :: AccessLevel -> Text
 renderEnglish Guest = "Guest"
 renderEnglish Admin = "Administrator"
 
+renderNorwegian :: AccessLevel -> Text
 renderNorwegian Guest = "Gjest"
 renderNorwegian Admin = "Administrator"
 

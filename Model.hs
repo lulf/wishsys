@@ -2,7 +2,6 @@ module Model where
 
 import Prelude
 import Yesod
-import Data.Int (Int64)
 import Data.Text (Text)
 import Database.Persist.Quasi
 import Data.Typeable (Typeable)

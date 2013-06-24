@@ -3,9 +3,7 @@ module Handler.WishList where
 
 import Import
 import Yesod.Auth
-import Data.Text (unpack)
 import Data.Maybe
-import Data.List (head)
 
 getWishes :: WishlistId -> Handler ([Entity Wish])
 getWishes listId = runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) [Asc WishName]
@@ -16,7 +14,7 @@ getWishListR listId = do
     userId <- requireAuthId
     wishes <- getWishes listId
     case maybeList of
-        Just list@(Wishlist _ ownerId guestId) ->
+        Just (Wishlist _ ownerId guestId) ->
           if userId == guestId
           then getGuestWishList listId wishes
           else if userId == ownerId
@@ -34,8 +32,8 @@ getOwnerWishList listId wishes = do
 
 generateEditWidgets :: WishlistId -> [Entity Wish] -> Handler ([(WishId, (Widget, Enctype), (Widget, Enctype))])
 generateEditWidgets listId wishEntities = do
-    let wishes = map (\(Entity id wish) -> Just wish) wishEntities
-    let wishIds = map (\(Entity id wish) -> id) wishEntities
+    let wishes = map (\(Entity _ wish) -> Just wish) wishEntities
+    let wishIds = map (\(Entity eid _) -> eid) wishEntities
     let forms = map (wishOwnerForm listId) wishes
     let deleteForms = map deleteWishForm wishIds
     deletePosts <- mapM generateFormPost deleteForms
@@ -51,7 +49,7 @@ getGuestWishList listId wishes = do
 
 generateGuestForms :: [Entity Wish] -> Handler ([(Widget, Enctype)])
 generateGuestForms wishEntities = do
-    let forms = map (\x -> wishGuestForm) wishEntities
+    let forms = map (\_ -> wishGuestForm) wishEntities
     mapM generateFormPost forms
 
 wishGuestForm :: Form (Int)
@@ -63,7 +61,7 @@ postWishListR listId = do
     ((result, _), _) <- runFormPost $ wishOwnerForm listId Nothing
     case result of
         FormSuccess (wish) -> do
-            runDB $ insert wish
+            _ <- runDB $ insert wish
             setMessage $ toHtml $ render MsgRegisterWishWishAdded
             redirect $ (WishListR listId)
         _ -> do

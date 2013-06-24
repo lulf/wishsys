@@ -1,12 +1,7 @@
 {-# LANGUAGE TupleSections, OverloadedStrings #-}
 module Handler.Home where
 
-import Yesod.Auth
-import Yesod.Auth.Message
 import Import
-import Data.Text (pack, unpack)
-import Control.Arrow
-import Data.Maybe
 import Handler.Login
 
 getHomeR :: Handler Html

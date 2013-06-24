@@ -5,7 +5,7 @@ import Import
 import Handler.WishList
 import Yesod.Auth
 
-postWishHandlerR :: WishlistId -> WishId -> Handler RepHtml
+postWishHandlerR :: WishlistId -> WishId -> Handler Html
 postWishHandlerR listId wishId = do
     maybeList <- runDB $ get listId
     userId <- requireAuthId
@@ -18,7 +18,7 @@ postWishHandlerR listId wishId = do
                else redirect HomeR
         _ -> redirect $ WishListR listId
 
-postGuestWishHandlerR :: WishlistId -> WishId -> Handler RepHtml
+postGuestWishHandlerR :: WishlistId -> WishId -> Handler Html
 postGuestWishHandlerR listId wishId = do
     render <- getMessageRender
     ((result, _), _) <- runFormPost $ wishGuestForm
@@ -29,7 +29,7 @@ postGuestWishHandlerR listId wishId = do
 
     redirect $ WishListR listId
 
-postOwnerWishHandlerR :: WishlistId -> WishId -> Handler RepHtml
+postOwnerWishHandlerR :: WishlistId -> WishId -> Handler Html
 postOwnerWishHandlerR listId wishId = do
     render <- getMessageRender
     ((updateResult, _), _) <- runFormPost $ wishOwnerForm listId Nothing

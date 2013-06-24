@@ -10,7 +10,7 @@ import Data.List (head)
 getWishes :: WishlistId -> Handler ([Entity Wish])
 getWishes listId = runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) [Asc WishName]
 
-getWishListR :: WishlistId -> Handler RepHtml
+getWishListR :: WishlistId -> Handler Html
 getWishListR listId = do
     maybeList <- runDB $ get listId
     userId <- requireAuthId
@@ -24,7 +24,7 @@ getWishListR listId = do
                else redirect HomeR
         _ -> redirect HomeR
 
-getOwnerWishList :: WishlistId -> [Entity Wish] -> Handler RepHtml
+getOwnerWishList :: WishlistId -> [Entity Wish] -> Handler Html
 getOwnerWishList listId wishes = do
     (wishRegisterWidget, enctype) <- generateFormPost $ wishOwnerForm listId Nothing
     editWishForms <- generateEditWidgets listId wishes
@@ -42,7 +42,7 @@ generateEditWidgets listId wishEntities = do
     posts <- mapM generateFormPost forms
     return $ zip3 wishIds posts deletePosts
 
-getGuestWishList :: WishlistId -> [Entity Wish] -> Handler RepHtml
+getGuestWishList :: WishlistId -> [Entity Wish] -> Handler Html
 getGuestWishList listId wishes = do
   guestForms <- generateGuestForms wishes
   defaultLayout $ do
@@ -57,7 +57,7 @@ generateGuestForms wishEntities = do
 wishGuestForm :: Form (Int)
 wishGuestForm = renderBootstrap $ areq intField "" (Just 0)
 
-postWishListR :: WishlistId -> Handler RepHtml
+postWishListR :: WishlistId -> Handler Html
 postWishListR listId = do
     render <- getMessageRender
     ((result, _), _) <- runFormPost $ wishOwnerForm listId Nothing

@@ -9,7 +9,7 @@ import Control.Arrow
 import Data.Maybe
 import Handler.Login
 
-getHomeR :: Handler RepHtml
+getHomeR :: Handler Html
 getHomeR = do
     loginForm <- generateLoginForm
     (formWidget, enctype) <- generateFormPost loginForm
@@ -17,7 +17,7 @@ getHomeR = do
         setTitleI MsgHomeTitle
         $(widgetFile "homepage")
 
-postHomeR :: Handler RepHtml
+postHomeR :: Handler Html
 postHomeR = do
     render <- getMessageRender
     loginForm <- generateLoginForm

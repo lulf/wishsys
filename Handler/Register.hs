@@ -7,14 +7,14 @@ import Yesod.Auth
 import qualified Data.Text as T
 import Handler.Login
 
-getRegisterR :: Handler RepHtml
+getRegisterR :: Handler Html
 getRegisterR = do
     (formWidget, enctype) <- generateFormPost registerForm
     defaultLayout $ do
         setTitleI MsgRegisterTitle
         $(widgetFile "register")
 
-postRegisterR :: Handler RepHtml
+postRegisterR :: Handler Html
 postRegisterR = do
     render <- getMessageRender
     ((result, _), _) <- runFormPost registerForm

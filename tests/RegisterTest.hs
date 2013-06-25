@@ -50,3 +50,25 @@ registerSpecs =
             let (Entity _ second) = head $ tail users
             assertEqual "admin user not correct" "admin_foobar" $ T.unpack $ userName first
             assertEqual "guest user not correct" "guest_foobar" $ T.unpack $ userName second
+
+        yit "provides a useful error message if list already exists" $ do
+            cleanDB
+            get RegisterR
+            request $ do
+                setMethod "POST"
+                setUrl RegisterR
+                addNonce
+                byLabel "Name of wish list" "foobar"
+                byLabel "Administrator password" "foo"
+                byLabel "Guest password" "bar"
+            statusIs 303
+
+            get RegisterR
+            request $ do
+                setMethod "POST"
+                setUrl RegisterR
+                addNonce
+                byLabel "Name of wish list" "foobar"
+                byLabel "Administrator password" "mamma"
+                byLabel "Guest password" "pappa"
+            statusIs 409

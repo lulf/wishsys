@@ -104,3 +104,4 @@ test-suite test
                  , monad-logger
                  , transformers
                  , hspec
+                 , text

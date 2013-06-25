@@ -4,6 +4,7 @@ module RegisterTest
     ) where
 
 import TestImport
+import qualified Data.Text as T
 import qualified Data.List as L
 
 cleanDB :: YesodExample App ()
@@ -40,5 +41,12 @@ registerSpecs =
             statusIs 303
             lists <- runDB $ selectList ([] :: [Filter Wishlist]) []
             assertEqual "wish list was not registered!" 1 $ L.length lists
+            let (Entity _ list) = head lists
+            assertEqual "list name is not correct" "foobar" $ wishlistName list
+
             users <- runDB $ selectList ([] :: [Filter User]) []
             assertEqual "users not registered" 2 $ L.length users
+            let (Entity _ first) = head users
+            let (Entity _ second) = head $ tail users
+            assertEqual "admin user not correct" "admin_foobar" $ T.unpack $ userName first
+            assertEqual "guest user not correct" "guest_foobar" $ T.unpack $ userName second

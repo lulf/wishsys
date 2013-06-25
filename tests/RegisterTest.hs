@@ -71,4 +71,7 @@ registerSpecs =
                 byLabel "Name of wish list" "foobar"
                 byLabel "Administrator password" "mamma"
                 byLabel "Guest password" "pappa"
-            statusIs 409
+            statusIs 303
+            get RegisterR
+            htmlAnyContain "div" "Wish list already exists, please choose a different name"
+

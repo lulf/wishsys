@@ -38,6 +38,7 @@ RegisterFormAdminPassword: Administrator password
 RegisterFormGuestPassword: Guest password
 RegisterFormSubmit: Register
 LoginFormAccessLevel: User
+WishListAlreadyExists: Wish list already exists, please choose a different name
 WishRegisterFormName: Name of wish
 WishRegisterFormImage: Photo URL
 WishRegisterFormStores: Name of stores

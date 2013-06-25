@@ -33,6 +33,7 @@ ErrorDuringLogin: En feil oppstod under innlogging
 InvalidUserOrPassword: Ugyldig ønskeliste/passord
 WishListCreateSuccess: Ønskeliste har blitt opprettet
 WishListCreateError: En feil oppstod under oppretting av ønskelisten
+WishListAlreadyExists: Ønskelisten finnes allerede, vennligst velg et annet navn
 RegisterFormListName: Navn på ønskeliste
 RegisterFormAdminPassword: Passord for administrator
 RegisterFormGuestPassword: Passord for gjest

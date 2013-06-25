@@ -13,12 +13,24 @@ getRegisterR = do
         setTitleI MsgRegisterTitle
         $(widgetFile "register")
 
+redirectIfListExists :: Text -> Handler ()
+redirectIfListExists name = do
+    render <- getMessageRender
+    exists <- runDB $ selectList [WishlistName ==. name] []
+    if length exists > 0
+      then do
+        setMessage $ toHtml $ render MsgWishListAlreadyExists
+        redirect $ RegisterR
+      else
+        return $ ()
+
 postRegisterR :: Handler Html
 postRegisterR = do
     render <- getMessageRender
     ((result, _), _) <- runFormPost registerForm
     case result of
         FormSuccess (name, adminPassword, guestPassword) -> do
+            redirectIfListExists name
             let adminName = T.pack ("admin_" ++ (T.unpack name))
             let guestName = T.pack ("guest_" ++ (T.unpack name))
             adminUser <- liftIO $ H.setPassword adminPassword (User adminName "" "")

@@ -26,7 +26,7 @@ registerSpecs =
             bodyContains "Administrator password"
             bodyContains "Guest password"
 
-        yit "registers new lists through POST requests" $ do
+        yit "registers new lists and users through POST requests" $ do
             cleanDB
             get RegisterR
             request $ do
@@ -38,5 +38,7 @@ registerSpecs =
                 byLabel "Guest password" "bar"
 
             statusIs 303
-            listAfter <- runDB $ selectList ([] :: [Filter Wishlist]) []
-            assertEqual "wish list was not registered!" 1 $ L.length listAfter
+            lists <- runDB $ selectList ([] :: [Filter Wishlist]) []
+            assertEqual "wish list was not registered!" 1 $ L.length lists
+            users <- runDB $ selectList ([] :: [Filter User]) []
+            assertEqual "users not registered" 2 $ L.length users

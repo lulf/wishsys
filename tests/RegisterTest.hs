@@ -19,3 +19,7 @@ registerSpecs =
             bodyContains "Name of wish list"
             bodyContains "Administrator password"
             bodyContains "Guest password"
+
+        yit "registers new lists through POST requests" $ do
+            get RegisterR
+            statusIs 200

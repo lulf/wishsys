@@ -9,7 +9,6 @@ getWishes listId = runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) 
 
 getWishListR :: WishlistId -> AccessLevel -> Handler Html
 getWishListR listId Admin = do
-    maybeList <- runDB $ get listId
     wishes <- getWishes listId
     (wishRegisterWidget, enctype) <- generateFormPost $ wishOwnerForm listId Nothing
     editWishForms <- generateEditWidgets listId wishes
@@ -18,7 +17,6 @@ getWishListR listId Admin = do
         $(widgetFile "wishlist_owner")
 
 getWishListR listId Guest = do
-    maybeList <- runDB $ get listId
     wishes <- getWishes listId
     guestForms <- generateGuestForms wishes
     defaultLayout $ do

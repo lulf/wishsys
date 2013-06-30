@@ -2,33 +2,28 @@
 module Handler.WishList where
 
 import Import
-import Yesod.Auth
 import Data.Maybe
 
 getWishes :: WishlistId -> Handler ([Entity Wish])
 getWishes listId = runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) [Asc WishName]
 
 getWishListR :: WishlistId -> AccessLevel -> Handler Html
-getWishListR listId _ = do
+getWishListR listId Admin = do
     maybeList <- runDB $ get listId
-    userId <- requireAuthId
     wishes <- getWishes listId
-    case maybeList of
-        Just (Wishlist _ ownerId guestId) ->
-          if userId == guestId
-          then getGuestWishList listId wishes
-          else if userId == ownerId
-               then getOwnerWishList listId wishes
-               else redirect HomeR
-        _ -> redirect HomeR
-
-getOwnerWishList :: WishlistId -> [Entity Wish] -> Handler Html
-getOwnerWishList listId wishes = do
     (wishRegisterWidget, enctype) <- generateFormPost $ wishOwnerForm listId Nothing
     editWishForms <- generateEditWidgets listId wishes
     defaultLayout $ do
         setTitleI MsgWishListTitle
         $(widgetFile "wishlist_owner")
+
+getWishListR listId Guest = do
+    maybeList <- runDB $ get listId
+    wishes <- getWishes listId
+    guestForms <- generateGuestForms wishes
+    defaultLayout $ do
+        setTitleI MsgWishListTitle
+        $(widgetFile "wishlist_guest")
 
 generateEditWidgets :: WishlistId -> [Entity Wish] -> Handler ([(WishId, (Widget, Enctype), (Widget, Enctype))])
 generateEditWidgets listId wishEntities = do
@@ -39,13 +34,6 @@ generateEditWidgets listId wishEntities = do
     deletePosts <- mapM generateFormPost deleteForms
     posts <- mapM generateFormPost forms
     return $ zip3 wishIds posts deletePosts
-
-getGuestWishList :: WishlistId -> [Entity Wish] -> Handler Html
-getGuestWishList listId wishes = do
-  guestForms <- generateGuestForms wishes
-  defaultLayout $ do
-      setTitleI MsgWishListTitle
-      $(widgetFile "wishlist_guest")
 
 generateGuestForms :: [Entity Wish] -> Handler ([(Widget, Enctype)])
 generateGuestForms wishEntities = do

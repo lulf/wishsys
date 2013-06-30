@@ -7,8 +7,10 @@ User
 
 Wishlist
     name Text
+    urlName Text
     owner UserId
     guest UserId
+    UniqueList urlName
 
 Wish
     name Text

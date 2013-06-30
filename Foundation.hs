@@ -99,7 +99,7 @@ instance Yesod App where
     authRoute _ = Just HomeR
 
     isAuthorized HomeR _ = return Authorized
-    isAuthorized (WishListR listId) False = do
+    isAuthorized (WishListR listId _) False = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
@@ -110,7 +110,7 @@ instance Yesod App where
                                         case wishList of
                                             [] -> return $ Unauthorized "You do not have permission to view this wish list"
                                             _ -> return Authorized
-    isAuthorized (WishListR listId) True = do
+    isAuthorized (WishListR listId _) True = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired

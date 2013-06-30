@@ -6,5 +6,5 @@
 
 / HomeR GET POST
 /wishlist RegisterR GET POST
-/wishlist/#WishlistId WishListR GET POST
+/wishlist/#WishlistId/#AccessLevel WishListR GET POST
 /wishlist/#WishlistId/wish/#WishId WishHandlerR POST

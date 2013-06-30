@@ -12,7 +12,7 @@ $else
         <th></th>
         <th></th>
     <tr>
-        <form method=post action=@{WishListR listId} enctype=#{enctype}>
+        <form method=post action=@{WishListR listId Admin} enctype=#{enctype}>
             ^{wishRegisterWidget}
             <td>
                 <input type="submit" value="_{MsgRegisterNewWishSubmit}">

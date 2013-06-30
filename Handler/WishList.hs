@@ -8,8 +8,8 @@ import Data.Maybe
 getWishes :: WishlistId -> Handler ([Entity Wish])
 getWishes listId = runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) [Asc WishName]
 
-getWishListR :: WishlistId -> Handler Html
-getWishListR listId = do
+getWishListR :: WishlistId -> AccessLevel -> Handler Html
+getWishListR listId _ = do
     maybeList <- runDB $ get listId
     userId <- requireAuthId
     wishes <- getWishes listId
@@ -55,18 +55,18 @@ generateGuestForms wishEntities = do
 wishGuestForm :: Form (Int)
 wishGuestForm = renderBootstrap $ areq intField "" (Just 0)
 
-postWishListR :: WishlistId -> Handler Html
-postWishListR listId = do
+postWishListR :: WishlistId -> AccessLevel -> Handler Html
+postWishListR listId accessLevel = do
     render <- getMessageRender
     ((result, _), _) <- runFormPost $ wishOwnerForm listId Nothing
     case result of
         FormSuccess (wish) -> do
             _ <- runDB $ insert wish
             setMessage $ toHtml $ render MsgRegisterWishWishAdded
-            redirect $ (WishListR listId)
+            redirect $ (WishListR listId accessLevel)
         _ -> do
             setMessage $ toHtml $ render MsgRegisterWishErrorAdding
-            redirect $ (WishListR listId)
+            redirect $ (WishListR listId accessLevel)
 
 wishOwnerForm :: WishlistId -> Maybe Wish -> Form (Wish)
 wishOwnerForm listId wish = renderEditWidget $ Wish

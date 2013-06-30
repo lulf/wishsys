@@ -16,7 +16,7 @@ postWishHandlerR listId wishId = do
           else if userId == ownerId
                then postOwnerWishHandlerR listId wishId
                else redirect HomeR
-        _ -> redirect $ WishListR listId
+        _ -> redirect $ WishListR listId Admin
 
 postGuestWishHandlerR :: WishlistId -> WishId -> Handler Html
 postGuestWishHandlerR listId wishId = do
@@ -27,7 +27,7 @@ postGuestWishHandlerR listId wishId = do
             runDB $ update wishId [WishBought +=. numPurchased]
         _ -> setMessage $ toHtml $ render MsgRegisterPurchasedError
 
-    redirect $ WishListR listId
+    redirect $ WishListR listId Guest
 
 postOwnerWishHandlerR :: WishlistId -> WishId -> Handler Html
 postOwnerWishHandlerR listId wishId = do
@@ -42,7 +42,7 @@ postOwnerWishHandlerR listId wishId = do
         if wasDeleted
           then return $ ()
           else setMessage $ toHtml $ render MsgRegisterWishErrorChangingWish
-    redirect $ (WishListR listId)
+    redirect $ (WishListR listId Admin)
 
 updateIfSuccess :: FormResult Wish -> WishId -> Handler (Bool)
 updateIfSuccess result wishId  = do

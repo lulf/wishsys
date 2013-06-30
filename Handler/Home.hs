@@ -27,7 +27,7 @@ postHomeR = do
                     setMessage $ toHtml $ render MsgWishListNotFound
                     redirect $ HomeR
                 (Entity wid _):_ -> do
-                    redirect $ (WishListR wid)
+                    redirect $ (WishListR wid accessLevel)
         _ -> do
             setMessage $ toHtml $ render MsgErrorDuringLogin
             redirect $ HomeR

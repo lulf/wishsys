@@ -2,7 +2,8 @@ module Model where
 
 import Prelude
 import Yesod
-import Data.Text (Text)
+import Data.Text (Text, pack, unpack)
+import Data.Char (toLower)
 import Database.Persist.Quasi
 import Data.Typeable (Typeable)
 import Yesod.Auth.HashDB (HashDBUser(..))
@@ -22,4 +23,14 @@ instance HashDBUser User where
                                      }
 
 data AccessLevel = Guest | Admin
-    deriving (Show, Eq, Enum, Bounded)
+    deriving (Show, Eq, Enum, Bounded, Read)
+
+instance PathPiece AccessLevel where
+    toPathPiece a = pack $ (map toLower $ show a)
+    fromPathPiece s =
+        case (map toLower $ unpack s) of
+            "guest" -> Just Guest
+            "admin" -> Just Admin
+            _ -> Nothing
+
+            

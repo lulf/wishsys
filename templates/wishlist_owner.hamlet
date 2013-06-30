@@ -19,11 +19,11 @@ $else
             <td></td>
     $forall (wishId, (editWishWidget, editWishEnctype), (deleteWishWidget, deleteWishEnctype)) <- editWishForms
         <tr>
-            <form method=post action=@{WishHandlerR listId wishId} enctype=#{editWishEnctype}>
+            <form method=post action=@{WishHandlerR listId Admin wishId} enctype=#{editWishEnctype}>
                 ^{editWishWidget}
                 <td>
                     <input type="submit" value="_{MsgSubmitWishUpdate}">
-            <form method=post action=@{WishHandlerR listId wishId} enctype=#{deleteWishEnctype}>
+            <form method=post action=@{WishHandlerR listId Admin wishId} enctype=#{deleteWishEnctype}>
                 <td>
                     ^{deleteWishWidget}
                     <input type="submit" value="_{MsgSubmitWishDelete}">

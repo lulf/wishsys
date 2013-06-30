@@ -3,34 +3,9 @@ module Handler.WishHandler where
 
 import Import
 import Handler.WishList
-import Yesod.Auth
 
-postWishHandlerR :: WishlistId -> WishId -> Handler Html
-postWishHandlerR listId wishId = do
-    maybeList <- runDB $ get listId
-    userId <- requireAuthId
-    case maybeList of
-        Just (Wishlist _ ownerId guestId) ->
-          if userId == guestId
-          then postGuestWishHandlerR listId wishId
-          else if userId == ownerId
-               then postOwnerWishHandlerR listId wishId
-               else redirect HomeR
-        _ -> redirect $ WishListR listId Admin
-
-postGuestWishHandlerR :: WishlistId -> WishId -> Handler Html
-postGuestWishHandlerR listId wishId = do
-    render <- getMessageRender
-    ((result, _), _) <- runFormPost $ wishGuestForm
-    case result of
-        FormSuccess (numPurchased) -> do
-            runDB $ update wishId [WishBought +=. numPurchased]
-        _ -> setMessage $ toHtml $ render MsgRegisterPurchasedError
-
-    redirect $ WishListR listId Guest
-
-postOwnerWishHandlerR :: WishlistId -> WishId -> Handler Html
-postOwnerWishHandlerR listId wishId = do
+postWishHandlerR :: WishlistId -> AccessLevel -> WishId -> Handler Html
+postWishHandlerR listId Admin wishId = do
     render <- getMessageRender
     ((updateResult, _), _) <- runFormPost $ wishOwnerForm listId Nothing
     wasUpdated <- updateIfSuccess updateResult wishId
@@ -43,6 +18,16 @@ postOwnerWishHandlerR listId wishId = do
           then return $ ()
           else setMessage $ toHtml $ render MsgRegisterWishErrorChangingWish
     redirect $ (WishListR listId Admin)
+
+postWishHandlerR listId Guest wishId = do
+    render <- getMessageRender
+    ((result, _), _) <- runFormPost $ wishGuestForm
+    case result of
+        FormSuccess (numPurchased) -> do
+            runDB $ update wishId [WishBought +=. numPurchased]
+        _ -> setMessage $ toHtml $ render MsgRegisterPurchasedError
+
+    redirect $ WishListR listId Guest
 
 updateIfSuccess :: FormResult Wish -> WishId -> Handler (Bool)
 updateIfSuccess result wishId  = do

@@ -1,8 +1,0 @@
-<h1>_{MsgAddWishList}
-<form method=post enctype=#{enctype}>
-    ^{formWidget}
-    <input type=submit>
-<h1>_{MsgOwnerWishes}
-<ul>
-$forall Entity wishListId list <- wishLists
-    <li><a href="@{WishListR wishListId}">#{wishlistName list}</a>

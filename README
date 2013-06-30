@@ -6,6 +6,6 @@ The view of the administrators and guests are separated, so that the
 administrators cannot see what the guests have purchased.
 
 To use:
-* You need to edit config/postgres.yml and config/settings.yml to configure  it to your liking.
+* You need to edit config/sqlite.yml and config/settings.yml to configure  it to your liking.
 * Just compile it using cabal and run it.
 * The default web interface supports registering multiple wish lists.

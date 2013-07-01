@@ -29,8 +29,8 @@ getLegacyLoginR = do
 
 legacyForm :: Form (Text, Text)
 legacyForm = renderBootstrap $ (,)
-    <$> areq textField "login" Nothing
-    <*> areq passwordField "password" Nothing
+    <$> areq textField "brukernavn" Nothing
+    <*> areq passwordField "passord" Nothing
 
 getListId :: Text -> Handler (Maybe WishlistId)
 getListId name = do

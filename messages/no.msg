@@ -31,6 +31,7 @@ LoginFormPassword: Passord
 WishListNotFound: Fant ikke ønskeliste
 ErrorDuringLogin: En feil oppstod under innlogging
 ErrorLegacyLoginName: Ugylding brukernavn
+LegacyLoginPageInfo: Christian og Maries ønskeliste. Logg inn med brukernavn og passord som ble gitt i invitasjonen.
 InvalidUserOrPassword: Ugyldig ønskeliste/passord
 WishListCreateSuccess: Ønskeliste har blitt opprettet
 WishListCreateError: En feil oppstod under oppretting av ønskelisten

@@ -1,5 +1,7 @@
 <h1>_{MsgHomeHeader}
 
+<p>_{MsgLegacyLoginPageInfo}
+
 <form method=post enctype=#{enctype}>
     ^{formWidget}
     <input type=submit value="Logg inn">

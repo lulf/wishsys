@@ -5,15 +5,25 @@ import Import
 import Handler.Login
 import Data.Text
 
+
 postLegacyLoginR :: Handler Html
 postLegacyLoginR = do
-    (name, password) <- runInputPost $ (,)
-                          <$> ireq textField "login"
-                          <*> ireq passwordField "password"
-    case name of
-        "gjest" -> loginUser "cogm" (append name password) Guest
-        "cogm" -> loginUser "cogm" (append name password) Admin
-        _ -> redirectToLegacyPage
+    render <- getMessageRender
+    ((result, _), _) <- runFormPost legacyForm
+    case result of
+        FormSuccess (name, password) -> do
+            case name of
+                "gjest" -> loginUser "cogm" (append name password) Guest
+                "cogm" -> loginUser "cogm" (append name password) Admin
+                _ -> redirect $ LegacyLoginR
+        _ -> do
+            setMessage $ toHtml $ render MsgErrorDuringLogin
+            redirect $ LegacyLoginR
+
+legacyForm :: Form (Text, Text)
+legacyForm = renderBootstrap $ (,)
+    <$> areq textField "login" Nothing
+    <*> areq passwordField "password" Nothing
 
 getListId :: Text -> Handler (Maybe WishlistId)
 getListId name = do
@@ -22,14 +32,11 @@ getListId name = do
     [] -> return $ Nothing
     ((Entity listId _):_) -> return $ Just listId
 
-redirectToLegacyPage :: Handler Html
-redirectToLegacyPage = redirect ("http://wishsys.dimling.net:8888" :: String)
-
 loginUser :: Text -> Text -> AccessLevel -> Handler Html
 loginUser listName password accessLevel = do
     maybeListId <- getListId listName
     case maybeListId of
-        Nothing -> redirectToLegacyPage
+        Nothing -> redirect $ LegacyLoginR
         Just listId -> do
             let loginName = getLoginName accessLevel listName
             doLogin loginName password

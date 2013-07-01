@@ -30,6 +30,7 @@ LoginFormListName: Navn på ønskeliste
 LoginFormPassword: Passord
 WishListNotFound: Fant ikke ønskeliste
 ErrorDuringLogin: En feil oppstod under innlogging
+ErrorLegacyLoginName: Ugylding brukernavn
 InvalidUserOrPassword: Ugyldig ønskeliste/passord
 WishListCreateSuccess: Ønskeliste har blitt opprettet
 WishListCreateError: En feil oppstod under oppretting av ønskelisten

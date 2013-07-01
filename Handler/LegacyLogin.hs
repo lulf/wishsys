@@ -15,7 +15,9 @@ postLegacyLoginR = do
             case name of
                 "gjest" -> loginUser "cogm" (append name password) Guest
                 "cogm" -> loginUser "cogm" (append name password) Admin
-                _ -> redirect $ LegacyLoginR
+                _ -> do
+                    setMessage $ toHtml $ render MsgErrorLegacyLoginName
+                    redirect LegacyLoginR
         _ -> do
             setMessage $ toHtml $ render MsgErrorDuringLogin
             redirect $ LegacyLoginR

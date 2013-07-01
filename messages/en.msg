@@ -30,6 +30,7 @@ LoginFormListName: Name of wish list
 LoginFormPassword: Password
 WishListNotFound: Unable to find wish list
 ErrorDuringLogin: An error occured while logging in
+ErrorLegacyLoginName: Invalid user name
 InvalidUserOrPassword: Unknown wish list/wrong password
 WishListCreateSuccess: Your wish list has been created
 WishListCreateError: An error occured when creating wish list

@@ -1,3 +1,5 @@
+<h1>_{MsgHomeHeader}
+
 <form method=post enctype=#{enctype}>
     ^{formWidget}
     <input type=submit value="Logg inn">

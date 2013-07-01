@@ -39,7 +39,7 @@ postRegisterR = do
             guestId <- runDB $ insert guestUser
             listId <- runDB $ insert (Wishlist name (createShortName name) adminId guestId)
             setMessage $ toHtml $ render MsgWishListCreateSuccess
-            doLogin adminName adminPassword
+            doLogin adminName adminPassword HomeR
             redirect $ WishListR listId Admin
         _ -> do
             setMessage $ toHtml $ render MsgWishListCreateError

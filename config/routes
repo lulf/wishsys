@@ -8,4 +8,4 @@
 /wishlist RegisterR GET POST
 /wishlist/#WishlistId/#AccessLevel WishListR GET POST
 /wishlist/#WishlistId/#AccessLevel/wish/#WishId WishHandlerR POST
-/legacy/login LegacyLoginR POST
+/legacy/login LegacyLoginR GET POST

@@ -20,6 +20,11 @@ postLegacyLoginR = do
             setMessage $ toHtml $ render MsgErrorDuringLogin
             redirect $ LegacyLoginR
 
+getLegacyLoginR :: Handler Html
+getLegacyLoginR = do
+    (formWidget, enctype) <- generateFormPost legacyForm
+    defaultLayout $(widgetFile "legacylogin")
+
 legacyForm :: Form (Text, Text)
 legacyForm = renderBootstrap $ (,)
     <$> areq textField "login" Nothing
@@ -39,5 +44,5 @@ loginUser listName password accessLevel = do
         Nothing -> redirect $ LegacyLoginR
         Just listId -> do
             let loginName = getLoginName accessLevel listName
-            doLogin loginName password
+            doLogin loginName password LegacyLoginR
             redirect $ WishListR listId accessLevel

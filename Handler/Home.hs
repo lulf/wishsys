@@ -20,7 +20,7 @@ postHomeR = do
     case result of 
         FormSuccess (accessLevel, name, password) -> do
             let loginName = getLoginName accessLevel name
-            doLogin loginName password
+            doLogin loginName password HomeR
             wl <- runDB $ selectList [WishlistName ==. name] [LimitTo 1]
             case wl of
                 [] -> do

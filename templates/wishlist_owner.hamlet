@@ -2,8 +2,8 @@
 
 <h2>_{MsgAdminWishUrls}
 <!-- TODO: GENERATE THIS AUTOMATICALLY -->
-<p>_{MsgAdminWishUrlForAdmins}: http://wishsys.dimling.net/wishlist/#{listUrl}/admin
-<p>_{MsgAdminWishUrlForGuests}: http://wishsys.dimling.net/wishlist/#{listUrl}/guest
+<p>_{MsgAdminWishUrlForAdmins}: @{WishListR listUrl Admin}
+<p>_{MsgAdminWishUrlForGuests}: @{WishListR listUrl Guest}
 
 <h2>_{MsgAdminWishList}
 

@@ -59,6 +59,6 @@ RegisterWishWishDeleted: Ønsket ble slettet
 GuestWishUpdate: Utfør
 RegisterPurchasedError: En feil skjedde under registrering av kjøp
 WishImageAlt: Bilde av ønske
-WishListLoginHeader: Innlogging
+WishListLoginHeader: Innlogging for
 WishListLoginRequired: Vennligst logg inn med passord nedenfor
 WishListLoginFormSubmit: Logg inn

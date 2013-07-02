@@ -1,4 +1,4 @@
-<h1>_{MsgWishListLoginHeader}
+<h1>_{MsgWishListLoginHeader} #{wishlistName wishList}
 
 <p>_{MsgWishListLoginRequired}
 

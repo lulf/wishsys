@@ -1,6 +1,8 @@
 <h1>#{wishlistName wishList}
 
+<br />
 <p><b>_{MsgRegisterExplanationHeader}</b>: _{MsgRegisterExplanation}
+<br />
 
 <table border="1">
     <tr>
@@ -24,4 +26,5 @@
             <td>
               <input type="submit" value=_{MsgGuestWishUpdate}>
 
+<br />
 <p>_{MsgRegisterTip}

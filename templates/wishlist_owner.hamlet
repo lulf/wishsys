@@ -1,9 +1,12 @@
 <h1>#{wishlistName wishList}
 
+<br />
+
 <h2>_{MsgAdminWishUrls}
 <p>_{MsgAdminWishUrlForAdmins}: @{WishListR listUrl Admin}
 <p>_{MsgAdminWishUrlForGuests}: @{WishListR listUrl Guest}
 
+<br />
 <h2>_{MsgAdminWishList}
 
 $if null wishes

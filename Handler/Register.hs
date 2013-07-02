@@ -13,10 +13,10 @@ getRegisterR = do
         setTitleI MsgRegisterTitle
         $(widgetFile "register")
 
-redirectIfListExists :: Text -> Handler ()
-redirectIfListExists name = do
+redirectIfListExists :: Text -> Text -> Handler ()
+redirectIfListExists name urlName = do
     render <- getMessageRender
-    exists <- runDB $ selectList [WishlistName ==. name] []
+    exists <- runDB $ selectList ([WishlistName ==. name] ||. [WishlistUrlName ==. urlName]) []
     if length exists > 0
       then do
         setMessage $ toHtml $ render MsgWishListAlreadyExists
@@ -29,15 +29,14 @@ postRegisterR = do
     render <- getMessageRender
     ((result, _), _) <- runFormPost registerForm
     case result of
-        FormSuccess (name, adminPassword, guestPassword) -> do
-            redirectIfListExists name
+        FormSuccess (name, urlName, adminPassword, guestPassword) -> do
+            redirectIfListExists name urlName
             let adminName = T.pack ("admin_" ++ (T.unpack name))
             let guestName = T.pack ("guest_" ++ (T.unpack name))
             adminUser <- liftIO $ H.setPassword adminPassword (User adminName "" "")
             guestUser <- liftIO $ H.setPassword guestPassword (User guestName "" "")
             adminId <- runDB $ insert adminUser
             guestId <- runDB $ insert guestUser
-            let urlName = createShortName name
             _ <- runDB $ insert (Wishlist name urlName adminId guestId)
             setMessage $ toHtml $ render MsgWishListCreateSuccess
             doLogin adminName adminPassword HomeR
@@ -46,8 +45,9 @@ postRegisterR = do
             setMessage $ toHtml $ render MsgWishListCreateError
             redirect $ RegisterR
 
-registerForm :: Form (Text, Text, Text)
-registerForm = renderBootstrap $ (,,)
+registerForm :: Form (Text, Text, Text, Text)
+registerForm = renderBootstrap $ (,,,)
     <$> areq textField (fieldSettingsLabel MsgRegisterFormListName) Nothing
+    <*> areq textField (fieldSettingsLabel MsgRegisterFormShortName) Nothing  -- TODO: Fix URL and use URL type to santize input
     <*> areq passwordField (fieldSettingsLabel MsgRegisterFormAdminPassword) Nothing
     <*> areq passwordField (fieldSettingsLabel MsgRegisterFormGuestPassword) Nothing

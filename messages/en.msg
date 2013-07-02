@@ -36,6 +36,7 @@ InvalidUserOrPassword: Unknown wish list/wrong password
 WishListCreateSuccess: Your wish list has been created
 WishListCreateError: An error occured when creating wish list
 RegisterFormListName: Name of wish list
+RegisterFormShortName: Short name used for guest URL (http://wishsys.dimling.net/wishlist/<short name>/guest)
 RegisterFormAdminPassword: Administrator password
 RegisterFormGuestPassword: Guest password
 RegisterFormSubmit: Register

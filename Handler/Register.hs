@@ -31,8 +31,8 @@ postRegisterR = do
     case result of
         FormSuccess (name, urlName, adminPassword, guestPassword) -> do
             redirectIfListExists name urlName
-            let adminName = T.pack ("admin_" ++ (T.unpack name))
-            let guestName = T.pack ("guest_" ++ (T.unpack name))
+            let adminName = getLoginName Admin urlName
+            let guestName = getLoginName Guest urlName
             adminUser <- liftIO $ H.setPassword adminPassword (User adminName "" "")
             guestUser <- liftIO $ H.setPassword guestPassword (User guestName "" "")
             adminId <- runDB $ insert adminUser

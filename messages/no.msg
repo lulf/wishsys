@@ -1,5 +1,9 @@
 Register: Registrere kjøp
 AdminWishes: Administrer ønskeliste
+AdminWishUrls: URLer til ønskeliste
+AdminWishList: Ønskeliste
+AdminWishUrlForAdmins: URL til administrasjonsside
+AdminWishUrlForGuests: URL til gjesteside
 RegisterNewWish: Legg til nytt ønske
 RegisterNewWishSubmit: Legg til
 RegisterExplanationHeader: Forklaring
@@ -18,7 +22,7 @@ ViewWishes: Ønskelister delt med deg
 AddWishList: Lag ny ønskeliste
 RegisterHeader: Lage ny ønskeliste
 HomeHeader: Ønskesys
-HomeWelcome: Velkommen til ønskesys! Hvis du er gjest, logg inn med navn på ønskeliste og gjestepassord under.
+HomeWelcome: Velkommen til ønskesys, en tjeneste for deg som vil dele dine ønsker med andre!
 LoginGuest: Logg inn
 HomeRegisterPreInstructions: Klikk
 HomeRegisterLink: her

@@ -2,8 +2,4 @@
 
 <p>_{MsgHomeWelcome}
 
-<form method=post action=@{HomeR} enctype=#{enctype}>
-    ^{formWidget}
-    <input type="submit" value="_{MsgLoginGuest}">
-
 <p>_{MsgHomeRegisterPreInstructions} <a href=@{RegisterR}>_{MsgHomeRegisterLink}</a> _{MsgHomeRegisterPostInstructions}

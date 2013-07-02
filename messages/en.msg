@@ -1,5 +1,9 @@
 Register: Register purchase
 AdminWishes: Administer wish list
+AdminWishUrls: URLs for wish list pages
+AdminWishList: Wish list
+AdminWishUrlForAdmins: URL to admin page
+AdminWishUrlForGuests: URL to guest page
 RegisterNewWish: Add new wish
 RegisterNewWishSubmit: Add
 RegisterExplanationHeader: Explanation
@@ -18,7 +22,7 @@ ViewWishes: Wish lists shared with you
 AddWishList: Create new wish list
 RegisterHeader: Create new wish list
 HomeHeader: Wishsys
-HomeWelcome: Welcome to wishsys. If you're a guest, please login using the name of the wish list and the guest password.
+HomeWelcome: Welcome to wishsys, a service for people wanting to share their wishes with others!
 LoginGuest: Log in
 HomeRegisterPreInstructions: Click
 HomeRegisterLink: here

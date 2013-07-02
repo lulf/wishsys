@@ -25,6 +25,7 @@ library
                      Handler.WishHandler
                      Handler.Login
                      Handler.LegacyLogin
+                     Handler.WishListLogin
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

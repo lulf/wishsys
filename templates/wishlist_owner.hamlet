@@ -1,5 +1,12 @@
 <h1>_{MsgAdminWishes}
 
+<h2>_{MsgAdminWishUrls}
+<!-- TODO: GENERATE THIS AUTOMATICALLY -->
+<p>_{MsgAdminWishUrlForAdmins}: http://wishsys.dimling.net/wishlist/#{listUrl}/admin
+<p>_{MsgAdminWishUrlForGuests}: http://wishsys.dimling.net/wishlist/#{listUrl}/guest
+
+<h2>_{MsgAdminWishList}
+
 $if null wishes
   <p>_{MsgRegisterOwnerEmptyList}
 $else

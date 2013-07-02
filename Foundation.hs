@@ -104,9 +104,13 @@ instance Yesod App where
         case mauth of
             Nothing -> return AuthenticationRequired
             Just (Entity userid _) -> runDB $ do
+                                        maybeUser <- get userid
+                                        let un = case maybeUser of
+                                                     Nothing -> "anonymous"
+                                                     Just user -> userName user
                                         wishList <- selectList ([WishlistUrlName ==.  listUrl, WishlistOwner ==. userid]) []
                                         case wishList of
-                                            [] -> return $ Unauthorized "You do not have permission to view this wish list"
+                                            [] -> return $ Unauthorized $ append "You do not have permission to view this wish list. Currently logged in as " un
                                             _ -> return Authorized
 
     isAuthorized (WishListR listUrl Guest) _ = do

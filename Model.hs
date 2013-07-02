@@ -3,6 +3,7 @@ module Model where
 import Prelude
 import Yesod
 import Data.Text (Text, pack, unpack)
+import qualified Data.Text as T
 import Data.Char (toLower)
 import Database.Persist.Quasi
 import Data.Typeable (Typeable)
@@ -33,4 +34,6 @@ instance PathPiece AccessLevel where
             "admin" -> Just Admin
             _ -> Nothing
 
-            
+createShortName :: Text -> Text
+createShortName = T.toLower . T.concat . (T.splitOn " ")
+

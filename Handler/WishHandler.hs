@@ -4,8 +4,9 @@ module Handler.WishHandler where
 import Import
 import Handler.WishList
 
-postWishHandlerR :: WishlistId -> AccessLevel -> WishId -> Handler Html
-postWishHandlerR listId Admin wishId = do
+postWishHandlerR :: Text -> AccessLevel -> WishId -> Handler Html
+postWishHandlerR listUrl Admin wishId = do
+    listId <- getWishlistId listUrl
     render <- getMessageRender
     ((updateResult, _), _) <- runFormPost $ wishOwnerForm listId Nothing
     wasUpdated <- updateIfSuccess updateResult wishId
@@ -17,17 +18,16 @@ postWishHandlerR listId Admin wishId = do
         if wasDeleted
           then return $ ()
           else setMessage $ toHtml $ render MsgRegisterWishErrorChangingWish
-    redirect $ (WishListR listId Admin)
+    redirect $ (WishListR listUrl Admin)
 
-postWishHandlerR listId Guest wishId = do
+postWishHandlerR listUrl Guest wishId = do
     render <- getMessageRender
     ((result, _), _) <- runFormPost $ wishGuestForm
     case result of
         FormSuccess (numPurchased) -> do
             runDB $ update wishId [WishBought +=. numPurchased]
         _ -> setMessage $ toHtml $ render MsgRegisterPurchasedError
-
-    redirect $ WishListR listId Guest
+    redirect $ WishListR listUrl Guest
 
 updateIfSuccess :: FormResult Wish -> WishId -> Handler (Bool)
 updateIfSuccess result wishId  = do

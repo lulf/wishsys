@@ -37,16 +37,14 @@ postRegisterR = do
             guestUser <- liftIO $ H.setPassword guestPassword (User guestName "" "")
             adminId <- runDB $ insert adminUser
             guestId <- runDB $ insert guestUser
-            listId <- runDB $ insert (Wishlist name (createShortName name) adminId guestId)
+            let urlName = createShortName name
+            _ <- runDB $ insert (Wishlist name urlName adminId guestId)
             setMessage $ toHtml $ render MsgWishListCreateSuccess
             doLogin adminName adminPassword HomeR
-            redirect $ WishListR listId Admin
+            redirect $ WishListR urlName Admin
         _ -> do
             setMessage $ toHtml $ render MsgWishListCreateError
             redirect $ RegisterR
-
-createShortName :: Text -> Text
-createShortName = T.toLower . T.concat . (T.splitOn " ")
 
 registerForm :: Form (Text, Text, Text)
 registerForm = renderBootstrap $ (,,)

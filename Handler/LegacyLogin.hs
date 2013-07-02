@@ -32,19 +32,8 @@ legacyForm = renderBootstrap $ (,)
     <$> areq textField "brukernavn" Nothing
     <*> areq passwordField "passord" Nothing
 
-getListId :: Text -> Handler (Maybe WishlistId)
-getListId name = do
-  lists <- runDB $ selectList [WishlistName ==. name] []
-  case lists of
-    [] -> return $ Nothing
-    ((Entity listId _):_) -> return $ Just listId
-
 loginUser :: Text -> Text -> AccessLevel -> Handler Html
 loginUser listName password accessLevel = do
-    maybeListId <- getListId listName
-    case maybeListId of
-        Nothing -> redirect $ LegacyLoginR
-        Just listId -> do
-            let loginName = getLoginName accessLevel listName
-            doLogin loginName password LegacyLoginR
-            redirect $ WishListR listId accessLevel
+    let loginName = getLoginName accessLevel listName
+    doLogin loginName password LegacyLoginR
+    redirect $ WishListR listName accessLevel

@@ -21,13 +21,15 @@ postHomeR = do
         FormSuccess (accessLevel, name, password) -> do
             let loginName = getLoginName accessLevel name
             doLogin loginName password HomeR
-            wl <- runDB $ selectList [WishlistName ==. name] [LimitTo 1]
-            case wl of
-                [] -> do
-                    setMessage $ toHtml $ render MsgWishListNotFound
-                    redirect $ HomeR
-                (Entity wid _):_ -> do
-                    redirect $ (WishListR wid accessLevel)
+            let urlName = createShortName name
+            redirect $ WishListR urlName accessLevel
+            --wl <- runDB $ selectList [WishlistName ==. name] [LimitTo 1]
+            --case wl of
+            --    [] -> do
+            --        setMessage $ toHtml $ render MsgWishListNotFound
+            --        redirect $ HomeR
+            --    (Entity wid _):_ -> do
+            --        redirect $ (WishListR wid accessLevel)
         _ -> do
             setMessage $ toHtml $ render MsgErrorDuringLogin
             redirect $ HomeR

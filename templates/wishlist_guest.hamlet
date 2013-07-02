@@ -12,7 +12,7 @@
         <th>
     $forall (Entity wishId wish, (editPurchaseWidget, enctype)) <- zip wishes guestForms
         <tr>
-          <form method=post action=@{WishHandlerR listId Guest wishId} enctype=#{enctype}>
+          <form method=post action=@{WishHandlerR listUrl Guest wishId} enctype=#{enctype}>
             <td>#{wishName wish}
             <td>
               <a href="#{wishImageUrl wish}">

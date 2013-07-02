@@ -1,0 +1,7 @@
+<h1>_{MsgWishListLoginHeader}
+
+<p>_{MsgWishListLoginRequired}
+
+<form method=post enctype=#{enctype}>
+    ^{formWidget}
+    <input type=submit value=_{MsgWishListLoginFormSubmit}>

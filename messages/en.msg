@@ -59,3 +59,6 @@ RegisterWishWishDeleted: Wish deleted
 GuestWishUpdate: Update
 RegisterPurchasedError: An error occured when registering purchase
 WishImageAlt: Photo of wish
+WishListLoginHeader: Login
+WishListLoginRequired: Please login with your password below
+WishListLoginFormSubmit: Log in

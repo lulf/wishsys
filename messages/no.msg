@@ -64,3 +64,5 @@ WishListLoginHeader: Innlogging for
 WishListLoginRequired: Vennligst logg inn med passord nedenfor
 WishListLoginFormSubmit: Logg inn
 HomeCreateList: Lag ny ønskeliste
+LoggedInAs: Logget inn som
+LogOut: Logg ut

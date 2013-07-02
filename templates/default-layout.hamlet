@@ -1,5 +1,5 @@
 $maybe msg <- mmsg
     <div #message>#{msg}
 ^{widget}
-$maybe _ <- maid
-  <p><a href="@{AuthR LogoutR}">Logout</a></p>
+$maybe u <- muser
+  <p>_{MsgLoggedInAs} #{userName u}. <a href="@{AuthR LogoutR}">_{MsgLogOut}</a></p>

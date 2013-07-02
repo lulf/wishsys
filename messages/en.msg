@@ -64,3 +64,5 @@ WishListLoginHeader: Login for
 WishListLoginRequired: Please login with your password below
 WishListLoginFormSubmit: Log in
 HomeCreateList: Create new wish list
+LoggedInAs: Logged in as
+LogOut: Log out

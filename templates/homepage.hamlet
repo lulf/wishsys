@@ -2,4 +2,4 @@
 
 <p>_{MsgHomeWelcome}
 
-<p>_{MsgHomeRegisterPreInstructions} <a href=@{RegisterR}>_{MsgHomeRegisterLink}</a> _{MsgHomeRegisterPostInstructions}
+<p><a href=@{RegisterR}>_{MsgHomeCreateList}</a>

@@ -1,7 +1,6 @@
-<h1>_{MsgAdminWishes}
+<h1>#{wishlistName wishList}
 
 <h2>_{MsgAdminWishUrls}
-<!-- TODO: GENERATE THIS AUTOMATICALLY -->
 <p>_{MsgAdminWishUrlForAdmins}: @{WishListR listUrl Admin}
 <p>_{MsgAdminWishUrlForGuests}: @{WishListR listUrl Guest}
 

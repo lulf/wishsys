@@ -1,4 +1,4 @@
-<h1>_{MsgRegister}
+<h1>#{wishlistName wishList}
 
 <p><b>_{MsgRegisterExplanationHeader}</b>: _{MsgRegisterExplanation}
 

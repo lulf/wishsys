@@ -41,6 +41,7 @@ WishListCreateSuccess: Ønskeliste har blitt opprettet
 WishListCreateError: En feil oppstod under oppretting av ønskelisten
 WishListAlreadyExists: Ønskelisten finnes allerede, vennligst velg et annet navn
 RegisterFormListName: Navn på ønskeliste
+RegisterFormShortNameUrl: <kortnavn>
 RegisterFormShortName: Kort navn brukt i gjestelenke (http://wishsys.dimling.net/wishlist/<kortnavn>/guest)
 RegisterFormAdminPassword: Passord for administrator
 RegisterFormGuestPassword: Passord for gjest
@@ -62,3 +63,4 @@ WishImageAlt: Bilde av ønske
 WishListLoginHeader: Innlogging for
 WishListLoginRequired: Vennligst logg inn med passord nedenfor
 WishListLoginFormSubmit: Logg inn
+HomeCreateList: Lag ny ønskeliste

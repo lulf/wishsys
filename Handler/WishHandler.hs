@@ -6,7 +6,7 @@ import Handler.WishList
 
 postWishHandlerR :: Text -> AccessLevel -> WishId -> Handler Html
 postWishHandlerR listUrl Admin wishId = do
-    listId <- getWishlistId listUrl
+    (listId, _) <- getWishlist listUrl
     render <- getMessageRender
     ((updateResult, _), _) <- runFormPost $ wishOwnerForm listId Nothing
     wasUpdated <- updateIfSuccess updateResult wishId

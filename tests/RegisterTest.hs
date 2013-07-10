@@ -22,7 +22,7 @@ registerSpecs =
             get RegisterR
             statusIs 200
             htmlAllContain "h1" "Create new wish list"
-            bodyContains "Copyright Ulf Lilleengen"
+            bodyContains "Lilleengen Programvarefabrikk"
             bodyContains "Name of wish list"
             bodyContains "Administrator password"
             bodyContains "Guest password"
@@ -34,7 +34,8 @@ registerSpecs =
                 setMethod "POST"
                 setUrl RegisterR
                 addNonce
-                byLabel "Name of wish list" "foobar"
+                byLabel "Name of wish list" "foo bar LOLZ"
+                byLabel "Short name used for guest URL (http://wishsys.dimling.net/wishlist/<short name>/guest)" "foobar"
                 byLabel "Administrator password" "foo"
                 byLabel "Guest password" "bar"
 
@@ -42,7 +43,7 @@ registerSpecs =
             lists <- runDB $ selectList ([] :: [Filter Wishlist]) []
             assertEqual "wish list was not registered!" 1 $ L.length lists
             let (Entity _ list) = head lists
-            assertEqual "list name is not correct" "foobar" $ wishlistName list
+            assertEqual "list name is not correct" "foobar" $ wishlistUrlName list
 
             users <- runDB $ selectList ([] :: [Filter User]) []
             assertEqual "users not registered" 2 $ L.length users
@@ -58,7 +59,8 @@ registerSpecs =
                 setMethod "POST"
                 setUrl RegisterR
                 addNonce
-                byLabel "Name of wish list" "foobar"
+                byLabel "Name of wish list" "foo bar LOLZ"
+                byLabel "Short name used for guest URL (http://wishsys.dimling.net/wishlist/<short name>/guest)" "foobar"
                 byLabel "Administrator password" "foo"
                 byLabel "Guest password" "bar"
             statusIs 303
@@ -68,7 +70,8 @@ registerSpecs =
                 setMethod "POST"
                 setUrl RegisterR
                 addNonce
-                byLabel "Name of wish list" "foobar"
+                byLabel "Name of wish list" "foo bar LOLZ"
+                byLabel "Short name used for guest URL (http://wishsys.dimling.net/wishlist/<short name>/guest)" "foobar"
                 byLabel "Administrator password" "mamma"
                 byLabel "Guest password" "pappa"
             statusIs 303

@@ -13,7 +13,6 @@ homeSpecs =
         yit "displays the correct elements" $ do
             get HomeR
             statusIs 200
-            htmlAllContain "h1" "Wishsys"
+            htmlAnyContain "h1" "Wishsys"
             bodyContains "Welcome to wishsys"
-            bodyContains "Copyright Ulf Lilleengen"
-            bodyContains "checked>Guest"
+            bodyContains "Lilleengen Programvarefabrikk"

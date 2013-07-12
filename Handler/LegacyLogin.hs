@@ -24,6 +24,7 @@ postLegacyLoginR = do
 
 getLegacyLoginR :: Handler Html
 getLegacyLoginR = do
+    setLanguage "no"
     (formWidget, enctype) <- generateFormPost legacyForm
     defaultLayout $(widgetFile "legacylogin")
 

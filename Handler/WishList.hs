@@ -3,7 +3,6 @@ module Handler.WishList where
 
 import Import
 import Data.Maybe
-import Yesod.Auth
 
 -- TODO: Merge into one database call?
 getWishes :: WishlistId -> Handler ([Entity Wish])
@@ -21,14 +20,7 @@ getWishlist urlListName = do
             return $ (wid, wlist)
 
 getWishListR :: Text -> AccessLevel -> Handler Html
-getWishListR listUrl accessLevel = do
-    maid <- maybeAuthId
-    case maid of
-        Nothing -> redirect $ WishListLoginR listUrl accessLevel
-        _ -> getWishListR2 listUrl accessLevel
-
-getWishListR2 :: Text -> AccessLevel -> Handler Html
-getWishListR2 listUrl Admin = do
+getWishListR listUrl Admin = do
     (listId, wishList) <- getWishlist listUrl
     wishes <- getWishes listId
     (wishRegisterWidget, enctype) <- generateFormPost $ wishOwnerForm listId Nothing
@@ -37,7 +29,7 @@ getWishListR2 listUrl Admin = do
         setTitleI MsgWishListTitle
         $(widgetFile "wishlist_owner")
 
-getWishListR2 listUrl Guest = do
+getWishListR listUrl Guest = do
     (listId, wishList) <- getWishlist listUrl
     wishes <- getWishes listId
     guestForms <- generateGuestForms wishes

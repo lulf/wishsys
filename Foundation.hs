@@ -102,7 +102,8 @@ instance Yesod App where
     authRoute _ = Just HomeR
 
     isAuthorized HomeR _ = return Authorized
-    isAuthorized (WishListR listUrl Admin) _ = do
+
+    isAuthorized (WishListR listUrl Admin) True = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
@@ -116,10 +117,34 @@ instance Yesod App where
                                             [] -> return $ Unauthorized $ append "You do not have permission to view this wish list. Currently logged in as " un
                                             _ -> return Authorized
 
-    isAuthorized (WishListR listUrl Guest) _ = do
+    isAuthorized (WishListR listUrl Guest) True = do
         mauth <- maybeAuth
         case mauth of
             Nothing -> return AuthenticationRequired
+            Just (Entity userid _) -> runDB $ do
+                                        wishList <- selectList ([WishlistUrlName ==.  listUrl, WishlistGuest ==. userid]) []
+                                        case wishList of
+                                            [] -> return $ Unauthorized "You do not have permission to view this wish list"
+                                            _ -> return Authorized
+
+    isAuthorized (WishListR listUrl Admin) False = do
+        mauth <- maybeAuth
+        case mauth of
+            Nothing -> return Authorized
+            Just (Entity userid _) -> runDB $ do
+                                        maybeUser <- get userid
+                                        let un = case maybeUser of
+                                                     Nothing -> "anonymous"
+                                                     Just user -> userName user
+                                        wishList <- selectList ([WishlistUrlName ==.  listUrl, WishlistOwner ==. userid]) []
+                                        case wishList of
+                                            [] -> return $ Unauthorized $ append "You do not have permission to view this wish list. Currently logged in as " un
+                                            _ -> return Authorized
+
+    isAuthorized (WishListR listUrl Guest) False = do
+        mauth <- maybeAuth
+        case mauth of
+            Nothing -> return Authorized
             Just (Entity userid _) -> runDB $ do
                                         wishList <- selectList ([WishlistUrlName ==.  listUrl, WishlistGuest ==. userid]) []
                                         case wishList of

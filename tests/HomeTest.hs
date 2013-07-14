@@ -5,7 +5,6 @@ module HomeTest
 
 import TestImport
 import qualified Data.List as L
-import           Data.Text
 
 homeSpecs :: Specs
 homeSpecs =
@@ -15,6 +14,6 @@ homeSpecs =
             render <- getMessageRender
             get HomeR
             statusIs 200
-            htmlAnyContain "h1" $ unpack $ render MsgHomeHeader
-            bodyContains $ unpack $ render MsgHomeWelcome
+            htmlAnyContain "h1" $ render MsgHomeHeader
+            bodyContains $ render MsgHomeWelcome
             bodyContains "Lilleengen Programvarefabrikk"

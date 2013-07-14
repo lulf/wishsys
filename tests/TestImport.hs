@@ -16,17 +16,17 @@ import Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import Control.Monad.Logger (NoLoggingT, runNoLoggingT)
 import Control.Monad.IO.Class (liftIO)
 import           Text.Shakespeare.I18N         (RenderMessage (..))
-import           Data.Text (Text)
+import           Data.Text (Text, unpack)
 
 import Foundation
 import Model
 
 type Specs = YesodSpec App
 
-getMessageRender :: YesodExample App (AppMessage -> Text)
+getMessageRender :: YesodExample App (AppMessage -> String)
 getMessageRender = do
     y <- getTestYesod
-    return $ renderMessage y ["en"]
+    return $ unpack . (renderMessage y ["en"])
 
 
 runDB :: SqlPersist (NoLoggingT (ResourceT IO)) a -> YesodExample App a

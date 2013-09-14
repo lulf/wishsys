@@ -1,0 +1,12 @@
+Source: wishsys
+Maintainer: Ulf Lilleengen <ulf_lilleengen@yahoo.com>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 8)
+
+Package: wishsys
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wishsys service
+  Wishsys service is a web application backend for managing wish lists.

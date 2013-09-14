@@ -21,7 +21,7 @@ Maintainer: Ulf Lilleengen <ulf_lillengen@yahoo.com>
 Readme: README
 Extra-Files: README
 Files: debian/initscript /etc/init.d/wishsys
-  cabal-dev/bin/wishsys /usr/bin/wishsys
+  .cabal-sandbox/bin/wishsys /usr/bin/wishsys
   static/img/glyphicons-halflings-white.png /usr/share/wishsys
   static/img/glyphicons-halflings.png /usr/share/wishsys
   static/combined/j49BOPB6.css /usr/share/wishsys

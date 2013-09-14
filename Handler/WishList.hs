@@ -8,20 +8,20 @@ import Data.Maybe
 getWishes :: WishlistId -> Handler ([Entity Wish])
 getWishes listId = runDB $ selectList ([WishWlist ==. listId] :: [Filter Wish]) [Asc WishName]
 
-getWishlist :: Text -> Handler (WishlistId, Wishlist)
-getWishlist urlListName = do
+getWishlist :: Text -> AccessLevel -> Handler (WishlistId, Wishlist)
+getWishlist urlListName accessLevel = do
     render <- getMessageRender
     wl <- runDB $ selectList [WishlistUrlName ==. urlListName] [LimitTo 1]
     case wl of
         [] -> do
             setMessage $ toHtml $ render MsgWishListNotFound
-            redirect $ LegacyLoginR
+            redirect $ WishListLoginR urlListName accessLevel
         (Entity wid wlist):_ -> do
             return $ (wid, wlist)
 
 getWishListR :: Text -> AccessLevel -> Handler Html
 getWishListR listUrl Admin = do
-    (listId, wishList) <- getWishlist listUrl
+    (listId, wishList) <- getWishlist listUrl Admin
     wishes <- getWishes listId
     (wishRegisterWidget, enctype) <- generateFormPost $ wishOwnerForm listId Nothing
     editWishForms <- generateEditWidgets listId wishes
@@ -30,7 +30,7 @@ getWishListR listUrl Admin = do
         $(widgetFile "wishlist_owner")
 
 getWishListR listUrl Guest = do
-    (listId, wishList) <- getWishlist listUrl
+    (listId, wishList) <- getWishlist listUrl Guest
     wishes <- getWishes listId
     guestForms <- generateGuestForms wishes
     defaultLayout $ do
@@ -57,7 +57,7 @@ wishGuestForm = renderBootstrap $ areq intField "" (Just 0)
 
 postWishListR :: Text -> AccessLevel -> Handler Html
 postWishListR listUrl accessLevel = do
-    (listId, _) <- getWishlist listUrl
+    (listId, _) <- getWishlist listUrl accessLevel
     render <- getMessageRender
     ((result, _), _) <- runFormPost $ wishOwnerForm listId Nothing
     case result of

@@ -6,7 +6,7 @@ import Handler.WishList
 
 postWishHandlerR :: Text -> AccessLevel -> WishId -> Handler Html
 postWishHandlerR listUrl Admin wishId = do
-    (listId, _) <- getWishlist listUrl
+    (listId, _) <- getWishlist listUrl Admin
     wish <- runDB $ get wishId
     render <- getMessageRender
     ((updateResult, _), _) <- runFormPost $ wishOwnerForm listId wish

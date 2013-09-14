@@ -25,7 +25,6 @@ import Handler.Home
 import Handler.WishList
 import Handler.Register
 import Handler.WishHandler
-import Handler.LegacyLogin
 import Handler.WishListLogin
 
 -- This line actually creates our YesodDispatch instance. It is the second half

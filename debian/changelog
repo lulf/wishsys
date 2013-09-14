@@ -1,5 +1,5 @@
-wishsys (0.5-1) UNRELEASED; urgency=low
+wishsys (0.5-1) unstable; urgency=low
 
-  * Initial release. 
+  * Initial release
 
- -- Ulf Lilleengen <ulf_lilleengen@yahoo.com>  Sat, 14 Sep 2013 20:11:45 +0200
+ -- Ulf Lilleengen <ulf_lilleengen@yahoo.com>  Sat, 14 Sep 2013 22:12:56 +0200

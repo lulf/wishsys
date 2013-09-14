@@ -1,12 +1,15 @@
 Source: wishsys
+Section: unknown
+Priority: extra
 Maintainer: Ulf Lilleengen <ulf_lilleengen@yahoo.com>
-Section: misc
-Priority: optional
-Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 8)
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: http://wishsys.dimling.net 
+#Vcs-Git: git://git.debian.org/collab-maint/wishsys.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/wishsys.git;a=summary
 
 Package: wishsys
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wishsys service
-  Wishsys service is a web application backend for managing wish lists.
+  Contains wishsys web service backend for administering wish lists.

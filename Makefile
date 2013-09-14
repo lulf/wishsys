@@ -1,6 +1,8 @@
 PREFIX ?= /usr/local
 CABAL ?= cabal
 VERSION ?= 0.5
+PKG=wishsys_$(VERSION)
+ORIGPKG=wishsys_$(VERSION).orig
 
 all:
 	$(CABAL) sandbox init
@@ -13,5 +15,6 @@ clean:
 	rm -rf .cabal-sandbox
 
 dist:
-	tar -cf wishsys_$(VERSION).tar .
-	gzip wishsys_$(VERSION).tar
+	tar -cf $(PKG).tar .
+	gzip $(PKG).tar
+	mv $(PKG).tar.gz $(ORIGPKG).tar.gz

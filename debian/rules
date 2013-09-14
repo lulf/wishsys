@@ -11,3 +11,5 @@
 
 %:
 	dh $@ 
+
+override_dh_auto_install: $(MAKE) PREFIX=$(CURDIR)/debian/wishsys/usr install

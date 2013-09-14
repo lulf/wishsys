@@ -15,6 +15,6 @@ clean:
 	rm -rf .cabal-sandbox
 
 dist:
-	tar -cf $(PKG).tar .
+	tar --exclude='.git' -cf $(PKG).tar .
 	gzip $(PKG).tar
 	mv $(PKG).tar.gz $(ORIGPKG).tar.gz

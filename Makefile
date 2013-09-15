@@ -24,6 +24,15 @@ install:
 	install -p -m 0644 config/favicon.ico $(PREFIX)/share/wishsys/config/
 	install -p -m 0644 config/settings.yml $(PREFIX)/share/wishsys/config/
 
+ifeq ($(wildcard .cabal-sandbox),)
+cibuild:
+	$(CABAL) --enable-tests install
+else
+cibuild:
+	$(CABAL) sandbox init
+	$(CABAL) --enable-tests install
+endif
+
 clean:
 	rm -rf config/client_session_key.aes
 	rm -rf dist/

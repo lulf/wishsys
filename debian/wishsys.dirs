@@ -1,1 +1,7 @@
 usr/bin
+usr/share/wishsys
+usr/share/wishsys/config
+usr/share/wishsys/static
+usr/share/wishsys/static/css
+usr/share/wishsys/static/img
+usr/share/wishsys/static/combined

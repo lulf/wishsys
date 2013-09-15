@@ -10,7 +10,7 @@ all:
 	$(CABAL) --enable-tests install
 
 install:
-	install -D .cabal-sandbox/bin/wishsys $(PREFIX)/bin/wishsys
+	install -p -m 0555 .cabal-sandbox/bin/wishsys $(PREFIX)/bin/wishsys
 
 clean:
 	rm -rf .cabal-sandbox

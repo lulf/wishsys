@@ -1,5 +1,5 @@
 PREFIX ?= /usr/local
-CABAL ?= $(HOME)/.cabal/bin/cabal
+CABAL ?= /usr/bin/cabal
 VERSION ?= 0.5
 TARBALL_NAME=wishsys_$(VERSION).orig.tar.gz
 BRANCH=stable

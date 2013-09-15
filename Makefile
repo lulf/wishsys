@@ -6,6 +6,7 @@ BRANCH=stable
 FORMAT=tar.gz
 
 all:
+	$(CABAL) update
 	$(CABAL) --enable-tests install
 
 install:

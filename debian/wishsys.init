@@ -19,8 +19,8 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 DESC="wishsys daemon"
 NAME=wishsys
-BASEDIR=/home/lulf/wishsys
-DAEMON=/home/lulf/wishsys/dist/build/wishsys/wishsys
+BASEDIR=/usr/share/wishsys
+DAEMON=/usr/bin/wishsys
 PIDFILE=/var/run/wishsysd.pid
 SCRIPTNAME=/etc/init.d/"$NAME"
 EXTRA_OPTS="Production --port 3000"

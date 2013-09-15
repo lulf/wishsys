@@ -14,6 +14,11 @@ install:
 
 clean:
 	rm -rf .cabal-sandbox
+	rm -rf cabal.sandbox.config
+	rm -rf config/client_session_key.aes
+	rm -rf dist/
+	rm -rf static/combined/j49BOPB6.css
+	rm -rf wishsys_test.sqlite3
 
 tarball:
 	git archive $(BRANCH) --format=$(FORMAT) -o $(TARBALL_NAME)

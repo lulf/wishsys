@@ -15,5 +15,5 @@ install:
 clean:
 	rm -rf .cabal-sandbox
 
-dist:
+tarball:
 	git archive $(BRANCH) --format=$(FORMAT) -o $(TARBALL_NAME)

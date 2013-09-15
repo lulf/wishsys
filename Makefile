@@ -1,8 +1,9 @@
 PREFIX ?= /usr/local
 CABAL ?= $(HOME)/.cabal/bin/cabal
 VERSION ?= 0.5
-PKG=wishsys_$(VERSION)
-ORIGPKG=wishsys_$(VERSION).orig
+TARBALL_NAME=wishsys_$(VERSION).orig.tar.gz
+BRANCH=stable
+FORMAT=tar.gz
 
 all:
 	$(CABAL) sandbox init
@@ -15,6 +16,4 @@ clean:
 	rm -rf .cabal-sandbox
 
 dist:
-	tar --exclude='.git' -cf $(PKG).tar .
-	gzip $(PKG).tar
-	mv $(PKG).tar.gz $(ORIGPKG).tar.gz
+	git archive $(BRANCH) --format=$(FORMAT) -o $(TARBALL_NAME)

@@ -18,7 +18,7 @@ doLogin :: Text -> Text -> Route App -> Handler ()
 doLogin mu mp route = do
     let uid = Just $ UniqueUser mu 
     isValid <- fromMaybe (return False) (validateUser <$> uid <*> (Just mp))
-    if isValid 
+    if isValid
        then setCreds False $ Creds "hashdb" mu []
        else do
             render <- getMessageRender

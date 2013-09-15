@@ -1,9 +1,5 @@
 PREFIX ?= /usr/local
 CABAL ?= /usr/bin/cabal
-VERSION ?= 0.5
-TARBALL_NAME=wishsys_$(VERSION).orig.tar.gz
-BRANCH=stable
-FORMAT=tar.gz
 
 all:
 	$(CABAL) update
@@ -38,6 +34,3 @@ clean:
 	rm -rf dist/
 	rm -rf static/combined/j49BOPB6.css
 	rm -rf wishsys_test.sqlite3
-
-tarball:
-	git archive $(BRANCH) --format=$(FORMAT) -o $(TARBALL_NAME)

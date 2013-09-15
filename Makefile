@@ -1,5 +1,5 @@
 PREFIX ?= /usr/local
-CABAL ?= cabal
+CABAL ?= $(HOME)/.cabal/bin/cabal
 VERSION ?= 0.5
 PKG=wishsys_$(VERSION)
 ORIGPKG=wishsys_$(VERSION).orig

@@ -8,6 +8,7 @@ Homepage: http://wishsys.dimling.net
 Vcs-Git: http://github.com/lulf/wishsys.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/wishsys.git;a=summary
 
+Build-Depends: debhelper (>=8), haskell-platform
 Package: wishsys
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}

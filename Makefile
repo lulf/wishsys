@@ -6,11 +6,10 @@ BRANCH=stable
 FORMAT=tar.gz
 
 all:
-	$(CABAL) sandbox init
 	$(CABAL) --enable-tests install
 
 install:
-	install -p -m 0555 .cabal-sandbox/bin/wishsys $(PREFIX)/bin/
+	install -p -m 0555 dist/bin/wishsys $(PREFIX)/bin/
 	install -p -m 0644 static/img/glyphicons-halflings-white.png $(PREFIX)/share/wishsys/static/img/
 	install -p -m 0644 static/img/glyphicons-halflings.png $(PREFIX)/share/wishsys/static/img/
 	install -p -m 0644 static/combined/j49BOPB6.css $(PREFIX)/share/wishsys/static/combined/
@@ -25,8 +24,6 @@ install:
 	install -p -m 0644 config/settings.yml $(PREFIX)/share/wishsys/config/
 
 clean:
-	rm -rf .cabal-sandbox
-	rm -rf cabal.sandbox.config
 	rm -rf config/client_session_key.aes
 	rm -rf dist/
 	rm -rf static/combined/j49BOPB6.css

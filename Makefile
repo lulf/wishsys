@@ -10,7 +10,7 @@ all:
 	$(CABAL) --enable-tests install
 
 install:
-	install -p -m 0555 dist/bin/wishsys $(PREFIX)/bin/
+	install -p -m 0555 dist/build/wishsys/wishsys $(PREFIX)/bin/
 	install -p -m 0644 static/img/glyphicons-halflings-white.png $(PREFIX)/share/wishsys/static/img/
 	install -p -m 0644 static/img/glyphicons-halflings.png $(PREFIX)/share/wishsys/static/img/
 	install -p -m 0644 static/combined/j49BOPB6.css $(PREFIX)/share/wishsys/static/combined/

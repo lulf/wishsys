@@ -187,12 +187,6 @@ instance YesodAuth App where
     logoutDest _ = HomeR
 
     getAuthId creds = getAuthIdHashDB AuthR (Just . UniqueUser) creds
-    --getAuthId creds = runDB $ do
-    --    x <- getBy $ UniqueEmail $ credsIdent creds
-    --    case x of
-    --        Just (Entity uid _) -> return $ Just uid
-    --        Nothing -> do
-    --            fmap Just $ insert $ User (credsIdent creds) Nothing
 
     authPlugins _ = [authHashDB (Just . UniqueUser)]
 

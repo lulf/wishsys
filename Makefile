@@ -34,7 +34,6 @@ cibuild:
 endif
 
 keter: cibuild
-	$(CABAL) install yesod-bin
 	$(YESOD) keter
 
 clean:

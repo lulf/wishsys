@@ -1,6 +1,10 @@
 PREFIX ?= /usr/local
 CABAL ?= /usr/bin/cabal
-
+ifeq ($(wildcard .cabal-sandbox),)
+	YESOD = .cabal-sandbox/bin/yesod
+else
+	YESOD = $(HOME)/.cabal/bin/yesod
+endif
 all:
 	$(CABAL) update
 	$(CABAL) --enable-tests install
@@ -28,6 +32,10 @@ cibuild:
 	$(CABAL) sandbox init
 	$(CABAL) --enable-tests install
 endif
+
+keter: cibuild
+	$(CABAL) install yesod-bin
+	$(YESOD) keter
 
 clean:
 	rm -rf config/client_session_key.aes

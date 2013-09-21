@@ -3,6 +3,7 @@ module Handler.WishHandler where
 
 import Import
 import Handler.WishList
+import Handler.Util
 
 postWishHandlerR :: Text -> AccessLevel -> WishId -> Handler Html
 postWishHandlerR listUrl Admin wishId = do

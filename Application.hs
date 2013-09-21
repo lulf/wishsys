@@ -26,6 +26,7 @@ import Handler.WishList
 import Handler.Register
 import Handler.WishHandler
 import Handler.WishListLogin
+import Handler.JsonWishListList
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the

@@ -7,12 +7,6 @@ import TestImport
 import qualified Data.Text as T
 import qualified Data.List as L
 
-cleanDB :: YesodExample App ()
-cleanDB = do
-    runDB $ deleteWhere ([] :: [Filter Wish])
-    runDB $ deleteWhere ([] :: [Filter Wishlist])
-    runDB $ deleteWhere ([] :: [Filter User])
-
 wishListGuestSpecs :: Specs
 wishListGuestSpecs =
     ydescribe "The wish list guest page" $ do

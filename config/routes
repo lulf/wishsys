@@ -9,3 +9,5 @@
 /wishlist RegisterR GET POST
 /wishlist/#Text/#AccessLevel WishListR GET POST
 /wishlist/#Text/#AccessLevel/wish/#WishId WishHandlerR POST
+
+/json/wishlist JsonWishListListR GET

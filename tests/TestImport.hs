@@ -5,6 +5,7 @@ module TestImport
     , module Foundation
     , module Database.Persist
     , runDB
+    , cleanDB
     , getMessageRender
     , Specs
     ) where
@@ -33,3 +34,9 @@ runDB :: SqlPersist (NoLoggingT (ResourceT IO)) a -> YesodExample App a
 runDB query = do
     pool <- fmap connPool getTestYesod
     liftIO $ runResourceT $ runNoLoggingT $ runSqlPool query pool
+
+cleanDB :: YesodExample App ()
+cleanDB = do
+    runDB $ deleteWhere ([] :: [Filter Wish])
+    runDB $ deleteWhere ([] :: [Filter Wishlist])
+    runDB $ deleteWhere ([] :: [Filter User])

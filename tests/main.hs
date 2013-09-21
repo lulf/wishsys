@@ -21,10 +21,10 @@ main = do
                 { csParseExtra = parseExtra
                 }
     foundation <- makeFoundation conf
-    jsonTest
     hspec $ do
         yesodSpec foundation $ do
             homeSpecs
             registerSpecs
             wishListGuestSpecs
+            jsonSpecs
 

@@ -1,10 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 module JsonTest
-    ( jsonTest
+    ( jsonSpecs
     ) where
 
-import Test.QuickCheck
+import TestImport
 
-jsonTest :: IO ()
-jsonTest = do
-  putStrLn "FOo"
+jsonSpecs :: Specs
+jsonSpecs =
+  ydescribe "The REST API" $ do
+    yit "Is able to produce wishes as json" $ do
+      statusIs 200

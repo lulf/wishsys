@@ -13,6 +13,7 @@ import Application (makeFoundation)
 import HomeTest
 import RegisterTest
 import WishListGuestTest
+import JsonTest
 
 main :: IO ()
 main = do
@@ -20,6 +21,7 @@ main = do
                 { csParseExtra = parseExtra
                 }
     foundation <- makeFoundation conf
+    jsonTest
     hspec $ do
         yesodSpec foundation $ do
             homeSpecs

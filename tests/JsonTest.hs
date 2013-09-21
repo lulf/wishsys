@@ -12,7 +12,8 @@ jsonSpecs =
       cleanDB
       uid <- runDB $ insert $ User "ulf"  "flu"  "salt"
       lid <- runDB $ insert $ Wishlist "foolist" "foourl" uid uid
-      wid <- runDB $ insert $ Wish "mywish" "myimage" "mystore" 10 1 lid
+      _ <- runDB $ insert $ Wish "mywish" "myimage" "mystore" 10 1 lid
+      _ <- runDB $ insert $ Wish "barwish" "lolimg" "barstore" 12 2 lid
       get $ JsonWishListR "foourl" Guest
       statusIs 200
       printBody

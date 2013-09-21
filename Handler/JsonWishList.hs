@@ -2,13 +2,16 @@
 module Handler.JsonWishList where
 
 import Import
+import Handler.Util
+import Data.Aeson
+import Data.List
 
-foo :: Text
-foo = "foo"
-
-bar :: Text
-bar = "bar"
+instance ToJSON Wish where
+  toJSON (Wish name url stores amount bought _) = object ["name" .= name ]
 
 getJsonWishListR :: Text -> AccessLevel -> Handler Value
-getJsonWishListR _ _ = do
-  return $ object [ foo .= bar ]
+getJsonWishListR listUrl accessLevel = do
+  (listId, wishList) <- getWishlist listUrl accessLevel
+  wishes <- getWishes listId
+  let list = map (\(Entity _ wish) -> wish) wishes
+  return $ toJSON list

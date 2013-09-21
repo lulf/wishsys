@@ -25,7 +25,7 @@ library
                      Handler.WishHandler
                      Handler.Login
                      Handler.WishListLogin
-                     Handler.JsonWishListList
+                     Handler.JsonWishList
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

@@ -12,9 +12,8 @@ jsonSpecs =
       cleanDB
       uid <- runDB $ insert $ User "ulf"  "flu"  "salt"
       lid <- runDB $ insert $ Wishlist "foolist" "foourl" uid uid
-      lid <- runDB $ insert $ Wishlist "barlist" "barurl" uid uid
-      lid <- runDB $ insert $ Wishlist "bazlist" "bazurl" uid uid
-      get JsonWishListListR
+      wid <- runDB $ insert $ Wish "mywish" "myimage" "mystore" 10 1 lid
+      get $ JsonWishListR "foourl" Guest
       statusIs 200
       printBody
       bodyEquals "[\"http://localhost/wishlist/foourl\",\"http://localhost/wishlist/barurl\",\"http://localhost/wishlist/bazurl\"]"

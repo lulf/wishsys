@@ -1,5 +1,5 @@
 {-# LANGUAGE TupleSections, OverloadedStrings #-}
-module Handler.JsonWishListList where
+module Handler.JsonWishList where
 
 import Import
 
@@ -9,6 +9,6 @@ foo = "foo"
 bar :: Text
 bar = "bar"
 
-getJsonWishListListR :: Handler Value
-getJsonWishListListR = do
+getJsonWishListR :: Text -> AccessLevel -> Handler Value
+getJsonWishListR _ _ = do
   return $ object [ foo .= bar ]

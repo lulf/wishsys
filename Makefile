@@ -1,13 +1,6 @@
 PREFIX ?= /usr/local
 CABAL ?= /usr/bin/cabal
-ifeq ($(wildcard .cabal-sandbox),)
-	YESOD = .cabal-sandbox/bin/yesod
-else
-	YESOD = $(HOME)/.cabal/bin/yesod
-endif
-all:
-	$(CABAL) update
-	$(CABAL) --enable-tests install
+YESOD ?= /usr/bin/yesod
 
 install:
 	install -p -m 0555 dist/build/wishsys/wishsys $(PREFIX)/bin/
@@ -24,14 +17,9 @@ install:
 	install -p -m 0644 config/favicon.ico $(PREFIX)/share/wishsys/config/
 	install -p -m 0644 config/settings.yml $(PREFIX)/share/wishsys/config/
 
-ifeq ($(wildcard .cabal-sandbox),)
-cibuild:
-	$(CABAL) --enable-tests install
-else
 cibuild:
 	$(CABAL) sandbox init
 	$(CABAL) --enable-tests install
-endif
 
 keter: cibuild
 	$(YESOD) keter

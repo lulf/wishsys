@@ -16,3 +16,5 @@ jsonSpecs =
       lid <- runDB $ insert $ Wishlist "bazlist" "bazurl" uid uid
       get JsonWishListListR
       statusIs 200
+      printBody
+      bodyEquals "[\"http://localhost/wishlist/foourl\",\"http://localhost/wishlist/barurl\",\"http://localhost/wishlist/bazurl\"]"

@@ -22,6 +22,7 @@ cibuild:
 	$(CABAL) --enable-tests install
 
 keter: cibuild
+	$(CABAL) install yesod-bin
 	$(YESOD) keter
 
 clean:

@@ -3,8 +3,12 @@ module Handler.JsonWishListList where
 
 import Import
 
-getJsonWishListListR :: Handler Html
+foo :: Text
+foo = "foo"
+
+bar :: Text
+bar = "bar"
+
+getJsonWishListListR :: Handler Value
 getJsonWishListListR = do
-    defaultLayout $ do
-        setTitleI MsgHomeTitle
-        $(widgetFile "homepage")
+  return $ object [ foo .= bar ]

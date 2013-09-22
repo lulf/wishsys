@@ -11,7 +11,7 @@ import Data.ByteString.Lazy
 getJsonResponseBody :: YesodExample App (Maybe (Maybe [Object]))
 getJsonResponseBody = do
   resp <- getResponse
-  return $ (fmap (decode . simpleBody) resp :: Maybe (Maybe [Object]))
+  return $ fmap (decode . simpleBody) resp
 
 expectedJsonData :: ByteString -> Maybe (Maybe [Object])
 expectedJsonData val = Just $ decode val

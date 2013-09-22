@@ -6,12 +6,22 @@ import Handler.Util
 import Data.Aeson
 import Data.List
 
-instance ToJSON Wish where
-  toJSON (Wish name url stores amount bought _) = object ["name" .= name ]
+data SecuredWish = SecuredWish AccessLevel Wish
+
+
+instance ToJSON SecuredWish where
+  toJSON (SecuredWish Guest (Wish name url stores amount bought _)) =
+    object ["name" .= name
+           ,"image" .= url
+           ,"stores" .= stores
+           ,"amount" .= amount
+           ,"remaining" .= (amount - bought)
+           ]
+  toJSON (SecuredWish Admin (Wish name url stores amount bought _)) = object ["adminname" .= name ]
 
 getJsonWishListR :: Text -> AccessLevel -> Handler Value
 getJsonWishListR listUrl accessLevel = do
   (listId, wishList) <- getWishlist listUrl accessLevel
   wishes <- getWishes listId
-  let list = map (\(Entity _ wish) -> wish) wishes
+  let list = map (\(Entity _ wish) -> SecuredWish accessLevel wish) wishes
   return $ toJSON list

@@ -4,6 +4,8 @@ module JsonTest
     ) where
 
 import TestImport
+import Network.Wai.Test
+import Data.Aeson
 
 jsonSpecs :: Specs
 jsonSpecs =
@@ -16,5 +18,7 @@ jsonSpecs =
 --      _ <- runDB $ insert $ Wish "barwish" "lolimg" "barstore" 12 2 lid
       get $ JsonWishListR "foourl" Guest
       statusIs 200
-      printBody
-      bodyEquals "[{\"name\":\"mywish\",\"image\":\"myimage\",\"store\":\"mystore\",\"amount\":10,\"remaining\":9}]"
+      resp <- getResponse
+      let js = fmap (decode . simpleBody) resp :: Maybe (Maybe [Object])
+      let expected = Just $ decode "[{\"amount\":10,\"image\":\"myimage\",\"name\":\"mywish\",\"remaining\":9,\"stores\":\"mystore\"}]" :: Maybe (Maybe [Object])
+      assertEqual "Bad json response for guest user" expected js

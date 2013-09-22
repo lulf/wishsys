@@ -110,3 +110,5 @@ test-suite test
                  , text
                  , shakespeare-i18n
                  , QuickCheck
+                 , wai-test
+                 , aeson

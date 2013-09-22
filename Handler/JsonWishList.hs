@@ -29,3 +29,13 @@ getJsonWishListR listUrl accessLevel = do
   wishes <- getWishes listId
   let list = map (\(Entity _ wish) -> SecuredWish accessLevel wish) wishes
   return $ toJSON list
+
+foo :: Text
+foo = "foo"
+
+bar :: Text
+bar = "bar"
+
+postJsonWishListR :: Text -> AccessLevel -> Handler Value
+postJsonWishListR _ _ = do
+  return $ object [foo .= bar]

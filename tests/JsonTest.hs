@@ -37,5 +37,13 @@ jsonSpecs =
 
       get $ JsonWishListR "foourl" Admin
       statusIs 200
-      printBody
       assertJsonResponse "Bad json response for admin user" "[{\"amount\":10,\"image\":\"myimage\",\"name\":\"mywish\",\"stores\":\"mystore\"}]"
+
+    yit "Can add wishes to list" $ do
+      cleanDB
+      uid <- runDB $ insert $ User "ulf"  "flu"  "salt"
+      _ <- runDB $ insert $ Wishlist "foolist" "foourl" uid uid
+      postBody (JsonWishListR "foourl" Admin) "heisann"
+      statusIs 200
+      printBody
+      bodyEquals ""

@@ -14,10 +14,14 @@ instance ToJSON SecuredWish where
     object ["name" .= name
            ,"image" .= url
            ,"stores" .= stores
-           ,"amount" .= amount
            ,"remaining" .= (amount - bought)
            ]
-  toJSON (SecuredWish Admin (Wish name url stores amount bought _)) = object ["adminname" .= name ]
+  toJSON (SecuredWish Admin (Wish name url stores amount _ _)) =
+    object ["name" .= name
+           ,"image" .= url
+           ,"stores" .= stores
+           ,"amount" .= amount
+           ]
 
 getJsonWishListR :: Text -> AccessLevel -> Handler Value
 getJsonWishListR listUrl accessLevel = do

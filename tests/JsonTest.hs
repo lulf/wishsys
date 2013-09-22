@@ -6,6 +6,21 @@ module JsonTest
 import TestImport
 import Network.Wai.Test
 import Data.Aeson
+import Data.ByteString.Lazy
+
+getJsonResponseBody :: YesodExample App (Maybe (Maybe [Object]))
+getJsonResponseBody = do
+  resp <- getResponse
+  return $ (fmap (decode . simpleBody) resp :: Maybe (Maybe [Object]))
+
+expectedJsonData :: ByteString -> Maybe (Maybe [Object])
+expectedJsonData val = Just $ decode val
+
+assertJsonResponse :: String -> ByteString -> YesodExample App ()
+assertJsonResponse errorMsg expected = do
+      js <- getJsonResponseBody
+      let expectedJson = expectedJsonData expected
+      assertEqual errorMsg expectedJson js
 
 jsonSpecs :: Specs
 jsonSpecs =
@@ -18,7 +33,5 @@ jsonSpecs =
 --      _ <- runDB $ insert $ Wish "barwish" "lolimg" "barstore" 12 2 lid
       get $ JsonWishListR "foourl" Guest
       statusIs 200
-      resp <- getResponse
-      let js = fmap (decode . simpleBody) resp :: Maybe (Maybe [Object])
-      let expected = Just $ decode "[{\"amount\":10,\"image\":\"myimage\",\"name\":\"mywish\",\"remaining\":9,\"stores\":\"mystore\"}]" :: Maybe (Maybe [Object])
-      assertEqual "Bad json response for guest user" expected js
+
+      assertJsonResponse "Bad json response for guest user" "[{\"amount\":10,\"image\":\"myimage\",\"name\":\"mywish\",\"remaining\":9,\"stores\":\"mystore\"}]"

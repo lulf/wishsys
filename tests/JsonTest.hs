@@ -33,5 +33,9 @@ jsonSpecs =
 --      _ <- runDB $ insert $ Wish "barwish" "lolimg" "barstore" 12 2 lid
       get $ JsonWishListR "foourl" Guest
       statusIs 200
-
       assertJsonResponse "Bad json response for guest user" "[{\"amount\":10,\"image\":\"myimage\",\"name\":\"mywish\",\"remaining\":9,\"stores\":\"mystore\"}]"
+
+      get $ JsonWishListR "foourl" Admin
+      statusIs 200
+      printBody
+      assertJsonResponse "Bad json response for admin user" "[{\"amount\":10,\"image\":\"myimage\",\"name\":\"mywish\",\",\"stores\":\"mystore\"}]"

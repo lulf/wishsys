@@ -15,5 +15,5 @@ Staging:
   <<: *defaults
 
 Production:
-  approot: "http://wishsys.dimling.net"
+  approot: "http://wishsys.lulf.no"
   <<: *defaults

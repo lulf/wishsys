@@ -25,7 +25,7 @@ wishListGuestSpecs =
                 setUrl RegisterR
                 addNonce
                 byLabel "Name of wish list" "test list"
-                byLabel "Short name used for guest URL (http://wishsys.dimling.net/wishlist/<short name>/guest)" "foobar"
+                byLabel "Short name used for guest URL (http://wishsys.lulf.no/wishlist/<short name>/guest)" "foobar"
                 byLabel "Administrator password" "foo"
                 byLabel "Guest password" "bar"
             statusIs 303

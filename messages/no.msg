@@ -42,7 +42,7 @@ WishListCreateError: En feil oppstod under oppretting av ønskelisten
 WishListAlreadyExists: Ønskelisten finnes allerede, vennligst velg et annet navn
 RegisterFormListName: Navn på ønskeliste
 RegisterFormShortNameUrl: <kortnavn>
-RegisterFormShortName: Kort navn brukt i gjestelenke (http://wishsys.dimling.net/wishlist/<kortnavn>/guest)
+RegisterFormShortName: Kort navn brukt i gjestelenke (http://wishsys.lulf.no/wishlist/<kortnavn>/guest)
 RegisterFormAdminPassword: Passord for administrator
 RegisterFormGuestPassword: Passord for gjest
 RegisterFormSubmit: Registrér
